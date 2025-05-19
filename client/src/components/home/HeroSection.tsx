@@ -8,14 +8,30 @@ export default function HeroSection() {
   return (
     <section className="relative overflow-hidden min-h-screen flex items-center py-16 md:py-24">
       {/* Background elements */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-secondary/50 via-background to-background dark:from-secondary/10"></div>
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        {/* Video background */}
+        <div className="absolute inset-0 w-full h-full">
+          <div className="absolute inset-0 bg-gradient-to-b from-secondary/50 via-background to-background dark:from-secondary/10 z-10"></div>
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute w-full h-full object-cover opacity-50 dark:opacity-30"
+          >
+            <source 
+              src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" 
+              type="video/mp4" 
+            />
+          </video>
+        </div>
+        
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent z-20"></div>
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.4 }}
           transition={{ duration: 2 }}
-          className="absolute inset-0 opacity-40 dark:opacity-20 mix-blend-soft-light"
+          className="absolute inset-0 opacity-40 dark:opacity-20 mix-blend-soft-light z-20"
           style={{
             backgroundImage: "url('https://grainy-gradients.vercel.app/noise.svg')",
             backgroundSize: "200px",
@@ -23,8 +39,8 @@ export default function HeroSection() {
         ></motion.div>
         
         {/* Decorative elements */}
-        <div className="absolute -top-40 -left-40 w-80 h-80 bg-primary/30 dark:bg-primary/20 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/4 right-0 w-96 h-96 bg-accent/20 dark:bg-accent/10 rounded-full blur-3xl"></div>
+        <div className="absolute -top-40 -left-40 w-80 h-80 bg-primary/30 dark:bg-primary/20 rounded-full blur-3xl z-20"></div>
+        <div className="absolute top-1/4 right-0 w-96 h-96 bg-accent/20 dark:bg-accent/10 rounded-full blur-3xl z-20"></div>
       </div>
       
       <Container className="relative z-10 px-6 md:px-12">

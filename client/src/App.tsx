@@ -10,13 +10,13 @@ import NotFound from "@/pages/not-found";
 
 function App() {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-200">
+    <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-200">
       <Header />
       <main className="flex-grow">
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/articles" component={Articles} />
-          <Route path="/articles/:slug" component={Article} />
+          <Route path="/article/:slug" component={Article} />
           <Route path="/playground" component={Playground} />
           <Route path="/about" component={About} />
           <Route component={NotFound} />
