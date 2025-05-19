@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'wouter';
 import ThemeToggle from '@/components/ThemeToggle';
-import { PlusCircle } from 'lucide-react';
+import { Brain, Menu, X } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -11,25 +12,48 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full backdrop-blur-sm bg-white/70 dark:bg-gray-900/70 border-b border-gray-200 dark:border-gray-800">
+    <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-background/80 border-b border-primary/10">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center space-x-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center font-bold text-xl text-primary-600 dark:text-primary-400">
-            <span className="flex items-center justify-center w-8 h-8 rounded-md bg-primary-500 text-white mr-2">
-              <PlusCircle className="h-5 w-5" />
-            </span>
-            AI Hub
+          <Link href="/" className="flex items-center font-semibold text-xl">
+            <motion.div 
+              className="flex items-center justify-center mr-2"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <div className="relative">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary to-accent blur-sm opacity-70"></div>
+                <div className="relative flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-primary to-accent text-white">
+                  <Brain className="h-5 w-5" />
+                </div>
+              </div>
+              <div className="ml-2">
+                <div className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Luca De Angelis</div>
+                <div className="text-xs text-muted-foreground -mt-1">AI Consultant</div>
+              </div>
+            </motion.div>
           </Link>
         </div>
         
         <div className="hidden md:flex items-center space-x-6">
           <nav>
-            <ul className="flex space-x-6">
-              <li><Link href="/" className="text-sm font-medium text-gray-700 hover:text-primary-600 dark:text-gray-200 dark:hover:text-primary-400">Home</Link></li>
-              <li><Link href="/articles" className="text-sm font-medium text-gray-700 hover:text-primary-600 dark:text-gray-200 dark:hover:text-primary-400">Articoli</Link></li>
-              <li><Link href="/playground" className="text-sm font-medium text-gray-700 hover:text-primary-600 dark:text-gray-200 dark:hover:text-primary-400">AI Playground</Link></li>
-              <li><Link href="/about" className="text-sm font-medium text-gray-700 hover:text-primary-600 dark:text-gray-200 dark:hover:text-primary-400">Chi siamo</Link></li>
+            <ul className="flex space-x-8">
+              <li>
+                <Link href="/" className="text-sm font-medium text-foreground hover:text-primary transition-colors py-2">
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link href="/articles" className="text-sm font-medium text-foreground hover:text-primary transition-colors py-2">
+                  Articoli
+                </Link>
+              </li>
+              <li>
+                <Link href="/about" className="text-sm font-medium text-foreground hover:text-primary transition-colors py-2">
+                  Chi sono
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>
@@ -38,26 +62,52 @@ export default function Header() {
           <ThemeToggle />
           
           <button
-            className="md:hidden focus:outline-none"
+            className="md:hidden focus:outline-none rounded-full p-1.5 hover:bg-primary/10 transition-colors"
             onClick={toggleMobileMenu}
             aria-label="Toggle mobile menu"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
       
       {/* Mobile menu */}
-      <nav className={`${mobileMenuOpen ? 'block' : 'hidden'} px-4 py-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800`}>
-        <ul className="space-y-3">
-          <li><Link href="/" className="block text-sm font-medium text-gray-700 hover:text-primary-600 dark:text-gray-200 dark:hover:text-primary-400">Home</Link></li>
-          <li><Link href="/articles" className="block text-sm font-medium text-gray-700 hover:text-primary-600 dark:text-gray-200 dark:hover:text-primary-400">Articoli</Link></li>
-          <li><Link href="/playground" className="block text-sm font-medium text-gray-700 hover:text-primary-600 dark:text-gray-200 dark:hover:text-primary-400">AI Playground</Link></li>
-          <li><Link href="/about" className="block text-sm font-medium text-gray-700 hover:text-primary-600 dark:text-gray-200 dark:hover:text-primary-400">Chi siamo</Link></li>
+      <motion.nav 
+        className={`${mobileMenuOpen ? 'block' : 'hidden'} px-4 py-3 bg-background border-t border-primary/10`}
+        initial={{ opacity: 0, height: 0 }}
+        animate={{ opacity: mobileMenuOpen ? 1 : 0, height: mobileMenuOpen ? 'auto' : 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        <ul className="space-y-4 py-2">
+          <li>
+            <Link 
+              href="/" 
+              className="block text-sm font-medium text-foreground hover:text-primary transition-colors py-2"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Home
+            </Link>
+          </li>
+          <li>
+            <Link 
+              href="/articles" 
+              className="block text-sm font-medium text-foreground hover:text-primary transition-colors py-2"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Articoli
+            </Link>
+          </li>
+          <li>
+            <Link 
+              href="/about" 
+              className="block text-sm font-medium text-foreground hover:text-primary transition-colors py-2"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Chi sono
+            </Link>
+          </li>
         </ul>
-      </nav>
+      </motion.nav>
     </header>
   );
 }

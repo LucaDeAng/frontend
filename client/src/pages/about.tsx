@@ -1,64 +1,193 @@
-import Container from '@/components/layout/Container';
-import { Helmet } from 'react-helmet';
+import { Helmet } from "react-helmet";
+import Container from "@/components/layout/Container";
+import { motion } from "framer-motion";
+import { Mail, Github, Linkedin, Twitter, FileText, Briefcase, GraduationCap } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function About() {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
+
   return (
     <>
       <Helmet>
-        <title>Chi Siamo | AI Hub</title>
-        <meta name="description" content="Scopri di più sul team di AI Hub, la nostra missione e la nostra visione per il futuro dell'intelligenza artificiale." />
-        <meta property="og:title" content="Chi Siamo | AI Hub" />
-        <meta property="og:description" content="Scopri di più sul team di AI Hub, la nostra missione e la nostra visione per il futuro dell'intelligenza artificiale." />
+        <title>Chi sono | Luca De Angelis</title>
+        <meta name="description" content="Luca De Angelis - AI Consultant e esperto di Generative AI. Scopri il mio approccio e i servizi che offro nell'ambito dell'intelligenza artificiale." />
+        <meta property="og:title" content="Chi sono | Luca De Angelis" />
+        <meta property="og:description" content="Luca De Angelis - AI Consultant e esperto di Generative AI. Scopri il mio approccio e i servizi che offro nell'ambito dell'intelligenza artificiale." />
         <meta property="og:type" content="website" />
       </Helmet>
-      <section className="py-16 bg-white dark:bg-gray-900">
-        <Container>
-          <div className="max-w-3xl mx-auto">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">Chi Siamo</h1>
-            
-            <div className="prose dark:prose-invert max-w-none">
-              <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
-                AI Hub è nato con l'obiettivo di rendere l'intelligenza artificiale accessibile a tutti, fornendo risorse, articoli e strumenti pratici in italiano.
-              </p>
+      
+      <section className="py-24">
+        <Container className="px-6 md:px-12">
+          <div className="max-w-4xl mx-auto">
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              <motion.div variants={itemVariants} className="mb-16 text-center">
+                <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 dark:bg-primary/20 text-primary text-sm font-medium mb-6">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Chi sono
+                </div>
+                <h1 className="mb-6">Luca De Angelis</h1>
+                <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+                  AI Consultant specializzato in soluzioni di Generative AI per aziende e professionisti
+                </p>
+                
+                <div className="flex justify-center space-x-4 mb-6">
+                  <motion.a 
+                    href="https://linkedin.com/in/lucadeangelis" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-full bg-background border border-border hover:bg-primary/5 transition-colors"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Linkedin className="h-5 w-5 text-foreground" />
+                  </motion.a>
+                  <motion.a 
+                    href="https://github.com/lucadeangelis" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-full bg-background border border-border hover:bg-primary/5 transition-colors"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Github className="h-5 w-5 text-foreground" />
+                  </motion.a>
+                  <motion.a 
+                    href="https://twitter.com/lucadeangelis" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-full bg-background border border-border hover:bg-primary/5 transition-colors"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Twitter className="h-5 w-5 text-foreground" />
+                  </motion.a>
+                  <motion.a 
+                    href="mailto:luca@deangelis.ai" 
+                    className="p-2 rounded-full bg-background border border-border hover:bg-primary/5 transition-colors"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Mail className="h-5 w-5 text-foreground" />
+                  </motion.a>
+                </div>
+              </motion.div>
               
-              <h2>La Nostra Missione</h2>
-              <p>
-                La nostra missione è democratizzare l'accesso alla conoscenza sull'intelligenza artificiale, abbattendo le barriere linguistiche e tecniche che spesso impediscono alle persone di avvicinarsi a questo mondo affascinante.
-              </p>
+              <motion.div variants={itemVariants} className="mb-16">
+                <h2 className="text-2xl font-semibold mb-6">La mia missione</h2>
+                <div className="prose dark:prose-invert max-w-none">
+                  <p className="text-lg">
+                    Aiuto aziende e professionisti ad integrare soluzioni di intelligenza artificiale generativa nei loro processi, 
+                    consentendo loro di aumentare produttività, creatività e valore. Il mio approccio combina competenze tecniche 
+                    all'avanguardia con una profonda comprensione delle esigenze di business.
+                  </p>
+                  <p>
+                    Credo fermamente che l'AI generativa rappresenti un punto di svolta per ogni tipo di organizzazione, 
+                    ma solo se implementata con una chiara strategia e con attenzione agli aspetti etici e di governance. 
+                    Il mio obiettivo è rendere questa tecnologia accessibile, comprensibile e applicabile in contesti reali.
+                  </p>
+                </div>
+              </motion.div>
               
-              <p>
-                Crediamo che l'AI avrà un impatto significativo su ogni aspetto della nostra vita e che sia fondamentale che più persone possibili comprendano queste tecnologie, le loro potenzialità e le sfide che comportano.
-              </p>
+              <motion.div variants={itemVariants} className="mb-16">
+                <div className="flex items-center mb-6">
+                  <div className="p-2 rounded-full bg-primary/10 mr-3">
+                    <Briefcase className="h-5 w-5 text-primary" />
+                  </div>
+                  <h2 className="text-2xl font-semibold">Esperienza professionale</h2>
+                </div>
+                
+                <div className="space-y-8">
+                  <div className="p-6 rounded-xl border border-border bg-background/50 hover:bg-primary/5 transition-colors">
+                    <div className="flex justify-between mb-2">
+                      <h3 className="font-semibold">AI Consultant &amp; Strategist</h3>
+                      <span className="text-sm text-muted-foreground">2022 - Presente</span>
+                    </div>
+                    <p className="mb-2">Consulenza indipendente per aziende nei settori finance, media e manifatturiero</p>
+                    <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                      <li>Implementazione di soluzioni basate su modelli LLM per automazione di processi</li>
+                      <li>Formazione executive su opportunità e sfide della Generative AI</li>
+                      <li>Sviluppo di roadmap strategiche per l'adozione dell'AI</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="p-6 rounded-xl border border-border bg-background/50 hover:bg-primary/5 transition-colors">
+                    <div className="flex justify-between mb-2">
+                      <h3 className="font-semibold">Senior AI Engineer</h3>
+                      <span className="text-sm text-muted-foreground">2019 - 2022</span>
+                    </div>
+                    <p className="mb-2">TechInnovate Srl, Milano</p>
+                    <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                      <li>Sviluppo di soluzioni NLP per analisi documentale in ambito legale</li>
+                      <li>Progettazione di pipeline di machine learning per classificazione automatica</li>
+                      <li>Gestione di team interdisciplinari su progetti di innovazione tecnologica</li>
+                    </ul>
+                  </div>
+                </div>
+              </motion.div>
               
-              <h2>Il Nostro Team</h2>
-              <p>
-                Il team di AI Hub è composto da esperti nel campo dell'intelligenza artificiale, sviluppatori, ricercatori e appassionati di tecnologia che condividono la stessa visione: rendere l'AI comprensibile e accessibile a tutti.
-              </p>
+              <motion.div variants={itemVariants} className="mb-16">
+                <div className="flex items-center mb-6">
+                  <div className="p-2 rounded-full bg-primary/10 mr-3">
+                    <GraduationCap className="h-5 w-5 text-primary" />
+                  </div>
+                  <h2 className="text-2xl font-semibold">Formazione</h2>
+                </div>
+                
+                <div className="space-y-8">
+                  <div className="p-6 rounded-xl border border-border bg-background/50 hover:bg-primary/5 transition-colors">
+                    <div className="flex justify-between mb-2">
+                      <h3 className="font-semibold">Master in Artificial Intelligence</h3>
+                      <span className="text-sm text-muted-foreground">2017 - 2019</span>
+                    </div>
+                    <p>Politecnico di Milano</p>
+                  </div>
+                  
+                  <div className="p-6 rounded-xl border border-border bg-background/50 hover:bg-primary/5 transition-colors">
+                    <div className="flex justify-between mb-2">
+                      <h3 className="font-semibold">Laurea in Ingegneria Informatica</h3>
+                      <span className="text-sm text-muted-foreground">2013 - 2017</span>
+                    </div>
+                    <p>Università degli Studi di Roma "La Sapienza"</p>
+                  </div>
+                </div>
+              </motion.div>
               
-              <h2>I Nostri Valori</h2>
-              <ul>
-                <li><strong>Accessibilità</strong>: Rendiamo l'AI comprensibile a tutti, indipendentemente dal background tecnico.</li>
-                <li><strong>Qualità</strong>: Produciamo contenuti accurati, aggiornati e di alta qualità.</li>
-                <li><strong>Etica</strong>: Promuoviamo un approccio responsabile e etico all'intelligenza artificiale.</li>
-                <li><strong>Comunità</strong>: Favoriamo lo scambio di idee e la collaborazione tra appassionati e professionisti.</li>
-              </ul>
-              
-              <h2>Unisciti a Noi</h2>
-              <p>
-                Se condividi la nostra passione per l'intelligenza artificiale e vuoi contribuire alla nostra missione, ci sono molti modi per farlo:
-              </p>
-              
-              <ul>
-                <li>Iscriviti alla nostra newsletter per rimanere aggiornato</li>
-                <li>Partecipa alle discussioni nel nostro forum</li>
-                <li>Condividi i nostri articoli sui social media</li>
-                <li>Contribuisci con i tuoi contenuti o feedback</li>
-              </ul>
-              
-              <p>
-                Insieme possiamo costruire un futuro in cui l'intelligenza artificiale sia uno strumento accessibile e benefico per tutti.
-              </p>
-            </div>
+              <motion.div variants={itemVariants} className="text-center">
+                <h2 className="text-2xl font-semibold mb-6">Contattami</h2>
+                <p className="mb-8">
+                  Sei interessato ad implementare soluzioni di AI generativa nella tua azienda o nel tuo lavoro?<br />
+                  Contattami per una consulenza o per discutere di possibili collaborazioni.
+                </p>
+                
+                <Button
+                  className="px-8 py-6 rounded-full text-base bg-gradient-to-r from-primary to-accent hover:opacity-90 shadow-lg"
+                  asChild
+                >
+                  <a href="mailto:luca@deangelis.ai">
+                    <Mail className="mr-2 h-5 w-5" />
+                    luca@deangelis.ai
+                  </a>
+                </Button>
+              </motion.div>
+            </motion.div>
           </div>
         </Container>
       </section>
