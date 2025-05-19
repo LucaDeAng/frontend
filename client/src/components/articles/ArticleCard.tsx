@@ -43,7 +43,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
         </div>
         
         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-          <Link href={`/articles/${slug}`} className="hover:text-primary-600 dark:hover:text-primary-400">
+          <Link href={`/article/${slug}`} className="hover:text-primary-600 dark:hover:text-primary-400">
             {title}
           </Link>
         </h3>
@@ -53,7 +53,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
         </p>
         
         <Link 
-          href={`/articles/${slug}`} 
+          href={`/article/${slug}`} 
           className="text-primary-600 dark:text-primary-400 font-medium flex items-center hover:underline mt-auto"
         >
           Leggi l'articolo
