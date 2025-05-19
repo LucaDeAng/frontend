@@ -1,54 +1,146 @@
 import { Link } from "wouter";
 import Container from "@/components/layout/Container";
 import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { ArrowRight, Sparkles } from "lucide-react";
 
 export default function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-white dark:bg-gray-900 pt-16 pb-24 md:pt-24 md:pb-32">
-      <div className="absolute inset-0 z-0 bg-gradient-to-b from-primary-50/30 to-white/0 dark:from-primary-900/20 dark:to-gray-900/0"></div>
+    <section className="relative overflow-hidden min-h-screen flex items-center py-16 md:py-24">
+      {/* Background elements */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-to-b from-secondary/50 via-background to-background dark:from-secondary/10"></div>
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.4 }}
+          transition={{ duration: 2 }}
+          className="absolute inset-0 opacity-40 dark:opacity-20 mix-blend-soft-light"
+          style={{
+            backgroundImage: "url('https://grainy-gradients.vercel.app/noise.svg')",
+            backgroundSize: "200px",
+          }}
+        ></motion.div>
+        
+        {/* Decorative elements */}
+        <div className="absolute -top-40 -left-40 w-80 h-80 bg-primary/30 dark:bg-primary/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/4 right-0 w-96 h-96 bg-accent/20 dark:bg-accent/10 rounded-full blur-3xl"></div>
+      </div>
       
-      <Container className="relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900 dark:text-white mb-6">
-              <span className="block">Esplora il futuro con</span>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-500 to-accent-600">AI Hub</span>
-            </h1>
+      <Container className="relative z-10 px-6 md:px-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+          >
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="flex items-center mb-6 space-x-3"
+            >
+              <div className="py-1 px-3 rounded-full bg-primary/10 dark:bg-primary/20 border border-primary/20 text-primary-foreground/80 flex items-center text-sm font-medium">
+                <Sparkles className="h-3.5 w-3.5 mr-2" />
+                Intelligenza Artificiale
+              </div>
+            </motion.div>
             
-            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl">
+            <motion.h1 
+              className="mb-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.7 }}
+            >
+              <span className="block text-foreground">Esplora il futuro con</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">AI Hub</span>
+            </motion.h1>
+            
+            <motion.p 
+              className="mb-8 max-w-2xl"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.7 }}
+            >
               Il punto di riferimento italiano per l'intelligenza artificiale. Articoli, risorse e strumenti per comprendere e utilizzare le tecnologie AI più avanzate.
-            </p>
+            </motion.p>
             
-            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+            <motion.div 
+              className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7, duration: 0.7 }}
+            >
               <Button
                 asChild
-                className="inline-flex justify-center items-center px-6 py-3 text-base font-medium shadow-sm"
+                size="lg"
+                className="group rounded-full px-6 text-base font-medium shadow-lg hover:shadow-primary/25 transition-all duration-300"
               >
                 <Link href="/articles">
                   Scopri gli articoli
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
-                className="inline-flex justify-center items-center px-6 py-3 text-base font-medium border border-gray-300 dark:border-gray-700 shadow-sm"
+                size="lg"
+                className="rounded-full bg-background/80 backdrop-blur-sm px-6 text-base font-medium border-primary/20 shadow-sm hover:bg-secondary/50 transition-all duration-300"
               >
                 <Link href="/playground">
                   Prova il Playground
                 </Link>
               </Button>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
           
-          <div className="relative">
-            <img 
-              src="https://images.unsplash.com/photo-1531746790731-6c087fecd65a?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&h=700&q=80" 
-              alt="Modern tech workspace with AI elements" 
-              className="rounded-xl shadow-2xl w-full h-auto object-cover transform hover:scale-[1.02] transition-transform duration-300" 
-            />
-            <div className="absolute -bottom-5 -right-5 md:-bottom-8 md:-right-8 w-24 h-24 md:w-32 md:h-32 rounded-xl bg-accent-500 opacity-20 dark:opacity-30 blur-xl"></div>
-            <div className="absolute -top-5 -left-5 md:-top-8 md:-left-8 w-24 h-24 md:w-32 md:h-32 rounded-xl bg-primary-500 opacity-20 dark:opacity-30 blur-xl"></div>
-          </div>
+          <motion.div 
+            className="relative"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5, duration: 0.7 }}
+          >
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-background/30 backdrop-blur-sm border border-primary/10 p-2">
+              <img 
+                src="https://images.unsplash.com/photo-1531746790731-6c087fecd65a?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&h=700&q=80" 
+                alt="Modern tech workspace with AI elements" 
+                className="rounded-xl w-full h-auto object-cover" 
+              />
+              
+              {/* Glassmorphism effects */}
+              <motion.div 
+                className="absolute inset-0 rounded-2xl opacity-0 hover:opacity-100 transition-opacity duration-500 bg-gradient-to-t from-black/60 to-transparent"
+                initial={{ opacity: 0 }}
+                whileHover={{ opacity: 1 }}
+              ></motion.div>
+            </div>
+            
+            {/* Decorative elements */}
+            <motion.div 
+              className="absolute -bottom-5 -right-5 md:-bottom-8 md:-right-8 w-32 h-32 md:w-40 md:h-40 rounded-full bg-accent opacity-20 dark:opacity-30 blur-3xl"
+              animate={{ 
+                scale: [1, 1.1, 1], 
+                opacity: [0.2, 0.3, 0.2] 
+              }}
+              transition={{ 
+                duration: 8, 
+                repeat: Infinity,
+                repeatType: "reverse" 
+              }}
+            ></motion.div>
+            <motion.div 
+              className="absolute -top-5 -left-5 md:-top-8 md:-left-8 w-32 h-32 md:w-40 md:h-40 rounded-full bg-primary opacity-20 dark:opacity-30 blur-3xl"
+              animate={{ 
+                scale: [1, 1.15, 1], 
+                opacity: [0.2, 0.25, 0.2] 
+              }}
+              transition={{ 
+                duration: 10, 
+                repeat: Infinity,
+                repeatType: "reverse" 
+              }}
+            ></motion.div>
+          </motion.div>
         </div>
       </Container>
     </section>
