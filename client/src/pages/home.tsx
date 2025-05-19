@@ -5,7 +5,7 @@ import { Helmet } from 'react-helmet';
 import FuturisticHero from '@/components/home/FuturisticHero';
 import ExperimentsSection from '@/components/home/ExperimentsSection';
 import FuturisticArticles from '@/components/home/FuturisticArticles';
-import NewsletterSection from '@/components/home/NewsletterSection';
+import FuturisticNewsletter from '@/components/home/FuturisticNewsletter';
 
 export default function Home() {
   return (
@@ -36,7 +36,7 @@ export default function Home() {
         <FuturisticArticles />
         
         {/* Newsletter with futuristic form */}
-        <NewsletterSection />
+        <FuturisticNewsletter />
       </motion.div>
     </>
   );
