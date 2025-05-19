@@ -1,113 +1,233 @@
-import { useState } from 'react';
-import { Link } from 'wouter';
-import ThemeToggle from '@/components/ThemeToggle';
-import { Brain, Menu, X } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'wouter';
+import { Brain, Menu, X, ChevronRight, Code, FileText } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [location] = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const offset = window.scrollY;
+      setScrolled(offset > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
+  // Glitch animation variants
+  const glitchVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: { 
+      opacity: 1, 
+      x: 0,
+      transition: {
+        type: "spring",
+        stiffness: 260,
+        damping: 20
+      } 
+    },
+    exit: { 
+      opacity: 0,
+      x: 20,
+      transition: { duration: 0.2 } 
+    }
+  };
+
+  // Menu links with animation
+  const links = [
+    { title: 'Home', path: '/', icon: <Brain className="h-4 w-4" /> },
+    { title: 'Articoli', path: '/articles', icon: <FileText className="h-4 w-4" /> },
+    { title: 'Chi sono', path: '/about', icon: <Code className="h-4 w-4" /> }
+  ];
+
+  const navVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        delayChildren: 0.3,
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: -20, opacity: 0 },
+    visible: { y: 0, opacity: 1 }
+  };
+
   return (
-    <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-background/80 border-b border-primary/10">
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+    <header 
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled 
+          ? 'py-2 glass backdrop-blur-xl border-b border-primary/20' 
+          : 'py-4 bg-transparent'
+      }`}
+    >
+      <div className="container mx-auto px-6 md:px-12">
+        <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center font-semibold text-xl">
+          <Link href="/">
             <motion.div 
-              className="flex items-center justify-center mr-2"
+              className="flex items-center hover:scale-105 transition-all duration-300"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <div className="relative">
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary to-accent blur-sm opacity-70"></div>
-                <div className="relative flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-primary to-accent text-white">
-                  <Brain className="h-5 w-5" />
+              <div className="relative flex items-center mr-3">
+                {/* Logo glow effect */}
+                <div className="absolute inset-0 rounded-full bg-primary blur-xl opacity-30 scale-150"></div>
+                <div className="relative flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-primary via-primary/80 to-secondary border border-primary/50 shadow-lg">
+                  <Brain className="h-5 w-5 text-black" />
                 </div>
               </div>
-              <div className="ml-2">
-                <div className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Luca De Angelis</div>
-                <div className="text-xs text-muted-foreground -mt-1">AI Consultant</div>
+              <div>
+                <motion.div 
+                  className="font-mono font-bold tracking-tight text-xl relative group"
+                  data-text="Luca De Angelis" // For glitch effect
+                >
+                  <span className="text-gradient">Luca De Angelis</span>
+                  <motion.span
+                    className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary via-secondary to-accent"
+                    initial={{ scaleX: 0, originX: 0 }}
+                    whileInView={{ scaleX: 1 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                  />
+                </motion.div>
+                <div className="text-xs font-mono text-gray-400">AI RESEARCHER</div>
               </div>
             </motion.div>
           </Link>
-        </div>
-        
-        <div className="hidden md:flex items-center space-x-6">
-          <nav>
-            <ul className="flex space-x-8">
-              <li>
-                <Link href="/" className="text-sm font-medium text-foreground hover:text-primary transition-colors py-2">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link href="/articles" className="text-sm font-medium text-foreground hover:text-primary transition-colors py-2">
-                  Articoli
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="text-sm font-medium text-foreground hover:text-primary transition-colors py-2">
-                  Chi sono
-                </Link>
-              </li>
-            </ul>
-          </nav>
-        </div>
-        
-        <div className="flex items-center space-x-4">
-          <ThemeToggle />
           
-          <button
-            className="md:hidden focus:outline-none rounded-full p-1.5 hover:bg-primary/10 transition-colors"
-            onClick={toggleMobileMenu}
-            aria-label="Toggle mobile menu"
+          {/* Desktop Navigation */}
+          <motion.nav
+            className="hidden md:block"
+            variants={navVariants}
+            initial="hidden"
+            animate="visible"
           >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+            <ul className="flex items-center space-x-8">
+              {links.map((link) => {
+                const isActive = location === link.path;
+                return (
+                  <motion.li key={link.path} variants={itemVariants}>
+                    <Link href={link.path}>
+                      <motion.div
+                        className={`group relative px-4 py-2 font-mono text-sm ${
+                          isActive 
+                            ? 'text-primary-glow' 
+                            : 'text-gray-400 hover:text-white'
+                        } transition-colors duration-300 flex items-center space-x-2 hoverable`}
+                        whileHover={{ y: -2 }}
+                        whileTap={{ y: 0 }}
+                      >
+                        <span className={`${isActive ? 'text-primary-glow' : ''}`}>
+                          {link.icon}
+                        </span>
+                        <span>{link.title}</span>
+                        
+                        {/* Underline animation */}
+                        <motion.span
+                          className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary to-transparent"
+                          initial={{ scaleX: isActive ? 1 : 0 }}
+                          animate={{ scaleX: isActive ? 1 : 0 }}
+                          whileHover={{ scaleX: 1 }}
+                          transition={{ duration: 0.3 }}
+                        />
+                      </motion.div>
+                    </Link>
+                  </motion.li>
+                );
+              })}
+            </ul>
+          </motion.nav>
+          
+          {/* Mobile Menu Button */}
+          <motion.button
+            className="flex md:hidden p-2 rounded-full glass border border-primary/20"
+            onClick={toggleMobileMenu}
+            whileTap={{ scale: 0.9 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <motion.div
+              initial={{ rotate: 0 }}
+              animate={{ rotate: mobileMenuOpen ? 90 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {mobileMenuOpen ? (
+                <X className="h-5 w-5 text-primary" />
+              ) : (
+                <Menu className="h-5 w-5 text-primary" />
+              )}
+            </motion.div>
+          </motion.button>
         </div>
       </div>
       
-      {/* Mobile menu */}
-      <motion.nav 
-        className={`${mobileMenuOpen ? 'block' : 'hidden'} px-4 py-3 bg-background border-t border-primary/10`}
-        initial={{ opacity: 0, height: 0 }}
-        animate={{ opacity: mobileMenuOpen ? 1 : 0, height: mobileMenuOpen ? 'auto' : 0 }}
-        transition={{ duration: 0.2 }}
-      >
-        <ul className="space-y-4 py-2">
-          <li>
-            <Link 
-              href="/" 
-              className="block text-sm font-medium text-foreground hover:text-primary transition-colors py-2"
-              onClick={() => setMobileMenuOpen(false)}
+      {/* Mobile Navigation Menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            className="fixed inset-0 z-40 glass"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div
+              className="w-full h-full flex flex-col items-center justify-center"
+              variants={glitchVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
             >
-              Home
-            </Link>
-          </li>
-          <li>
-            <Link 
-              href="/articles" 
-              className="block text-sm font-medium text-foreground hover:text-primary transition-colors py-2"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Articoli
-            </Link>
-          </li>
-          <li>
-            <Link 
-              href="/about" 
-              className="block text-sm font-medium text-foreground hover:text-primary transition-colors py-2"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Chi sono
-            </Link>
-          </li>
-        </ul>
-      </motion.nav>
+              <ul className="space-y-6 text-center">
+                {links.map((link, index) => (
+                  <motion.li 
+                    key={link.path}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 + 0.2 }}
+                    className={location === link.path ? 'text-primary-glow' : ''}
+                  >
+                    <Link 
+                      href={link.path} 
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <div className="flex items-center justify-center space-x-3 text-xl font-mono hover:text-primary-glow transition-colors duration-300">
+                        <div className="p-2 rounded-full bg-black/30 border border-primary/20">
+                          {link.icon}
+                        </div>
+                        <span>{link.title}</span>
+                        <ChevronRight className="h-4 w-4 opacity-50" />
+                      </div>
+                    </Link>
+                  </motion.li>
+                ))}
+              </ul>
+              
+              <motion.div 
+                className="mt-12 font-mono text-sm text-gray-500 border-t border-primary/10 pt-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+              >
+                ESC per chiudere
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

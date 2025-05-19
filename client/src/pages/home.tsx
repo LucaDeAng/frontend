@@ -1,23 +1,43 @@
-import HeroSection from '@/components/home/HeroSection';
-import FeaturesSection from '@/components/home/FeaturesSection';
-import LatestArticlesSection from '@/components/home/LatestArticlesSection';
-import NewsletterSection from '@/components/home/NewsletterSection';
+import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
+
+// Futuristic UI components
+import FuturisticHero from '@/components/home/FuturisticHero';
+import ExperimentsSection from '@/components/home/ExperimentsSection';
+import FuturisticArticles from '@/components/home/FuturisticArticles';
+import NewsletterSection from '@/components/home/NewsletterSection';
 
 export default function Home() {
   return (
     <>
       <Helmet>
-        <title>Luca De Angelis - AI Consultant & Generative AI Expert</title>
-        <meta name="description" content="Luca De Angelis, esperto di Generative AI e consulente per l'implementazione di soluzioni di intelligenza artificiale per aziende e professionisti." />
-        <meta property="og:title" content="Luca De Angelis - AI Consultant & Generative AI Expert" />
-        <meta property="og:description" content="Luca De Angelis, esperto di Generative AI e consulente per l'implementazione di soluzioni di intelligenza artificiale per aziende e professionisti." />
+        <title>Luca De Angelis // AI Researcher & Generative AI Expert</title>
+        <meta name="description" content="Consulenza ed implementazione di soluzioni AI generativa per trasformare la tua azienda. Scopri i miei progetti e servizi sull'intelligenza artificiale." />
+        <meta property="og:title" content="Luca De Angelis // AI Researcher & Generative AI Expert" />
+        <meta property="og:description" content="Consulenza ed implementazione di soluzioni AI generativa per trasformare la tua azienda. Scopri i miei progetti e servizi sull'intelligenza artificiale." />
         <meta property="og:type" content="website" />
       </Helmet>
-      <HeroSection />
-      <FeaturesSection />
-      <LatestArticlesSection />
-      <NewsletterSection />
+      
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="relative"
+      >
+        {/* Scroll progress indicator is in App.tsx */}
+        
+        {/* Fullscreen hero with animated terminal effect */}
+        <FuturisticHero />
+        
+        {/* AI Experiments showcase with glassmorphism cards */}
+        <ExperimentsSection />
+        
+        {/* Latest articles with 3D hover effects */}
+        <FuturisticArticles />
+        
+        {/* Newsletter with futuristic form */}
+        <NewsletterSection />
+      </motion.div>
     </>
   );
 }
