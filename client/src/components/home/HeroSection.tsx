@@ -20,7 +20,7 @@ export default function HeroSection() {
             className="absolute w-full h-full object-cover opacity-50 dark:opacity-30"
           >
             <source 
-              src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" 
+              src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-brain-surrounded-by-data-12724-large.mp4" 
               type="video/mp4" 
             />
           </video>
@@ -58,7 +58,7 @@ export default function HeroSection() {
             >
               <div className="py-1 px-3 rounded-full bg-primary/10 dark:bg-primary/20 border border-primary/20 text-primary-foreground/80 flex items-center text-sm font-medium">
                 <Sparkles className="h-3.5 w-3.5 mr-2" />
-                Intelligenza Artificiale
+                Generative AI Consultant
               </div>
             </motion.div>
             
@@ -68,8 +68,8 @@ export default function HeroSection() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.7 }}
             >
-              <span className="block text-foreground">Esplora il futuro con</span>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">AI Hub</span>
+              <span className="block text-foreground">Trasforma il tuo business con la</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Generative AI</span>
             </motion.h1>
             
             <motion.p 
@@ -78,7 +78,7 @@ export default function HeroSection() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5, duration: 0.7 }}
             >
-              Il punto di riferimento italiano per l'intelligenza artificiale. Articoli, risorse e strumenti per comprendere e utilizzare le tecnologie AI più avanzate.
+              Aiuto aziende e professionisti a implementare soluzioni di intelligenza artificiale generativa per aumentare produttività, creatività e innovazione nei processi di business.
             </motion.p>
             
             <motion.div 
@@ -92,8 +92,8 @@ export default function HeroSection() {
                 size="lg"
                 className="group rounded-full px-6 text-base font-medium shadow-lg hover:shadow-primary/25 transition-all duration-300"
               >
-                <Link href="/articles">
-                  Scopri gli articoli
+                <Link href="/about">
+                  Chi sono
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </Link>
               </Button>
