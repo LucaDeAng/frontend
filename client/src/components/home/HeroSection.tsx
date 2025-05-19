@@ -103,8 +103,8 @@ export default function HeroSection() {
                 size="lg"
                 className="rounded-full bg-background/80 backdrop-blur-sm px-6 text-base font-medium border-primary/20 shadow-sm hover:bg-secondary/50 transition-all duration-300"
               >
-                <Link href="/playground">
-                  Prova il Playground
+                <Link href="/articles">
+                  Leggi gli articoli
                 </Link>
               </Button>
             </motion.div>
