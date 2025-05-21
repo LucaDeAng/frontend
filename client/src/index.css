@@ -280,3 +280,108 @@ html {
     linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   background-size: 50px 50px;
 }
+
+/* Advanced effects for more visual appeal */
+.glass-blur {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.text-glitch {
+  position: relative;
+  display: inline-block;
+}
+
+.text-glitch::before,
+.text-glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+}
+
+.text-glitch::before {
+  left: 2px;
+  text-shadow: -1px 0 #00fffc;
+  animation: noise-anim-1 2s linear infinite alternate-reverse;
+  clip-path: inset(0 0 0 0);
+}
+
+.text-glitch::after {
+  left: -2px;
+  text-shadow: 1px 0 #ff00cc;
+  animation: noise-anim-2 3s linear infinite alternate-reverse;
+  clip-path: inset(0 0 0 0);
+}
+
+@keyframes noise-anim-1 {
+  0%, 3%, 5%, 42%, 44%, 100% { clip-path: inset(0 0 100% 0); }
+  20%, 24%, 62%, 78% { clip-path: inset(33% 0 33% 0); }
+  4%, 22%, 45%, 65% { clip-path: inset(66% 0 1% 0); }
+  61%, 79%, 91% { clip-path: inset(2% 0 97% 0); }
+}
+
+@keyframes noise-anim-2 {
+  0%, 12%, 15%, 52%, 55%, 100% { clip-path: inset(0 0 100% 0); }
+  30%, 35%, 72%, 85% { clip-path: inset(33% 0 33% 0); }
+  13%, 25%, 58%, 80% { clip-path: inset(25% 0 75% 0); }
+  74%, 88%, 94% { clip-path: inset(33% 0 66% 0); }
+}
+
+/* 3D hover effect for cards */
+.hover-3d {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-3d:hover {
+  transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
+  box-shadow: 
+    0 20px 30px -10px rgba(0, 0, 0, 0.2),
+    0 0 20px 0px rgba(var(--primary), 0.15);
+}
+
+/* Enhanced scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, rgb(var(--primary)), rgb(var(--secondary)));
+  border-radius: 10px;
+}
+
+/* Spotlight hover effect */
+.spotlight {
+  position: relative;
+  overflow: hidden;
+}
+
+.spotlight::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle at center,
+    rgba(var(--primary), 0.1) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  transform: scale(2);
+  transition: opacity 0.3s ease, transform 0.5s ease;
+  pointer-events: none;
+}
+
+.spotlight:hover::after {
+  opacity: 1;
+  transform: scale(1);
+}
