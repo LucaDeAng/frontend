@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import Home from "@/pages/home";
 import Articles from "@/pages/articles";
 import Article from "@/pages/article";
-import About from "@/pages/about";
+import Playground from "@/pages/playground";
 import Admin from "@/pages/admin";
 import NotFound from "@/pages/not-found";
 import CustomCursor from "@/components/ui/cursor";
@@ -57,6 +57,7 @@ function App() {
             <Route path="/" component={Home} />
             <Route path="/articles" component={Articles} />
             <Route path="/article/:slug" component={Article} />
+            <Route path="/playground" component={Playground} />
             <Route path="/admin" component={Admin} />
             <Route component={NotFound} />
           </Switch>

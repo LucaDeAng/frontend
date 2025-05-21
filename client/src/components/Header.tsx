@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Brain, Menu, X, ChevronRight, Code, FileText, BookOpen, Sparkles, Lightbulb } from 'lucide-react';
+import { Brain, Menu, X, ChevronRight, Code, FileText, BookOpen, Sparkles, Lightbulb, Bot } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Header() {
@@ -44,7 +44,8 @@ export default function Header() {
   // Menu links with animation
   const links = [
     { title: 'Home', path: '/', icon: <Sparkles className="h-4 w-4" /> },
-    { title: 'Articles', path: '/articles', icon: <BookOpen className="h-4 w-4" /> }
+    { title: 'Articles', path: '/articles', icon: <BookOpen className="h-4 w-4" /> },
+    { title: 'Playground', path: '/playground', icon: <Bot className="h-4 w-4" /> }
   ];
 
   const navVariants = {
