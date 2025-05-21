@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
 
-// Futuristic UI components
-import FuturisticHero from '@/components/home/FuturisticHero';
-import ExperimentsSection from '@/components/home/ExperimentsSection';
-import FuturisticArticles from '@/components/home/FuturisticArticles';
-import FuturisticNewsletter from '@/components/home/FuturisticNewsletter';
+// Business-oriented UI components
+import BusinessHero from '@/components/home/BusinessHero';
+import BusinessFeatures from '@/components/home/BusinessFeatures';
+import BusinessArticles from '@/components/home/BusinessArticles';
+import BusinessNewsletter from '@/components/home/BusinessNewsletter';
 
 export default function Home() {
   return (
@@ -26,17 +26,17 @@ export default function Home() {
       >
         {/* Scroll progress indicator is in App.tsx */}
         
-        {/* Fullscreen hero with animated terminal effect */}
-        <FuturisticHero />
+        {/* Professional hero section with video */}
+        <BusinessHero />
         
-        {/* AI Experiments showcase with glassmorphism cards */}
-        <ExperimentsSection />
+        {/* Professional services/features grid */}
+        <BusinessFeatures />
         
-        {/* Latest articles with 3D hover effects */}
-        <FuturisticArticles />
+        {/* Articles in professional business style */}
+        <BusinessArticles />
         
-        {/* Newsletter with futuristic form */}
-        <FuturisticNewsletter />
+        {/* Newsletter with professional design */}
+        <BusinessNewsletter />
       </motion.div>
     </>
   );
