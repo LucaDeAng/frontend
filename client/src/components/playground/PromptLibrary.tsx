@@ -162,8 +162,10 @@ export default function PromptLibrary() {
   ];
   
   // Extract unique categories and models
-  const categories = ['all', ...new Set(prompts.map(prompt => prompt.category))];
-  const models = ['all', ...new Set(prompts.map(prompt => prompt.model))];
+  const uniqueCategories = [...new Set(prompts.map(prompt => prompt.category))];
+  const uniqueModels = [...new Set(prompts.map(prompt => prompt.model))];
+  const categories = ['all', ...uniqueCategories];
+  const models = ['all', ...uniqueModels];
   
   // Filter prompts based on search, category, and model
   const filteredPrompts = prompts.filter(prompt => {
