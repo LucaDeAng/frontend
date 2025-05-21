@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
-import { ArrowRight, Book, Brain, Bot, Sparkles } from 'lucide-react';
+import { ArrowRight, Book, Brain, Bot } from 'lucide-react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import CommunityNewsletter from '@/components/home/CommunityNewsletter';
+import ArticleShowcase from '@/components/home/ArticleShowcase';
 
 export default function Home() {
   return (
@@ -115,10 +116,10 @@ export default function Home() {
                   delay: 0.2
                 },
                 {
-                  title: "AI Playground",
-                  description: "Interactive environment to test and experiment with AI models and see the results in real-time.",
-                  icon: <Sparkles className="h-10 w-10 text-primary" />,
-                  link: "/playground",
+                  title: "Article Categories",
+                  description: "Browse our content by topics like AI ethics, machine learning, business applications, and more.",
+                  icon: <Brain className="h-10 w-10 text-primary" />,
+                  link: "/articles",
                   delay: 0.3
                 }
               ].map((feature, index) => (
@@ -147,6 +148,9 @@ export default function Home() {
             </div>
           </div>
         </section>
+        
+        {/* Featured articles section */}
+        <ArticleShowcase />
         
         {/* Newsletter signup */}
         <CommunityNewsletter />
