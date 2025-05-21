@@ -68,6 +68,112 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ message: "Subscription successful" });
   });
   
+  // Admin API routes for content management
+  apiRouter.post("/admin/articles", async (req, res) => {
+    try {
+      const { title, slug, summary, category, content, author, date } = req.body;
+      
+      if (!title || !slug || !summary || !category || !content || !author) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+      
+      // Check if article with this slug already exists
+      const existingArticle = await storage.getArticleBySlug(slug);
+      if (existingArticle) {
+        return res.status(409).json({ error: "An article with this slug already exists" });
+      }
+      
+      const articleContent = `---
+title: "${title}"
+date: "${date || new Date().toISOString().split('T')[0]}"
+summary: "${summary}"
+author: "${author}"
+category: "${category}"
+image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500&q=80"
+---
+
+${content}`;
+      
+      // Create new article file
+      const articlesDir = path.join("content", "articles");
+      await fs.writeFile(path.join(articlesDir, `${slug}.md`), articleContent);
+      
+      res.status(201).json({ 
+        success: true, 
+        message: "Article created successfully",
+        slug 
+      });
+    } catch (error) {
+      console.error("Error creating article:", error);
+      res.status(500).json({ error: "Failed to create article" });
+    }
+  });
+  
+  apiRouter.put("/admin/articles/:slug", async (req, res) => {
+    try {
+      const { title, summary, category, content, author, date } = req.body;
+      const { slug } = req.params;
+      
+      if (!title || !summary || !category || !content || !author) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+      
+      // Check if article exists
+      const existingArticle = await storage.getArticleBySlug(slug);
+      if (!existingArticle) {
+        return res.status(404).json({ error: "Article not found" });
+      }
+      
+      const articleContent = `---
+title: "${title}"
+date: "${date || existingArticle.meta.date}"
+summary: "${summary}"
+author: "${author}"
+category: "${category}"
+image: "${existingArticle.meta.image || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500&q=80"}"
+---
+
+${content}`;
+      
+      // Update article file
+      const articlesDir = path.join("content", "articles");
+      await fs.writeFile(path.join(articlesDir, `${slug}.md`), articleContent);
+      
+      res.json({ 
+        success: true, 
+        message: "Article updated successfully",
+        slug 
+      });
+    } catch (error) {
+      console.error(`Error updating article (${req.params.slug}):`, error);
+      res.status(500).json({ error: "Failed to update article" });
+    }
+  });
+  
+  apiRouter.delete("/admin/articles/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      
+      // Check if article exists
+      const existingArticle = await storage.getArticleBySlug(slug);
+      if (!existingArticle) {
+        return res.status(404).json({ error: "Article not found" });
+      }
+      
+      // Delete article file
+      const articlesDir = path.join("content", "articles");
+      await fs.unlink(path.join(articlesDir, `${slug}.md`));
+      
+      res.json({ 
+        success: true, 
+        message: "Article deleted successfully" 
+      });
+    } catch (error) {
+      console.error(`Error deleting article (${req.params.slug}):`, error);
+      res.status(500).json({ error: "Failed to delete article" });
+    }
+  });
+  
   // Mount API routes under /api
   app.use("/api", apiRouter);
 
