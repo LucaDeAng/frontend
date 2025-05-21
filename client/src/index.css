@@ -21,13 +21,13 @@
   --border: 240 5% 10%;
   --input: 240 5% 10%;
   
-  /* Brand Colors */
-  --primary: 120 100% 50%; /* Lime green */
+  /* Brand Colors - More Professional and Subdued */
+  --primary: 206 100% 50%; /* Deep blue */
   --primary-foreground: 0 0% 0%;
-  --secondary: 180 100% 50%; /* Cyan */
-  --secondary-foreground: 0 0% 0%;
-  --accent: 300 100% 50%; /* Fuschia */
-  --accent-foreground: 0 0% 0%;
+  --secondary: 232 51% 36%; /* Indigo */
+  --secondary-foreground: 0 0% 100%;
+  --accent: 262 83% 58%; /* Deep purple */
+  --accent-foreground: 0 0% 100%;
   
   /* Functional Colors */
   --destructive: 0 100% 50%;

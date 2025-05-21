@@ -5,7 +5,7 @@ import ArticleContent from '@/components/articles/ArticleContent';
 import { Helmet } from 'react-helmet';
 
 export default function ArticlePage() {
-  const [, params] = useRoute<{ slug: string }>('/articles/:slug');
+  const [, params] = useRoute<{ slug: string }>('/article/:slug');
   const slug = params?.slug || '';
 
   const { data: article, isLoading, error } = useQuery<Article>({
