@@ -69,7 +69,7 @@ export default function Header() {
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled 
           ? 'py-2 glass backdrop-blur-xl border-b border-primary/20' 
-          : 'py-4 bg-transparent'
+          : 'py-3 bg-black/80 backdrop-blur-sm'
       }`}
     >
       <div className="container mx-auto px-6 md:px-12">
@@ -144,30 +144,16 @@ export default function Header() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
                 >
-                  <div className="relative overflow-hidden">
-                    <span 
-                      className="text-glitch inline-block"
-                      data-text="GenAI Hub"
-                    >
-                      <span className="text-gradient text-2xl">GenAI Hub</span>
-                    </span>
+                  <div className="relative">
+                    <span className="text-white font-bold text-xl">AI Hub</span>
                     
                     <motion.span
-                      className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary via-secondary to-accent"
+                      className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"
                       initial={{ scaleX: 0, originX: 0 }}
                       animate={{ scaleX: 1 }}
-                      transition={{ duration: 0.5, delay: 0.4 }}
+                      transition={{ duration: 0.5, delay: 0.2 }}
                     />
                   </div>
-                  
-                  <motion.div 
-                    className="text-sm font-medium text-gray-300 mt-0.5 tracking-wider"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5, delay: 0.6 }}
-                  >
-                    MASTERING AI TOGETHER
-                  </motion.div>
                 </motion.div>
               </div>
             </motion.div>
