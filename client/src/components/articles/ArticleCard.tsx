@@ -1,8 +1,8 @@
 import { Link } from 'wouter';
 import { format } from 'date-fns';
-import { it } from 'date-fns/locale';
 import { ArticleMeta } from '@shared/types';
-import { ChevronRight } from 'lucide-react';
+import { ArrowRight, Calendar, Tag } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface ArticleCardProps {
   article: ArticleMeta;
@@ -10,16 +10,22 @@ interface ArticleCardProps {
 
 export default function ArticleCard({ article }: ArticleCardProps) {
   const { title, date, summary, category, slug, image } = article;
-  const formattedDate = format(new Date(date), 'd MMMM yyyy', { locale: it });
+  const formattedDate = format(new Date(date), 'MMMM d, yyyy');
   
   const getDefaultImage = (category: string) => {
     switch (category.toLowerCase()) {
-      case 'intelligenza artificiale':
+      case 'artificial intelligence':
+      case 'ai':
         return 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500&q=80';
       case 'machine learning':
+      case 'ml':
         return 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500&q=80';
-      case 'etica dell\'ai':
-        return 'https://pixabay.com/get/gd3114ebba8ef5edec5cb08c488a1172404c815df9112e2af9505684121515fb8893441afdfea72c424b21b397ba7956df25be708b255f35070fc44f18243e0d2_1280.jpg';
+      case 'ai ethics':
+      case 'ethics':
+        return 'https://images.unsplash.com/photo-1633613286848-e6f43bbafb8d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500&q=80';
+      case 'generative ai':
+      case 'genai':
+        return 'https://images.unsplash.com/photo-1684391963056-cae1a2ece91e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500&q=80';
       default:
         return 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500&q=80';
     }
@@ -28,36 +34,47 @@ export default function ArticleCard({ article }: ArticleCardProps) {
   const imageUrl = image || getDefaultImage(category);
 
   return (
-    <article className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700 flex flex-col h-full">
-      <img 
-        src={imageUrl} 
-        alt={`${title} - illustrazione`} 
-        className="w-full h-52 object-cover"
-      />
+    <article className="bg-black/30 border border-white/10 rounded-xl overflow-hidden hover:border-primary/30 transition-all duration-300 flex flex-col h-full group">
+      <div className="relative overflow-hidden h-48">
+        <img 
+          src={imageUrl} 
+          alt={`${title} - illustration`} 
+          className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-80"></div>
+        
+        <div className="absolute bottom-0 left-0 p-4 w-full">
+          <div className="flex flex-wrap gap-2 items-center text-xs text-gray-300">
+            <div className="flex items-center bg-black/50 px-2 py-1 rounded-full">
+              <Calendar className="h-3 w-3 mr-1.5 text-primary" />
+              <span>{formattedDate}</span>
+            </div>
+            
+            <div className="flex items-center bg-black/50 px-2 py-1 rounded-full">
+              <Tag className="h-3 w-3 mr-1.5 text-primary" />
+              <span>{category}</span>
+            </div>
+          </div>
+        </div>
+      </div>
       
       <div className="p-6 flex-1 flex flex-col">
-        <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
-          <span>{formattedDate}</span>
-          <span className="mx-2">•</span>
-          <span>{category}</span>
-        </div>
-        
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-          <Link href={`/article/${slug}`} className="hover:text-primary-600 dark:hover:text-primary-400">
+        <h3 className="text-xl font-bold text-white mb-3 group-hover:text-primary transition-colors">
+          <Link href={`/article/${slug}`}>
             {title}
           </Link>
         </h3>
         
-        <p className="text-gray-600 dark:text-gray-300 mb-4 flex-1">
+        <p className="text-gray-400 mb-4 flex-1 text-sm">
           {summary}
         </p>
         
         <Link 
           href={`/article/${slug}`} 
-          className="text-primary-600 dark:text-primary-400 font-medium flex items-center hover:underline mt-auto"
+          className="text-primary font-medium flex items-center group-hover:text-primary/80 transition-colors mt-auto"
         >
-          Leggi l'articolo
-          <ChevronRight className="h-4 w-4 ml-1" />
+          <span>Read article</span>
+          <ArrowRight className="h-4 w-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
         </Link>
       </div>
     </article>
