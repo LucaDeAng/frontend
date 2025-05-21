@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AiPlayground from '@/components/playground/AiPlayground';
-import PromptLibrary from '@/components/playground/PromptLibrary';
+import EnhancedPromptLibrary from '@/components/playground/EnhancedPromptLibrary';
 
 export default function Playground() {
   const [activeTab, setActiveTab] = useState('prompts');
@@ -56,7 +56,7 @@ export default function Playground() {
               </TabsList>
               
               <TabsContent value="prompts" className="mt-0">
-                <PromptLibrary />
+                <EnhancedPromptLibrary />
               </TabsContent>
               
               <TabsContent value="playground" className="mt-0">

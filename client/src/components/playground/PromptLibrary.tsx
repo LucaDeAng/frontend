@@ -2,21 +2,62 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CheckCircle, ClipboardCopy, Filter, Search, X } from 'lucide-react';
+import { 
+  CheckCircle, 
+  ClipboardCopy, 
+  Filter, 
+  Search, 
+  X, 
+  ThumbsUp, 
+  MessageSquare, 
+  Plus,
+  ChevronDown,
+  Star,
+  StarOff,
+  SortAsc,
+  Flame
+} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+interface Comment {
+  id: number;
+  userName: string;
+  text: string;
+  date: string;
+}
+
 interface PromptCardProps {
+  id: number;
   title: string;
   description: string;
   promptText: string;
   category: string;
   model: string;
+  votes: number;
+  comments: Comment[];
   index: number;
+  onVote: (id: number, increment: boolean) => void;
+  onComment: (id: number, comment: string) => void;
 }
 
-const PromptCard = ({ title, description, promptText, category, model, index }: PromptCardProps) => {
+const PromptCard = ({ 
+  id, 
+  title, 
+  description, 
+  promptText, 
+  category, 
+  model, 
+  votes, 
+  comments,
+  index,
+  onVote,
+  onComment 
+}: PromptCardProps) => {
   const [copied, setCopied] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [newComment, setNewComment] = useState('');
   const { toast } = useToast();
   
   const copyToClipboard = async () => {
@@ -35,6 +76,17 @@ const PromptCard = ({ title, description, promptText, category, model, index }: 
         title: "Failed to copy",
         description: "Please try again or copy manually",
         variant: "destructive"
+      });
+    }
+  };
+  
+  const handleAddComment = () => {
+    if (newComment.trim()) {
+      onComment(id, newComment);
+      setNewComment('');
+      toast({
+        title: "Comment added",
+        description: "Your comment has been added to this prompt",
       });
     }
   };
@@ -66,24 +118,87 @@ const PromptCard = ({ title, description, promptText, category, model, index }: 
         <p className="text-gray-300 text-sm whitespace-pre-wrap">{promptText}</p>
       </div>
       
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={copyToClipboard}
-        className="flex items-center gap-2 bg-black/20 hover:bg-primary/20 hover:text-primary border-white/10"
-      >
-        {copied ? (
-          <>
-            <CheckCircle className="h-4 w-4" />
-            <span>Copied!</span>
-          </>
-        ) : (
-          <>
-            <ClipboardCopy className="h-4 w-4" />
-            <span>Copy to GPT</span>
-          </>
-        )}
-      </Button>
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={copyToClipboard}
+          className="flex items-center gap-2 bg-black/20 hover:bg-primary/20 hover:text-primary border-white/10"
+        >
+          {copied ? (
+            <>
+              <CheckCircle className="h-4 w-4" />
+              <span>Copied!</span>
+            </>
+          ) : (
+            <>
+              <ClipboardCopy className="h-4 w-4" />
+              <span>Copy to GPT</span>
+            </>
+          )}
+        </Button>
+        
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => onVote(id, true)}
+            className="flex items-center gap-1 text-gray-400 hover:text-green-500 hover:bg-green-500/10 p-2 h-8"
+          >
+            <ThumbsUp className="h-4 w-4" />
+            <span className="text-xs font-medium">{votes}</span>
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => setShowComments(!showComments)}
+            className="flex items-center gap-1 text-gray-400 hover:text-primary hover:bg-primary/10 p-2 h-8"
+          >
+            <MessageSquare className="h-4 w-4" />
+            <span className="text-xs font-medium">{comments.length}</span>
+          </Button>
+        </div>
+      </div>
+      
+      {showComments && (
+        <div className="mt-4 border-t border-white/10 pt-4">
+          <h4 className="text-sm font-medium text-white mb-3">Comments</h4>
+          
+          {comments.length > 0 ? (
+            <div className="space-y-3 mb-4">
+              {comments.map((comment) => (
+                <div key={comment.id} className="bg-black/40 rounded-lg p-3 text-sm">
+                  <div className="flex justify-between text-xs text-gray-500 mb-1">
+                    <span>{comment.userName}</span>
+                    <span>{comment.date}</span>
+                  </div>
+                  <p className="text-gray-300">{comment.text}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 text-sm mb-4">No comments yet. Be the first to comment!</p>
+          )}
+          
+          <div className="flex gap-2">
+            <Textarea
+              placeholder="Add your comment..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              className="bg-black/40 border-white/10 text-white text-sm resize-none"
+            />
+            <Button 
+              size="sm" 
+              onClick={handleAddComment}
+              className="bg-primary hover:bg-primary/90 text-black"
+              disabled={!newComment.trim()}
+            >
+              Add
+            </Button>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 };
@@ -92,9 +207,19 @@ export default function PromptLibrary() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [activeModel, setActiveModel] = useState('all');
+  const [sortBy, setSortBy] = useState('newest'); // 'newest', 'popular', 'top-rated'
+  const [showAddPrompt, setShowAddPrompt] = useState(false);
+  const [newPrompt, setNewPrompt] = useState({
+    title: '',
+    description: '',
+    promptText: '',
+    category: '',
+    model: 'GPT-4o'
+  });
+  const { toast } = useToast();
   
   // Sample prompts data
-  const prompts = [
+  const [prompts, setPrompts] = useState([
     {
       id: 1,
       title: "Professional Email Writer",
