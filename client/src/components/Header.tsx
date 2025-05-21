@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Brain, Menu, X, ChevronRight, Code, FileText } from 'lucide-react';
+import { Brain, Menu, X, ChevronRight, Code, FileText, BookOpen, Sparkles, Lightbulb } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Header() {
@@ -43,9 +43,9 @@ export default function Header() {
 
   // Menu links with animation
   const links = [
-    { title: 'Home', path: '/', icon: <Brain className="h-4 w-4" /> },
-    { title: 'Articoli', path: '/articles', icon: <FileText className="h-4 w-4" /> },
-    { title: 'Chi sono', path: '/about', icon: <Code className="h-4 w-4" /> }
+    { title: 'Home', path: '/', icon: <Sparkles className="h-4 w-4" /> },
+    { title: 'Articles', path: '/articles', icon: <BookOpen className="h-4 w-4" /> },
+    { title: 'About', path: '/about', icon: <Lightbulb className="h-4 w-4" /> }
   ];
 
   const navVariants = {
@@ -74,7 +74,7 @@ export default function Header() {
     >
       <div className="container mx-auto px-6 md:px-12">
         <div className="flex items-center justify-between">
-          {/* Logo */}
+          {/* Enhanced Logo */}
           <Link href="/">
             <motion.div 
               className="flex items-center hover:scale-105 transition-all duration-300"
@@ -83,27 +83,92 @@ export default function Header() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <div className="relative flex items-center mr-3">
-                {/* Logo glow effect */}
-                <div className="absolute inset-0 rounded-full bg-primary blur-xl opacity-30 scale-150"></div>
-                <div className="relative flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-primary via-primary/80 to-secondary border border-primary/50 shadow-lg">
-                  <Brain className="h-5 w-5 text-black" />
+              <div className="relative flex items-center mr-4">
+                {/* Logo glow effect with pulsing animation */}
+                <motion.div 
+                  className="absolute inset-0 rounded-full bg-primary blur-xl opacity-30 scale-150"
+                  animate={{ 
+                    scale: [1.5, 1.7, 1.5],
+                    opacity: [0.3, 0.5, 0.3]
+                  }}
+                  transition={{ 
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut" 
+                  }}
+                />
+                
+                {/* Multi-layered logo for depth */}
+                <div className="relative">
+                  <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-primary/40 to-secondary/40 blur-sm"></div>
+                  <div className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-primary/60 to-secondary/60 blur-[2px]"></div>
+                  
+                  <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-primary via-secondary to-accent border border-white/20 shadow-lg">
+                    {/* Orbit effect */}
+                    <motion.div 
+                      className="absolute w-full h-full rounded-full border-2 border-transparent"
+                      style={{
+                        borderLeftColor: 'rgba(var(--primary), 0.4)',
+                        borderTopColor: 'rgba(var(--secondary), 0.4)'
+                      }}
+                      animate={{
+                        rotate: [0, 360]
+                      }}
+                      transition={{
+                        duration: 10,
+                        repeat: Infinity,
+                        ease: "linear"
+                      }}
+                    />
+                    
+                    <motion.div
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ 
+                        type: "spring",
+                        stiffness: 260,
+                        damping: 20,
+                        delay: 0.3
+                      }}
+                    >
+                      <Brain className="h-6 w-6 text-white drop-shadow-glow" />
+                    </motion.div>
+                  </div>
                 </div>
               </div>
+              
               <div>
                 <motion.div 
                   className="font-mono font-bold tracking-tight text-xl relative group"
-                  data-text="Luca De Angelis" // For glitch effect
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
                 >
-                  <span className="text-gradient">Luca De Angelis</span>
-                  <motion.span
-                    className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary via-secondary to-accent"
-                    initial={{ scaleX: 0, originX: 0 }}
-                    whileInView={{ scaleX: 1 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                  />
+                  <div className="relative overflow-hidden">
+                    <span 
+                      className="text-glitch inline-block"
+                      data-text="GenAI Hub"
+                    >
+                      <span className="text-gradient text-2xl">GenAI Hub</span>
+                    </span>
+                    
+                    <motion.span
+                      className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary via-secondary to-accent"
+                      initial={{ scaleX: 0, originX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: 0.5, delay: 0.4 }}
+                    />
+                  </div>
+                  
+                  <motion.div 
+                    className="text-sm font-medium text-gray-300 mt-0.5 tracking-wider"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.6 }}
+                  >
+                    MASTERING AI TOGETHER
+                  </motion.div>
                 </motion.div>
-                <div className="text-xs font-mono text-gray-400">AI RESEARCHER</div>
               </div>
             </motion.div>
           </Link>
