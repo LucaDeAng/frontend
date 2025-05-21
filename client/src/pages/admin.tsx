@@ -2,19 +2,39 @@ import { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Layout, FileText, Plus, Edit, Trash2, Save, X, Eye } from 'lucide-react';
+import { 
+  Layout, 
+  FileText, 
+  Plus, 
+  Edit, 
+  Trash2, 
+  Save, 
+  X, 
+  Eye, 
+  Copy, 
+  CheckCheck, 
+  BrainCircuit, 
+  Sparkles,
+  Lightbulb,
+  Rocket,
+  Bot
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArticleMeta } from '@shared/types';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { ArticleMeta, PlaygroundRequest, PlaygroundResponse } from '@shared/types';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 
 export default function AdminDashboard() {
   const { toast } = useToast();
-  const [selectedTab, setSelectedTab] = useState<'articles' | 'create'>('articles');
+  const [selectedTab, setSelectedTab] = useState<'articles' | 'create' | 'playground'>('articles');
   const [editingArticle, setEditingArticle] = useState<ArticleMeta | null>(null);
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
   
   // Form state for creating/editing articles
   const [formData, setFormData] = useState({
@@ -24,6 +44,16 @@ export default function AdminDashboard() {
     category: '',
     content: '',
     author: 'Admin'
+  });
+  
+  // Playground state
+  const [playgroundInput, setPlaygroundInput] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [playgroundResult, setPlaygroundResult] = useState<string | null>(null);
+  const [playgroundSettings, setPlaygroundSettings] = useState({
+    model: 'gpt-4o',
+    temperature: 0.7,
+    maxTokens: 1000
   });
   
   // Fetch articles

@@ -57,7 +57,6 @@ function App() {
             <Route path="/" component={Home} />
             <Route path="/articles" component={Articles} />
             <Route path="/article/:slug" component={Article} />
-            <Route path="/about" component={About} />
             <Route path="/admin" component={Admin} />
             <Route component={NotFound} />
           </Switch>

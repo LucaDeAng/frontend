@@ -4,10 +4,10 @@ import { motion } from 'framer-motion';
 
 export default function Footer() {
   return (
-    <footer className="bg-background/80 backdrop-blur-sm pt-16 pb-8 border-t border-primary/10">
+    <footer className="bg-background/80 backdrop-blur-sm pt-12 pb-6 border-t border-primary/10">
       <div className="container mx-auto px-6 md:px-12">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 mb-16">
-          <div className="md:col-span-5 lg:col-span-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+          <div>
             <motion.div 
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -20,19 +20,19 @@ export default function Footer() {
                   </div>
                 </div>
                 <div className="ml-3">
-                  <div className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Luca De Angelis</div>
-                  <div className="text-xs text-muted-foreground -mt-1">AI Consultant</div>
+                  <div className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">GenAI Hub</div>
+                  <div className="text-xs text-muted-foreground -mt-1">MASTERING AI TOGETHER</div>
                 </div>
               </Link>
             </motion.div>
             
             <p className="text-muted-foreground mb-6 max-w-md">
-              Consulente specializzato in Generative AI per aziende e professionisti. Aiuto a implementare soluzioni di intelligenza artificiale nei processi di business.
+              Explore cutting-edge resources, tutorials, and insights on generative AI technologies. Learn how to leverage AI models effectively in your projects and workflows.
             </p>
             
             <div className="flex space-x-4">
               <motion.a 
-                href="https://linkedin.com/in/lucadeangelis" 
+                href="https://linkedin.com/" 
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-full bg-background border border-border hover:bg-primary/5 transition-colors"
@@ -42,7 +42,7 @@ export default function Footer() {
                 <Linkedin className="h-5 w-5 text-foreground" />
               </motion.a>
               <motion.a 
-                href="https://github.com/lucadeangelis" 
+                href="https://github.com/" 
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-full bg-background border border-border hover:bg-primary/5 transition-colors"
@@ -52,7 +52,7 @@ export default function Footer() {
                 <Github className="h-5 w-5 text-foreground" />
               </motion.a>
               <motion.a 
-                href="https://twitter.com/lucadeangelis" 
+                href="https://twitter.com/" 
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-full bg-background border border-border hover:bg-primary/5 transition-colors"
@@ -62,7 +62,7 @@ export default function Footer() {
                 <Twitter className="h-5 w-5 text-foreground" />
               </motion.a>
               <motion.a 
-                href="mailto:luca@deangelis.ai"
+                href="mailto:contact@genai-hub.com"
                 className="p-2 rounded-full bg-background border border-border hover:bg-primary/5 transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -72,67 +72,50 @@ export default function Footer() {
             </div>
           </div>
           
-          <div className="md:col-span-2 lg:col-span-2">
-            <h3 className="font-semibold mb-6">Naviga</h3>
-            <ul className="space-y-4">
-              <li>
-                <Link href="/" className="flex items-center text-muted-foreground hover:text-primary transition-colors">
-                  <div className="w-5 h-5 mr-2 flex items-center justify-center">
-                    <Brain className="h-4 w-4" />
-                  </div>
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link href="/articles" className="flex items-center text-muted-foreground hover:text-primary transition-colors">
-                  <div className="w-5 h-5 mr-2 flex items-center justify-center">
-                    <BookOpen className="h-4 w-4" />
-                  </div>
-                  Articoli
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="flex items-center text-muted-foreground hover:text-primary transition-colors">
-                  <div className="w-5 h-5 mr-2 flex items-center justify-center">
-                    <User className="h-4 w-4" />
-                  </div>
-                  Chi sono
-                </Link>
-              </li>
-            </ul>
-          </div>
-          
-          <div className="md:col-span-3">
-            <h3 className="font-semibold mb-6">Servizi</h3>
-            <ul className="space-y-3">
-              <li className="text-muted-foreground">Consulenza strategica AI</li>
-              <li className="text-muted-foreground">Implementazione LLM</li>
-              <li className="text-muted-foreground">Formazione e workshop</li>
-              <li className="text-muted-foreground">Prompt engineering</li>
-              <li className="text-muted-foreground">Automazione processi</li>
-            </ul>
-          </div>
-          
-          <div className="md:col-span-2 lg:col-span-3">
-            <h3 className="font-semibold mb-6">Contatti</h3>
-            <div className="space-y-4">
-              <div className="flex items-start">
-                <Mail className="h-5 w-5 text-primary mr-3 mt-0.5" />
-                <a href="mailto:luca@deangelis.ai" className="text-muted-foreground hover:text-primary transition-colors">luca@deangelis.ai</a>
-              </div>
-              <div className="mt-6">
-                <a href="mailto:luca@deangelis.ai" className="inline-flex justify-center items-center px-4 py-2 rounded-full bg-gradient-to-r from-primary to-accent text-white text-sm font-medium hover:opacity-90 transition-opacity shadow-md">
-                  <Mail className="h-4 w-4 mr-2" />
-                  Contattami
-                </a>
+          <div className="grid grid-cols-2 gap-8">
+            <div>
+              <h3 className="font-semibold mb-6">Navigation</h3>
+              <ul className="space-y-4">
+                <li>
+                  <Link href="/" className="flex items-center text-muted-foreground hover:text-primary transition-colors">
+                    <div className="w-5 h-5 mr-2 flex items-center justify-center">
+                      <Brain className="h-4 w-4" />
+                    </div>
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/articles" className="flex items-center text-muted-foreground hover:text-primary transition-colors">
+                    <div className="w-5 h-5 mr-2 flex items-center justify-center">
+                      <BookOpen className="h-4 w-4" />
+                    </div>
+                    Articles
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="font-semibold mb-6">Contact</h3>
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <Mail className="h-5 w-5 text-primary mr-3 mt-0.5" />
+                  <a href="mailto:contact@genai-hub.com" className="text-muted-foreground hover:text-primary transition-colors">contact@genai-hub.com</a>
+                </div>
+                <div className="mt-6">
+                  <a href="mailto:contact@genai-hub.com" className="inline-flex justify-center items-center px-4 py-2 rounded-full bg-gradient-to-r from-primary to-accent text-white text-sm font-medium hover:opacity-90 transition-opacity shadow-md">
+                    <Mail className="h-4 w-4 mr-2" />
+                    Contact Us
+                  </a>
+                </div>
               </div>
             </div>
           </div>
         </div>
         
-        <div className="border-t border-primary/10 pt-8">
+        <div className="border-t border-primary/10 pt-6">
           <p className="text-sm text-muted-foreground text-center">
-            &copy; {new Date().getFullYear()} Luca De Angelis • AI Consultant • Tutti i diritti riservati
+            &copy; {new Date().getFullYear()} GenAI Hub • All rights reserved
           </p>
         </div>
       </div>

@@ -44,8 +44,7 @@ export default function Header() {
   // Menu links with animation
   const links = [
     { title: 'Home', path: '/', icon: <Sparkles className="h-4 w-4" /> },
-    { title: 'Articles', path: '/articles', icon: <BookOpen className="h-4 w-4" /> },
-    { title: 'About', path: '/about', icon: <Lightbulb className="h-4 w-4" /> }
+    { title: 'Articles', path: '/articles', icon: <BookOpen className="h-4 w-4" /> }
   ];
 
   const navVariants = {
