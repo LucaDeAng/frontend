@@ -1,11 +1,12 @@
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
 
-// Business-oriented UI components
-import BusinessHero from '@/components/home/BusinessHero';
-import BusinessFeatures from '@/components/home/BusinessFeatures';
-import BusinessArticles from '@/components/home/BusinessArticles';
-import BusinessNewsletter from '@/components/home/BusinessNewsletter';
+// Educational-oriented UI components
+import EducationalHero from '@/components/home/EducationalHero';
+import TopicsSection from '@/components/home/TopicsSection';
+import ArticleShowcase from '@/components/home/ArticleShowcase';
+import PromptLibrary from '@/components/home/PromptLibrary';
+import CommunityNewsletter from '@/components/home/CommunityNewsletter';
 
 export default function Home() {
   return (
@@ -26,17 +27,20 @@ export default function Home() {
       >
         {/* Scroll progress indicator is in App.tsx */}
         
-        {/* Professional hero section with video */}
-        <BusinessHero />
+        {/* Educational hero section with video background */}
+        <EducationalHero />
         
-        {/* Professional services/features grid */}
-        <BusinessFeatures />
+        {/* AI topics exploration section */}
+        <TopicsSection />
         
-        {/* Articles in professional business style */}
-        <BusinessArticles />
+        {/* Featured articles section */}
+        <ArticleShowcase />
         
-        {/* Newsletter with professional design */}
-        <BusinessNewsletter />
+        {/* Prompt library with copyable templates */}
+        <PromptLibrary />
+        
+        {/* Community newsletter signup */}
+        <CommunityNewsletter />
       </motion.div>
     </>
   );
