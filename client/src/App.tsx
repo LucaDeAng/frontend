@@ -14,6 +14,7 @@ import BuildInPublic from "@/pages/build-in-public";
 import NotFound from "@/pages/not-found";
 import CustomCursor from "@/components/ui/cursor";
 import ScrollProgress from "@/components/ui/scroll-progress";
+import ReadingProgress from "@/components/ui/reading-progress";
 import ParticleBackground from "@/components/ui/particle-background";
 import Lenis from "@studio-freight/lenis";
 
@@ -47,8 +48,9 @@ function App() {
       {/* Custom cursor */}
       <CustomCursor />
       
-      {/* Scroll progress */}
+      {/* Enhanced progress indicators */}
       <ScrollProgress />
+      <ReadingProgress />
       
       {/* Particle background */}
       <ParticleBackground />

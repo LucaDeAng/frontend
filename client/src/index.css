@@ -4,6 +4,289 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Enhanced Design System */
+@layer base {
+  :root {
+    --primary: 16 185 129;
+    --secondary: 59 130 246;
+    --accent: 139 92 246;
+    --background: 0 0 0;
+    --foreground: 255 255 255;
+    --muted: 39 39 42;
+    --muted-foreground: 161 161 170;
+    --border: 39 39 42;
+    --input: 39 39 42;
+    --ring: 16 185 129;
+    
+    /* Consistent spacing system */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 0.75rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    
+    /* Enhanced shadows for depth */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.2);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.6);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    scroll-behavior: smooth;
+  }
+
+  /* Improved text contrast and readability */
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-white font-bold;
+    text-rendering: optimizeLegibility;
+  }
+
+  p {
+    @apply text-gray-200 leading-relaxed;
+  }
+
+  /* Enhanced focus states for accessibility */
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  a:focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-black;
+  }
+
+  /* Smooth transitions for all interactive elements */
+  button, a, input, textarea, select {
+    @apply transition-all duration-300 ease-out;
+  }
+}
+
+@layer components {
+  /* Glassmorphism components */
+  .glass {
+    @apply bg-black/20 backdrop-blur-xl border border-white/10;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  }
+
+  .glass-card {
+    @apply glass rounded-xl p-6;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  /* Enhanced hover states */
+  .hoverable {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .hoverable:hover {
+    @apply transform -translate-y-1;
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Consistent card styling */
+  .enhanced-card {
+    @apply bg-zinc-900/80 border border-primary/20 rounded-xl p-6;
+    @apply shadow-xl shadow-black/20 transition-all duration-300;
+  }
+
+  .enhanced-card:hover {
+    @apply border-primary/40 shadow-2xl shadow-black/30 transform -translate-y-1;
+  }
+
+  /* Text contrast improvements */
+  .text-high-contrast {
+    @apply text-white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
+
+  .text-medium-contrast {
+    @apply text-gray-100;
+  }
+
+  .text-low-contrast {
+    @apply text-gray-300;
+  }
+
+  /* Button enhancements */
+  .btn-primary {
+    @apply bg-gradient-to-r from-primary to-secondary text-white;
+    @apply shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40;
+    @apply transition-all duration-300 transform hover:-translate-y-1;
+  }
+
+  .btn-glass {
+    @apply glass text-white hover:bg-white/20;
+    @apply shadow-xl hover:shadow-2xl transition-all duration-300;
+  }
+
+  /* Layout improvements */
+  .container-enhanced {
+    @apply container mx-auto px-6 md:px-8 lg:px-12;
+  }
+
+  .section-spacing {
+    @apply py-16 md:py-20 lg:py-24;
+  }
+
+  /* Grid system enhancements */
+  .grid-responsive {
+    @apply grid gap-6 md:gap-8;
+    @apply grid-cols-1 md:grid-cols-2 lg:grid-cols-3;
+  }
+
+  .grid-card {
+    @apply enhanced-card min-h-[200px];
+  }
+
+  /* Animation utilities */
+  .fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  .slide-up {
+    animation: slideUp 0.6s ease-out forwards;
+  }
+
+  .scale-in {
+    animation: scaleIn 0.4s ease-out forwards;
+  }
+
+  /* Scroll indicators */
+  .scroll-progress {
+    @apply fixed top-0 left-0 h-1 bg-gradient-to-r from-primary to-secondary z-50;
+  }
+
+  /* Enhanced prose styling */
+  .prose-enhanced {
+    @apply prose prose-lg prose-invert max-w-none;
+  }
+
+  .prose-enhanced h1,
+  .prose-enhanced h2,
+  .prose-enhanced h3 {
+    @apply text-white;
+  }
+
+  .prose-enhanced p {
+    @apply text-gray-200 leading-relaxed;
+  }
+
+  .prose-enhanced a {
+    @apply text-primary hover:text-primary/80 transition-colors;
+  }
+
+  .prose-enhanced code {
+    @apply bg-black/50 text-primary px-2 py-1 rounded;
+  }
+
+  .prose-enhanced blockquote {
+    @apply border-l-4 border-primary bg-black/30 p-4 rounded-r;
+  }
+}
+
+@layer utilities {
+  /* Spacing utilities */
+  .space-section {
+    @apply space-y-16 md:space-y-20 lg:space-y-24;
+  }
+
+  .space-content {
+    @apply space-y-6 md:space-y-8;
+  }
+
+  /* Responsive text utilities */
+  .text-responsive-xl {
+    @apply text-2xl md:text-3xl lg:text-4xl xl:text-5xl;
+  }
+
+  .text-responsive-lg {
+    @apply text-xl md:text-2xl lg:text-3xl;
+  }
+
+  .text-responsive-md {
+    @apply text-lg md:text-xl;
+  }
+
+  /* Enhanced shadows */
+  .shadow-glow {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+  }
+
+  .shadow-depth {
+    box-shadow: 
+      0 4px 6px -1px rgba(0, 0, 0, 0.3),
+      0 2px 4px -1px rgba(0, 0, 0, 0.3),
+      0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* Keyframe animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .glass {
+    @apply bg-black border-white;
+  }
+  
+  .text-gray-300 {
+    @apply text-gray-100;
+  }
+  
+  .text-gray-400 {
+    @apply text-gray-200;
+  }
+}
+
 :root {
   color-scheme: dark;
   
