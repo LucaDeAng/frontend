@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { motion } from 'framer-motion';
-import { Home, BookOpen, Bot, Menu as MenuIcon, X } from 'lucide-react';
+import { Home, BookOpen, Bot, Menu as MenuIcon, X, User, Hammer } from 'lucide-react';
 
 export default function Menu() {
   const [location] = useLocation();
@@ -10,7 +10,9 @@ export default function Menu() {
   const menuItems = [
     { name: 'Home', path: '/', icon: <Home className="h-4 w-4" /> },
     { name: 'Articles', path: '/articles', icon: <BookOpen className="h-4 w-4" /> },
-    { name: 'Prompts', path: '/playground', icon: <Bot className="h-4 w-4" /> }
+    { name: 'Prompts', path: '/playground', icon: <Bot className="h-4 w-4" /> },
+    { name: 'About Me', path: '/about', icon: <User className="h-4 w-4" /> },
+    { name: 'Build in Public', path: '/build-in-public', icon: <Hammer className="h-4 w-4" /> }
   ];
 
   return (

@@ -8,6 +8,8 @@ import Articles from "@/pages/articles";
 import Article from "@/pages/article";
 import Playground from "@/pages/playground";
 import Admin from "@/pages/admin";
+import AboutMe from "@/pages/about-me";
+import BuildInPublic from "@/pages/build-in-public";
 import NotFound from "@/pages/not-found";
 import CustomCursor from "@/components/ui/cursor";
 import ScrollProgress from "@/components/ui/scroll-progress";
@@ -58,6 +60,8 @@ function App() {
             <Route path="/articles" component={Articles} />
             <Route path="/article/:slug" component={Article} />
             <Route path="/playground" component={Playground} />
+            <Route path="/about" component={AboutMe} />
+            <Route path="/build-in-public" component={BuildInPublic} />
             <Route path="/admin" component={Admin} />
             <Route component={NotFound} />
           </Switch>
