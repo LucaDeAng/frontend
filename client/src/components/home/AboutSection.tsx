@@ -145,20 +145,36 @@ export default function AboutSection() {
             ))}
           </motion.div>
 
-          {/* Mission Statement */}
+          {/* Contact & Mission Statement */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 1 }}
-            className="mt-16 text-center"
+            className="mt-16 space-y-8"
           >
-            <div className="bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-2xl p-8">
-              <h3 className="text-2xl font-bold text-white mb-4">My Mission</h3>
-              <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mx-auto">
-                To democratize AI knowledge and empower individuals and organizations to harness artificial intelligence 
-                as a force for positive change, innovation, and sustainable growth in our rapidly evolving digital landscape.
-              </p>
+            {/* Contact Information */}
+            <div className="text-center">
+              <div className="bg-black/30 border border-primary/20 rounded-xl p-6 max-w-md mx-auto">
+                <h3 className="text-lg font-bold text-white mb-3">Get In Touch</h3>
+                <a 
+                  href="mailto:lucadeang@hotmail.it"
+                  className="text-primary hover:text-primary/80 transition-colors font-mono text-sm"
+                >
+                  lucadeang@hotmail.it
+                </a>
+              </div>
+            </div>
+
+            {/* Mission Statement */}
+            <div className="text-center">
+              <div className="bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-2xl p-8">
+                <h3 className="text-2xl font-bold text-white mb-4">My Mission</h3>
+                <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mx-auto">
+                  To democratize AI knowledge and empower individuals and organizations to harness artificial intelligence 
+                  as a force for positive change, innovation, and sustainable growth in our rapidly evolving digital landscape.
+                </p>
+              </div>
             </div>
           </motion.div>
         </motion.div>
