@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Brain, Menu, X, ChevronRight, Code, FileText, BookOpen, Sparkles, Lightbulb, Bot } from 'lucide-react';
+import { Brain, Menu, X, ChevronRight, Code, FileText, BookOpen, Sparkles, Lightbulb, Bot, Search, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Logo from './Logo';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [articlesDropdownOpen, setArticlesDropdownOpen] = useState(false);
   const [location] = useLocation();
 
   useEffect(() => {
@@ -42,10 +45,25 @@ export default function Header() {
     }
   };
 
+  // Article categories for dropdown
+  const articleCategories = [
+    { title: 'All Articles', path: '/articles', icon: <BookOpen className="h-4 w-4" /> },
+    { title: 'AI Research', path: '/articles?category=research', icon: <Brain className="h-4 w-4" /> },
+    { title: 'Machine Learning', path: '/articles?category=ml', icon: <Bot className="h-4 w-4" /> },
+    { title: 'Technology', path: '/articles?category=tech', icon: <Code className="h-4 w-4" /> },
+    { title: 'Tutorials', path: '/articles?category=tutorials', icon: <Lightbulb className="h-4 w-4" /> }
+  ];
+
   // Menu links with animation
   const links = [
     { title: 'Home', path: '/', icon: <Sparkles className="h-4 w-4" /> },
-    { title: 'Articles', path: '/articles', icon: <BookOpen className="h-4 w-4" /> },
+    { 
+      title: 'Articles', 
+      path: '/articles', 
+      icon: <BookOpen className="h-4 w-4" />, 
+      hasDropdown: true,
+      dropdown: articleCategories
+    },
     { title: 'Prompts', path: '/playground', icon: <Bot className="h-4 w-4" /> },
     { title: 'About Me', path: '/about', icon: <Brain className="h-4 w-4" /> },
     { title: 'Build in Public', path: '/build-in-public', icon: <Code className="h-4 w-4" /> }
@@ -71,8 +89,8 @@ export default function Header() {
     <header 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled 
-          ? 'py-2 glass backdrop-blur-xl border-b border-primary/20' 
-          : 'py-3 bg-black/80 backdrop-blur-sm'
+          ? 'py-2 glass backdrop-blur-xl border-b border-primary/20 shadow-xl' 
+          : 'py-4 bg-black/90 backdrop-blur-sm'
       }`}
     >
       <div className="container mx-auto px-6 md:px-12">

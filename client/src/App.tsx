@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { Route, Switch } from "wouter";
 import { AnimatePresence } from "framer-motion";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import EnhancedHeader from "@/components/EnhancedHeader";
+import EnhancedFooter from "@/components/EnhancedFooter";
+import Breadcrumb from "@/components/Breadcrumb";
 import Home from "@/pages/home";
 import Articles from "@/pages/articles";
 import Article from "@/pages/article";
@@ -52,7 +53,8 @@ function App() {
       {/* Particle background */}
       <ParticleBackground />
       
-      <Header />
+      <EnhancedHeader />
+      <Breadcrumb />
       <main className="flex-grow relative z-10">
         <AnimatePresence mode="wait">
           <Switch>
@@ -67,7 +69,7 @@ function App() {
           </Switch>
         </AnimatePresence>
       </main>
-      <Footer />
+      <EnhancedFooter />
     </div>
   );
 }
