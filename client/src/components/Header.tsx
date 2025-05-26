@@ -144,11 +144,14 @@ export default function Header() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
                 >
-                  <div className="relative">
-                    <span className="text-white font-bold text-xl">AI Hub</span>
+                  <div className="relative flex items-center">
+                    <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg mr-3 flex items-center justify-center">
+                      <span className="text-white font-bold text-sm">AI</span>
+                    </div>
+                    <span className="text-white font-bold text-xl">Hub</span>
                     
                     <motion.span
-                      className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"
+                      className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary to-secondary"
                       initial={{ scaleX: 0, originX: 0 }}
                       animate={{ scaleX: 1 }}
                       transition={{ duration: 0.5, delay: 0.2 }}

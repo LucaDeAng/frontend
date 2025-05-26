@@ -15,14 +15,16 @@ export default function ArticlePage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-16">
-        <div className="max-w-4xl mx-auto">
-          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-md w-1/3 mb-4 animate-pulse"></div>
-          <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded-md w-2/3 mb-8 animate-pulse"></div>
-          <div className="space-y-4">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="h-4 bg-gray-200 dark:bg-gray-700 rounded-md animate-pulse"></div>
-            ))}
+      <div className="py-20 bg-black">
+        <div className="container mx-auto px-6 md:px-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="h-8 bg-white/10 rounded-md w-1/3 mb-4 animate-pulse"></div>
+            <div className="h-16 bg-white/10 rounded-md w-2/3 mb-8 animate-pulse"></div>
+            <div className="space-y-4">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="h-4 bg-white/10 rounded-md animate-pulse"></div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

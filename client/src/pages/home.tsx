@@ -5,6 +5,7 @@ import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import CommunityNewsletter from '@/components/home/CommunityNewsletter';
 import ArticleShowcase from '@/components/home/ArticleShowcase';
+import AboutSection from '@/components/home/AboutSection';
 
 export default function Home() {
   return (
@@ -148,6 +149,9 @@ export default function Home() {
             </div>
           </div>
         </section>
+        
+        {/* About section */}
+        <AboutSection />
         
         {/* Featured articles section */}
         <ArticleShowcase />
