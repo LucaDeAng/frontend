@@ -2,46 +2,18 @@ import { Link } from "wouter";
 import Container from "@/components/layout/Container";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, Brain, Zap } from "lucide-react";
+import AnimatedBackground from "@/components/ui/animated-background";
+import ScrollReveal from "@/components/ui/scroll-reveal";
 
 export default function HeroSection() {
   return (
-    <section className="relative overflow-hidden min-h-screen flex items-center py-16 md:py-24">
-      {/* Background elements */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        {/* Video background */}
-        <div className="absolute inset-0 w-full h-full">
-          <div className="absolute inset-0 bg-gradient-to-b from-secondary/50 via-background to-background dark:from-secondary/10 z-10"></div>
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="absolute w-full h-full object-cover opacity-50 dark:opacity-30"
-          >
-            <source 
-              src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-brain-surrounded-by-data-12724-large.mp4" 
-              type="video/mp4" 
-            />
-          </video>
-        </div>
-        
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent z-20"></div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.4 }}
-          transition={{ duration: 2 }}
-          className="absolute inset-0 opacity-40 dark:opacity-20 mix-blend-soft-light z-20"
-          style={{
-            backgroundImage: "url('https://grainy-gradients.vercel.app/noise.svg')",
-            backgroundSize: "200px",
-          }}
-        ></motion.div>
-        
-        {/* Decorative elements */}
-        <div className="absolute -top-40 -left-40 w-80 h-80 bg-primary/30 dark:bg-primary/20 rounded-full blur-3xl z-20"></div>
-        <div className="absolute top-1/4 right-0 w-96 h-96 bg-accent/20 dark:bg-accent/10 rounded-full blur-3xl z-20"></div>
-      </div>
+    <section className="relative overflow-hidden min-h-screen flex items-center section-spacing">
+      {/* Enhanced animated background */}
+      <AnimatedBackground />
+      
+      {/* Glassmorphism overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/70 z-10"></div>
       
       <Container className="relative z-10 px-6 md:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
