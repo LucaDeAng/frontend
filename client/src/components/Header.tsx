@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Brain, Menu, X, ChevronRight, Code, FileText, BookOpen, Sparkles, Lightbulb, Bot } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Logo from './Logo';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -144,19 +145,11 @@ export default function Header() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
                 >
-                  <div className="relative flex items-center">
-                    <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg mr-3 flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">AI</span>
-                    </div>
-                    <span className="text-white font-bold text-xl">Hub</span>
-                    
-                    <motion.span
-                      className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary to-secondary"
-                      initial={{ scaleX: 0, originX: 0 }}
-                      animate={{ scaleX: 1 }}
-                      transition={{ duration: 0.5, delay: 0.2 }}
-                    />
-                  </div>
+                  <Logo 
+                    size="md" 
+                    variant="dark" 
+                    showFullName={true}
+                  />
                 </motion.div>
               </div>
             </motion.div>
