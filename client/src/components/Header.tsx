@@ -273,7 +273,7 @@ export default function Header() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
               >
-                ESC per chiudere
+                Press ESC to close
               </motion.div>
             </motion.div>
           </motion.div>
