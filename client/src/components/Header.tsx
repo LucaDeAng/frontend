@@ -46,7 +46,9 @@ export default function Header() {
   const links = [
     { title: 'Home', path: '/', icon: <Sparkles className="h-4 w-4" /> },
     { title: 'Articles', path: '/articles', icon: <BookOpen className="h-4 w-4" /> },
-    { title: 'Prompts', path: '/playground', icon: <Bot className="h-4 w-4" /> }
+    { title: 'Prompts', path: '/playground', icon: <Bot className="h-4 w-4" /> },
+    { title: 'About Me', path: '/about', icon: <Brain className="h-4 w-4" /> },
+    { title: 'Build in Public', path: '/build-in-public', icon: <Code className="h-4 w-4" /> }
   ];
 
   const navVariants = {
