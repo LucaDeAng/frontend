@@ -1,7 +1,7 @@
-----
+---
 title: "Google AlphaEvolve: Pioneering Next-Gen AI Evolution"
 date: "2025-05-26"
-summary: "Discover how Google AlphaEvolve applies evolutionary strategies to optimize AI models—boosting adaptability, efficiency, and real-world performance across diverse applications."
+summary: "Discover how Google AlphaEvolve applies evolutionary strategies to optimize AI models—boosting adaptability, efficiency, and real-world performance."
 author: "Luca De Angelis"
 category: "AI Innovations"
 image: "https://images.unsplash.com/photo-1603791440384-56cd371ee9a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500&q=80"
