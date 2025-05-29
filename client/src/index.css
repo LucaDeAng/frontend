@@ -313,8 +313,8 @@
   --accent-foreground: 0 0% 0%;
   
   /* Functional Colors */
-  --destructive: 0 100% 50%;
-  --destructive-foreground: 0 0% 0%;
+  --destructive: 0 70% 40%;
+  --destructive-foreground: 0 0% 100%;
   --success: 142 70% 45%;
   --success-foreground: 0 0% 0%;
   --warning: 38 92% 50%;

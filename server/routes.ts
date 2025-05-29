@@ -47,14 +47,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all articles metadata
   apiRouter.get("/articles", async (req: Request, res: Response) => {
     try {
+      console.log("🔍 [ARTICLES] Richiesta articoli ricevuta");
       const articles = await storage.getArticles();
+      console.log("✅ [ARTICLES] Articoli recuperati:", articles?.length || 0);
       if (!articles || articles.length === 0) {
-        console.log("Nessun articolo trovato");
+        console.log("⚠️ [ARTICLES] Nessun articolo trovato, ritorno array vuoto");
         return res.json([]);
       }
+      console.log("📋 [ARTICLES] Primi 3 articoli:", articles.slice(0, 3).map(a => ({ slug: a.slug, title: a.title })));
       res.json(articles);
     } catch (error) {
-      console.error("Error fetching articles:", error);
+      console.error("❌ [ARTICLES] Errore nel recupero degli articoli:", error);
       // In caso di errore, ritorniamo un array vuoto invece di un errore 500
       res.json([]);
     }
@@ -498,7 +501,7 @@ ${content}`;
       await fs.writeFile(prefPath, JSON.stringify(prefs, null, 2));
       console.log('[PREFERENCES] Preferenze salvate:', prefs);
       res.json({ success: true, preferences: prefs });
-    } catch (err) {
+    } catch (err: any) {
       console.error('[PREFERENCES] Errore scrittura file:', err);
       res.status(500).json({ error: 'Errore nel salvataggio delle preferenze', details: err.message });
     }
@@ -640,6 +643,100 @@ ${content}`;
       createdAt: new Date().toISOString()
     }));
     res.json(topPrompts);
+  });
+
+  // Debug endpoint temporaneo
+  apiRouter.get("/debug/articles-log", async (req: Request, res: Response) => {
+    try {
+      const debugFile = path.join("/app", "debug-articles.log");
+      const content = await fs.readFile(debugFile, "utf-8");
+      res.set('Content-Type', 'text/plain');
+      res.send(content);
+    } catch (error: any) {
+      res.status(404).json({ error: "Debug log not found", message: error.message });
+    }
+  });
+
+  // Nuovo endpoint debug per verificare gli articoli
+  apiRouter.get("/debug/articles-info", async (req: Request, res: Response) => {
+    try {
+      const debug: {
+        timestamp: string;
+        workingDirectory: string;
+        environment: string;
+        contentDir: any;
+        articlesInfo: {
+          directoryExists: boolean;
+          files: string[];
+          articles: any[];
+          errors: any[];
+        };
+      } = {
+        timestamp: new Date().toISOString(),
+        workingDirectory: process.cwd(),
+        environment: process.env.NODE_ENV || 'development',
+        contentDir: {},
+        articlesInfo: {
+          directoryExists: false,
+          files: [],
+          articles: [],
+          errors: []
+        }
+      };
+
+      // Verifica directory content
+      try {
+        const contentPath = path.join("content");
+        const contentExists = await fs.access(contentPath).then(() => true).catch(() => false);
+        if (contentExists) {
+          const contentFiles = await fs.readdir(contentPath);
+          debug.contentDir = { exists: true, files: contentFiles };
+        } else {
+          debug.contentDir = { exists: false, error: "Directory content not found" };
+        }
+      } catch (error: any) {
+        debug.contentDir = { exists: false, error: error.message };
+      }
+
+      // Verifica directory articles
+      try {
+        const articlesPath = path.join("content", "articles");
+        const articlesExists = await fs.access(articlesPath).then(() => true).catch(() => false);
+        if (articlesExists) {
+          debug.articlesInfo.directoryExists = true;
+          const articleFiles = await fs.readdir(articlesPath);
+          debug.articlesInfo.files = articleFiles.filter(f => f.endsWith('.md'));
+          
+          // Prova a leggere ogni articolo
+          for (const file of debug.articlesInfo.files) {
+            try {
+              const filePath = path.join(articlesPath, file);
+              const content = await fs.readFile(filePath, "utf-8");
+              const lines = content.split('\n').length;
+              const size = content.length;
+              debug.articlesInfo.articles.push({
+                file,
+                slug: path.basename(file, '.md'),
+                size,
+                lines,
+                hasContent: size > 0,
+                preview: content.substring(0, 200) + (content.length > 200 ? '...' : '')
+              });
+            } catch (error: any) {
+              debug.articlesInfo.errors.push({ file, error: error.message });
+            }
+          }
+        } else {
+          debug.articlesInfo.directoryExists = false;
+        }
+      } catch (error: any) {
+        debug.articlesInfo.errors.push({ general: error.message });
+      }
+
+      res.json(debug);
+    } catch (error: any) {
+      res.status(500).json({ error: "Debug failed", message: error.message });
+    }
   });
 
   // Mount API routes under /api
