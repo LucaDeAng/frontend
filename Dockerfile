@@ -29,4 +29,3 @@
     
     # 7) Avvia il server
     CMD ["node", "dist/index.js"]
-    
