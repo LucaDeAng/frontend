@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
-# 2) Copia tutto il sorgente
+# 2) Copia tutto il sorgente (inclusi i tuoi .md sotto sitopersonale-backend/content/articles)
 COPY . .
 
 # 3) Genera il build (frontend + backend)
@@ -40,4 +40,3 @@ USER appuser
 
 # 9) Avvia il server
 CMD ["node", "dist/index.js"]
-    
