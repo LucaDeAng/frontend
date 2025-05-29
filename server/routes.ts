@@ -17,7 +17,19 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
-const upload = multer({ dest: path.join('public', 'uploads') });
+// Configurazione multer per usare /tmp invece di public/uploads
+const uploadsDir = process.env.NODE_ENV === 'production' ? '/tmp/uploads' : path.join('public', 'uploads');
+
+// Assicuriamoci che la directory esista
+try {
+  if (!fsSync.existsSync(uploadsDir)) {
+    fsSync.mkdirSync(uploadsDir, { recursive: true });
+  }
+} catch (error) {
+  console.warn('Impossibile creare la directory uploads:', error);
+}
+
+const upload = multer({ dest: uploadsDir });
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API routes

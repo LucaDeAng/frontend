@@ -96,6 +96,13 @@ app.use((req, res, next) => {
 function serveStaticFiles(app: express.Express) {
   const distPath = path.resolve(process.cwd(), "dist/public");
   
+  // Configurazione per servire i file uploads
+  const uploadsDir = process.env.NODE_ENV === 'production' ? '/tmp/uploads' : path.join(process.cwd(), 'public', 'uploads');
+  
+  // Middleware per servire file uploads
+  app.use('/uploads', express.static(uploadsDir));
+  console.log(`📁 Servendo file uploads da: ${uploadsDir}`);
+  
   console.log(`📁 Tentativo di servire file statici da: ${distPath}`);
   
   if (fs.existsSync(distPath)) {
