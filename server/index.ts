@@ -53,9 +53,76 @@ app.use((req, res, next) => {
   // Setup per development o production
   if (process.env.NODE_ENV === "development") {
     try {
-      // Tenta di importare e configurare Vite per development
-      const { setupVite } = await import("./vite");
-      await setupVite(app, server);
+      console.log("🔧 Modalità development: configurando Vite...");
+      // Import dinamico di vite solo in development
+      const vite = await import("vite");
+      const { createServer: createViteServer, createLogger } = vite;
+      
+      // Import vite.config solo se disponibile
+      let viteConfig;
+      try {
+        const configModule = await import("../vite.config.js");
+        viteConfig = configModule.default;
+      } catch {
+        // Se vite.config non esiste, usa configurazione di base
+        viteConfig = {
+          root: path.resolve(process.cwd(), "client"),
+          build: {
+            outDir: path.resolve(process.cwd(), "dist/public"),
+          }
+        };
+      }
+      
+      const serverOptions = {
+        middlewareMode: true,
+        hmr: { server },
+        allowedHosts: true as const
+      };
+
+      const viteDevServer = await createViteServer({
+        ...viteConfig,
+        configFile: false,
+        customLogger: {
+          ...createLogger(),
+          error: (msg, options) => {
+            createLogger().error(msg, options);
+            process.exit(1);
+          },
+        },
+        server: serverOptions,
+        appType: "custom",
+      });
+
+      app.use(viteDevServer.middlewares);
+      app.use("*", async (req, res, next) => {
+        const url = req.originalUrl;
+
+        // NON intercettare le routes API
+        if (url.startsWith('/api')) {
+          return next();
+        }
+
+        try {
+          const clientTemplate = path.resolve(process.cwd(), "client", "index.html");
+
+          if (!fs.existsSync(clientTemplate)) {
+            throw new Error(`Could not find index.html at ${clientTemplate}`);
+          }
+
+          // always reload the index.html file from disk incase it changes
+          let template = await fs.promises.readFile(clientTemplate, "utf-8");
+          template = template.replace(
+            `src="/src/main.tsx"`,
+            `src="/src/main.tsx?v=${Date.now()}"`,
+          );
+          const page = await viteDevServer.transformIndexHtml(url, template);
+          res.status(200).set({ "Content-Type": "text/html" }).end(page);
+        } catch (e) {
+          viteDevServer.ssrFixStacktrace(e as Error);
+          next(e);
+        }
+      });
+      
       console.log("✅ Vite development server configurato");
     } catch (error) {
       console.error("❌ Errore nell'impostazione di Vite (development):", error);
