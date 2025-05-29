@@ -19,7 +19,7 @@ export function SEOHead({
   title = "AI Hub - Il Tuo Portale per l'Intelligenza Artificiale",
   description = "Esplora il futuro dell'AI con AI Hub: articoli, guide pratiche, insights e risorse per professionisti e appassionati di intelligenza artificiale.",
   image = "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=630&q=80",
-  url = "https://aihub.dev",
+  url = "https://genai4business.com",
   type = "website",
   article
 }: SEOHeadProps) {

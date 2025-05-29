@@ -78,7 +78,7 @@ export default function ArticlePage() {
   }
 
   // URL assoluto per i meta tag
-  const articleUrl = `https://aihub.dev/article/${article.slug}`;
+  const articleUrl = `https://genai4business.com/article/${article.slug}`;
   const imageUrl = article.meta.image || "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=630&q=80";
 
   return (
@@ -141,7 +141,7 @@ export default function ArticlePage() {
             "name": "AI Hub",
             "logo": {
               "@type": "ImageObject",
-              "url": "https://aihub.dev/logo.png"
+              "url": "https://genai4business.com/logo.png"
             }
           },
           "mainEntityOfPage": {
