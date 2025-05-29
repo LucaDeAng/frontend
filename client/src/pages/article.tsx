@@ -77,45 +77,79 @@ export default function ArticlePage() {
     );
   }
 
+  // URL assoluto per i meta tag
+  const articleUrl = `https://aihub.dev/article/${article.slug}`;
+  const imageUrl = article.meta.image || "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=630&q=80";
+
   return (
     <>
       <Helmet>
+        {/* Titolo e descrizione base */}
         <title>{article.meta.title} | AI Hub</title>
         <meta name="description" content={article.meta.summary} />
+        <meta name="keywords" content={article.meta.tags?.join(', ') || 'AI, Intelligenza Artificiale, Tecnologia'} />
+        <meta name="author" content={article.meta.author} />
+        
+        {/* Open Graph meta tags per LinkedIn e Facebook */}
         <meta property="og:title" content={`${article.meta.title} | AI Hub`} />
         <meta property="og:description" content={article.meta.summary} />
         <meta property="og:type" content="article" />
-        <meta property="og:image" content={article.meta.image} />
-        <meta property="og:url" content={window.location.href} />
-        <meta property="article:published_time" content={article.meta.date} />
+        <meta property="og:image" content={imageUrl} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={`${article.meta.title} - AI Hub`} />
+        <meta property="og:url" content={articleUrl} />
+        <meta property="og:site_name" content="AI Hub" />
+        <meta property="og:locale" content="it_IT" />
+        
+        {/* Meta tag specifici per articoli */}
+        <meta property="article:published_time" content={new Date(article.meta.date).toISOString()} />
         <meta property="article:author" content={article.meta.author} />
         <meta property="article:section" content={article.meta.category} />
+        {article.meta.tags?.map(tag => (
+          <meta key={tag} property="article:tag" content={tag} />
+        ))}
+        
+        {/* Twitter Card meta tags */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${article.meta.title} | AI Hub`} />
         <meta name="twitter:description" content={article.meta.summary} />
-        <meta name="twitter:image" content={article.meta.image} />
-        <script type="application/ld+json">{`
-          {
-            "@context": "https://schema.org",
-            "@type": "Article",
-            "headline": "${article.meta.title}",
-            "description": "${article.meta.summary}",
-            "image": "${article.meta.image}",
-            "author": {
-              "@type": "Person",
-              "name": "${article.meta.author}"
-            },
-            "datePublished": "${article.meta.date}",
-            "publisher": {
-              "@type": "Organization",
-              "name": "AI Hub"
-            },
-            "mainEntityOfPage": {
-              "@type": "WebPage",
-              "@id": "${window.location.href}"
+        <meta name="twitter:image" content={imageUrl} />
+        <meta name="twitter:image:alt" content={`${article.meta.title} - AI Hub`} />
+        
+        {/* LinkedIn specifici */}
+        <meta property="linkedin:owner" content="AI Hub" />
+        
+        {/* URL canonico */}
+        <link rel="canonical" href={articleUrl} />
+        
+        {/* Schema.org JSON-LD per Rich Snippets */}
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Article",
+          "headline": article.meta.title,
+          "description": article.meta.summary,
+          "image": imageUrl,
+          "author": {
+            "@type": "Person",
+            "name": article.meta.author
+          },
+          "datePublished": new Date(article.meta.date).toISOString(),
+          "dateModified": new Date(article.meta.date).toISOString(),
+          "publisher": {
+            "@type": "Organization",
+            "name": "AI Hub",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://aihub.dev/logo.png"
             }
-          }
-        `}</script>
+          },
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": articleUrl
+          },
+          "keywords": article.meta.tags?.join(', ') || 'AI, Intelligenza Artificiale, Tecnologia'
+        })}</script>
       </Helmet>
       <ArticleContent article={article} isAdmin={isAdmin} />
       {/* Rating e condivisione */}
