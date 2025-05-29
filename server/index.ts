@@ -1,6 +1,8 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import cors from 'cors';
+import path from 'path';
+import fs from 'fs';
 
 const app = express();
 
@@ -48,13 +50,21 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  // Setup Vite in development DOPO aver registrato le routes API
+  // Setup per development o production
   if (process.env.NODE_ENV === "development") {
-    const { setupVite } = await import("./vite");
-    await setupVite(app, server);
+    try {
+      // Tenta di importare e configurare Vite per development
+      const { setupVite } = await import("./vite");
+      await setupVite(app, server);
+      console.log("✅ Vite development server configurato");
+    } catch (error) {
+      console.error("❌ Errore nell'impostazione di Vite (development):", error);
+      // Fallback per servire file statici anche in development
+      serveStaticFiles(app);
+    }
   } else {
-    const { serveStatic } = await import("./vite");
-    serveStatic(app);
+    console.log("🚀 Modalità produzione: servendo file statici");
+    serveStaticFiles(app);
   }
 
   // Gestione errori globale
@@ -90,3 +100,44 @@ app.use((req, res, next) => {
     }
   });
 })();
+
+// Funzione per servire file statici senza dipendenze da vite
+function serveStaticFiles(app: express.Express) {
+  const distPath = path.resolve(process.cwd(), "dist/public");
+  
+  console.log(`📁 Tentativo di servire file statici da: ${distPath}`);
+  
+  if (fs.existsSync(distPath)) {
+    app.use(express.static(distPath));
+    console.log("✅ File statici configurati correttamente");
+    
+    // Fallback per SPA routing - MA NON per le routes API
+    app.use("*", (req, res, next) => {
+      if (req.originalUrl.startsWith('/api')) {
+        return next();
+      }
+      
+      const indexPath = path.resolve(distPath, "index.html");
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        res.status(404).send("Applicazione non trovata. Eseguire 'npm run build' per buildare l'applicazione.");
+      }
+    });
+  } else {
+    console.warn(`⚠️ Directory dist/public non trovata: ${distPath}`);
+    console.warn("   Per servire file statici, eseguire 'npm run build' prima di avviare il server");
+    
+    // Serve una pagina di errore base per non-API routes
+    app.use("*", (req, res, next) => {
+      if (req.originalUrl.startsWith('/api')) {
+        return next();
+      }
+      
+      res.status(404).json({ 
+        error: "Applicazione frontend non trovata", 
+        message: "Eseguire 'npm run build' per buildare l'applicazione"
+      });
+    });
+  }
+}

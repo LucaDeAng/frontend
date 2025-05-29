@@ -25,63 +25,82 @@ export async function setupVite(app: Express, server: Server) {
     return;
   }
 
-  const { createServer: createViteServer, createLogger } = await import("vite");
-  const viteConfig = await import("../vite.config").then(m => m.default);
-  
-  const serverOptions = {
-    middlewareMode: true,
-    hmr: { server },
-    allowedHosts: true as const
-  };
-
-  const vite = await createViteServer({
-    ...viteConfig,
-    configFile: false,
-    customLogger: {
-      ...createLogger(),
-      error: (msg, options) => {
-        createLogger().error(msg, options);
-        process.exit(1);
-      },
-    },
-    server: serverOptions,
-    appType: "custom",
-  });
-
-  app.use(vite.middlewares);
-  app.use("*", async (req, res, next) => {
-    const url = req.originalUrl;
-
-    // NON intercettare le routes API
-    if (url.startsWith('/api')) {
-      return next();
-    }
-
+  try {
+    const { createServer: createViteServer, createLogger } = await import("vite");
+    
+    // Import vite.config solo se disponibile
+    let viteConfig;
     try {
-      const clientTemplate = path.resolve(
-        __dirname,
-        "..",
-        "client",
-        "index.html"
-      );
+      const configModule = await import("../vite.config.js");
+      viteConfig = configModule.default;
+    } catch {
+      // Se vite.config non esiste, usa configurazione di base
+      viteConfig = {
+        root: path.resolve(__dirname, "..", "client"),
+        build: {
+          outDir: path.resolve(__dirname, "..", "dist/public"),
+        }
+      };
+    }
+    
+    const serverOptions = {
+      middlewareMode: true,
+      hmr: { server },
+      allowedHosts: true as const
+    };
 
-      if (!fs.existsSync(clientTemplate)) {
-        throw new Error(`Could not find index.html at ${clientTemplate}`);
+    const vite = await createViteServer({
+      ...viteConfig,
+      configFile: false,
+      customLogger: {
+        ...createLogger(),
+        error: (msg, options) => {
+          createLogger().error(msg, options);
+          process.exit(1);
+        },
+      },
+      server: serverOptions,
+      appType: "custom",
+    });
+
+    app.use(vite.middlewares);
+    app.use("*", async (req, res, next) => {
+      const url = req.originalUrl;
+
+      // NON intercettare le routes API
+      if (url.startsWith('/api')) {
+        return next();
       }
 
-      // always reload the index.html file from disk incase it changes
-      let template = await fs.promises.readFile(clientTemplate, "utf-8");
-      template = template.replace(
-        `src="/src/main.tsx"`,
-        `src="/src/main.tsx?v=${nanoid()}"`,
-      );
-      const page = await vite.transformIndexHtml(url, template);
-      res.status(200).set({ "Content-Type": "text/html" }).end(page);
-    } catch (e) {
-      vite.ssrFixStacktrace(e as Error);
-      next(e);
-    }
-  });
+      try {
+        const clientTemplate = path.resolve(
+          __dirname,
+          "..",
+          "client",
+          "index.html"
+        );
+
+        if (!fs.existsSync(clientTemplate)) {
+          throw new Error(`Could not find index.html at ${clientTemplate}`);
+        }
+
+        // always reload the index.html file from disk incase it changes
+        let template = await fs.promises.readFile(clientTemplate, "utf-8");
+        template = template.replace(
+          `src="/src/main.tsx"`,
+          `src="/src/main.tsx?v=${nanoid()}"`,
+        );
+        const page = await vite.transformIndexHtml(url, template);
+        res.status(200).set({ "Content-Type": "text/html" }).end(page);
+      } catch (e) {
+        vite.ssrFixStacktrace(e as Error);
+        next(e);
+      }
+    });
+  } catch (error) {
+    console.error("Errore nell'impostazione di Vite:", error);
+    // In caso di errore, continua senza Vite
+  }
 }
 
 export function serveStatic(app: Express) {
