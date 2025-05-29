@@ -48,10 +48,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.get("/articles", async (req: Request, res: Response) => {
     try {
       const articles = await storage.getArticles();
+      if (!articles || articles.length === 0) {
+        console.log("Nessun articolo trovato");
+        return res.json([]);
+      }
       res.json(articles);
     } catch (error) {
       console.error("Error fetching articles:", error);
-      res.status(500).json({ message: "Error fetching articles" });
+      // In caso di errore, ritorniamo un array vuoto invece di un errore 500
+      res.json([]);
     }
   });
   

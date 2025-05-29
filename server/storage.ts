@@ -64,11 +64,11 @@ export class MemStorage implements IStorage {
     try {
       const contentDir = path.join("content", "articles");
       
-      // Verifica se la directory esiste
+      // Verifica se la directory esiste e i permessi
       try {
-        await fs.access(contentDir);
+        await fs.access(contentDir, fs.constants.R_OK);
       } catch (error) {
-        console.error("Directory content/articles non trovata:", error);
+        console.error("Directory content/articles non trovata o non accessibile:", error);
         return [];
       }
       
@@ -79,9 +79,11 @@ export class MemStorage implements IStorage {
           .filter(file => file.endsWith(".md"))
           .map(async (file) => {
             try {
-              const slug = path.basename(file, ".md");
-              const content = await fs.readFile(path.join(contentDir, file), "utf-8");
-              const article = extractFrontmatter(content, slug);
+              const filePath = path.join(contentDir, file);
+              // Verifica i permessi del file
+              await fs.access(filePath, fs.constants.R_OK);
+              const content = await fs.readFile(filePath, "utf-8");
+              const article = extractFrontmatter(content, path.basename(file, ".md"));
               return article.meta;
             } catch (error) {
               console.error(`Errore nella lettura dell'articolo ${file}:`, error);
@@ -96,7 +98,7 @@ export class MemStorage implements IStorage {
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     } catch (error) {
       console.error("Error reading articles directory:", error);
-      return []; // Ritorna un array vuoto invece di lanciare l'errore
+      return [];
     }
   }
 
