@@ -4,11 +4,15 @@ WORKDIR /app
 
 COPY package.json package-lock.json* ./
 
-RUN npm ci --omit=dev
+# Installa tutte le dipendenze (dev + prod) per il build
+RUN npm ci
 
 COPY . .
 
 RUN npm run build
+
+# Dopo il build, rimuovi le devDependencies per alleggerire l'immagine
+RUN npm prune --production
 
 ENV NODE_ENV=production
 
