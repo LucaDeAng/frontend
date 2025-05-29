@@ -128,7 +128,7 @@ export default function UserPromptDashboard() {
                       </span>
                     </div>
                   </div>
-                  <div className="flex justify-end mt-4">
+                  <div className="flex justify-end gap-2 mt-4">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -235,8 +235,6 @@ export default function UserPromptDashboard() {
                   </div>
                   <div className="flex justify-end gap-2 mt-4">
                     <Button
-                      variant="ghost"
-                      size="sm"
                       onClick={() => handleSharePrompt(prompt)}
                       className="text-primary hover:text-primary/90 hover:bg-primary/10"
                     >

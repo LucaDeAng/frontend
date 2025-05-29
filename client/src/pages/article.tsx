@@ -363,9 +363,9 @@ function CommentsSection({ slug }: { slug: string }) {
         <button
           type="submit"
           className="bg-primary text-white px-4 py-2 rounded font-semibold hover:bg-primary-dark"
-          disabled={mutation.isLoading}
+          disabled={mutation.isPending}
         >
-          {mutation.isLoading ? 'Invio...' : 'Invia commento'}
+          {mutation.isPending ? 'Invio...' : 'Invia commento'}
         </button>
       </form>
     </div>

@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import PatternBG from '@/components/ui/PatternBG';
 import { Logo } from '@/components/ui/logo';
 
