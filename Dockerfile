@@ -27,10 +27,10 @@ COPY --from=builder /app/content ./content
 # 5) Installa solo le dipendenze di produzione
 RUN npm ci --only=production
 
-# 6) Crea le directory necessarie e imposta i permessi
+# 6) Crea le directory necessarie e imposta i permessi SOLO dove serve
 RUN mkdir -p content/articles content/comments content/uploads && \
-    chown -R appuser:appgroup /app && \
-    chmod -R 755 /app/content
+    chown -R appuser:appgroup content && \
+    chmod -R 755 content
 
 # 7) Variabili d'ambiente e porta
 ENV NODE_ENV=production
