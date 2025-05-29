@@ -32,17 +32,17 @@ RUN mkdir -p content/articles content/comments content/uploads && \
     chown -R appuser:appgroup content && \
     chmod -R 755 content
 
-# 7) Variabili d'ambiente e porta
+# 7) Debug temporaneo - copio e imposto permessi prima di cambiare utente
+COPY check-articles.sh /app/check-articles.sh
+RUN chmod +x /app/check-articles.sh && chown appuser:appgroup /app/check-articles.sh
+
+# 8) Variabili d'ambiente e porta
 ENV NODE_ENV=production
 ENV PORT=4000
 EXPOSE 4000
 
-# 8) Cambia all'utente non-root
+# 9) Cambia all'utente non-root
 USER appuser
-
-# 9) Debug temporaneo - rimuovere dopo test
-COPY check-articles.sh /app/check-articles.sh
-RUN chmod +x /app/check-articles.sh
 
 # 10) Avvia il server
 CMD ["/app/check-articles.sh"]
