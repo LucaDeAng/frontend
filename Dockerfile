@@ -19,11 +19,13 @@ WORKDIR /app
 # Aggiungiamo un utente non-root per maggiore sicurezza
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
-# 4) Copia tutta la directory /app generata dal builder
-COPY --from=builder /app ./
+# 4) Copia solo i file necessari per la produzione
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/content ./content
 
-# 5) Rimuovi le dev-dependencies per snellire l'immagine
-RUN npm prune --production
+# 5) Installa solo le dipendenze di produzione
+RUN npm ci --only=production
 
 # 6) Crea le directory necessarie e imposta i permessi
 RUN mkdir -p content/articles content/comments content/uploads && \
