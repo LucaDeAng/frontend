@@ -1,6 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
 import cors from 'cors';
 
 const app = express();
@@ -39,7 +38,7 @@ app.use((req, res, next) => {
         logLine = logLine.slice(0, 79) + "…";
       }
 
-      log(logLine);
+      console.log(logLine);
     }
   });
 
@@ -64,13 +63,15 @@ app.use((req, res, next) => {
   });
 
   // Setup Vite in development
-  if (app.get("env") === "development") {
+  if (process.env.NODE_ENV === "development") {
+    const { setupVite } = await import("./vite");
     await setupVite(app, server);
   } else {
+    const { serveStatic } = await import("./vite");
     serveStatic(app);
   }
 
-  const port = 5000;
+  const port = process.env.PORT || 5000;
   const host = "0.0.0.0";
 
   server.listen({
@@ -78,13 +79,13 @@ app.use((req, res, next) => {
     host,
     reusePort: true,
   }, () => {
-    log(`Server in ascolto su http://${host}:${port}`);
+    console.log(`Server in ascolto su http://${host}:${port}`);
   }).on('error', (err: any) => {
     if (err.code === 'EADDRINUSE') {
-      log(`Errore: La porta ${port} è già in uso`);
+      console.log(`Errore: La porta ${port} è già in uso`);
       process.exit(1);
     } else {
-      log(`Errore del server: ${err.message}`);
+      console.log(`Errore del server: ${err.message}`);
       process.exit(1);
     }
   });
