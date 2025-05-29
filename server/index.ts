@@ -50,83 +50,12 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  // Setup per development o production
-  if (process.env.NODE_ENV === "development") {
-    try {
-      console.log("🔧 Modalità development: configurando Vite...");
-      // Import dinamico di vite solo in development
-      const vite = await import("vite");
-      const { createServer: createViteServer, createLogger } = vite;
-      
-      // Configurazione vite di base senza dipendere da file esterni
-      const viteConfig = {
-        root: path.resolve(process.cwd(), "client"),
-        build: {
-          outDir: path.resolve(process.cwd(), "dist/public"),
-        },
-        plugins: []
-      };
-      
-      const serverOptions = {
-        middlewareMode: true,
-        hmr: { server },
-        allowedHosts: true as const
-      };
-
-      const viteDevServer = await createViteServer({
-        ...viteConfig,
-        configFile: false,
-        customLogger: {
-          ...createLogger(),
-          error: (msg, options) => {
-            createLogger().error(msg, options);
-            process.exit(1);
-          },
-        },
-        server: serverOptions,
-        appType: "custom",
-      });
-
-      app.use(viteDevServer.middlewares);
-      app.use("*", async (req, res, next) => {
-        const url = req.originalUrl;
-
-        // NON intercettare le routes API
-        if (url.startsWith('/api')) {
-          return next();
-        }
-
-        try {
-          const clientTemplate = path.resolve(process.cwd(), "client", "index.html");
-
-          if (!fs.existsSync(clientTemplate)) {
-            throw new Error(`Could not find index.html at ${clientTemplate}`);
-          }
-
-          // always reload the index.html file from disk incase it changes
-          let template = await fs.promises.readFile(clientTemplate, "utf-8");
-          template = template.replace(
-            `src="/src/main.tsx"`,
-            `src="/src/main.tsx?v=${Date.now()}"`,
-          );
-          const page = await viteDevServer.transformIndexHtml(url, template);
-          res.status(200).set({ "Content-Type": "text/html" }).end(page);
-        } catch (e) {
-          viteDevServer.ssrFixStacktrace(e as Error);
-          next(e);
-        }
-      });
-      
-      console.log("✅ Vite development server configurato");
-    } catch (error) {
-      console.error("❌ Errore nell'impostazione di Vite (development):", error);
-      // Fallback per servire file statici anche in development
-      serveStaticFiles(app);
-    }
-  } else {
-    console.log("🚀 Modalità produzione: servendo file statici");
-    serveStaticFiles(app);
-  }
+  // Setup DRASTICAMENTE SEMPLIFICATO - NO VITE MAI
+  console.log("🚀 Avvio server in modalità simplificata...");
+  console.log(`📍 NODE_ENV: ${process.env.NODE_ENV}`);
+  
+  // Sempre e solo file statici
+  serveStaticFiles(app);
 
   // Gestione errori globale
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -151,6 +80,7 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     console.log(`Server in ascolto su http://${host}:${port}`);
+    console.log(`📁 Servendo file statici senza vite`);
   }).on('error', (err: any) => {
     if (err.code === 'EADDRINUSE') {
       console.log(`Errore: La porta ${port} è già in uso`);
