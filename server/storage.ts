@@ -3,6 +3,11 @@ import fs from "fs/promises";
 import path from "path";
 import { Article, ArticleMeta } from "@shared/types";
 import { extractFrontmatter } from "../client/src/lib/markdown";
+import fsSync from 'fs';
+
+// Import del backup locale degli articoli
+import articlesBackup from './articles-backup.json';
+import articlesContentBackup from './articles-content-backup.json';
 
 // modify the interface with any CRUD methods
 // you might need
@@ -30,9 +35,12 @@ export class MemStorage implements IStorage {
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    for (const user of this.users.values()) {
+      if (user.username === username) {
+        return user;
+      }
+    }
+    return undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
@@ -64,71 +72,81 @@ export class MemStorage implements IStorage {
     try {
       const contentDir = path.join("content", "articles");
       
-      // Verifica se la directory esiste e i permessi
+      // Prova prima a leggere dalla directory
       try {
         await fs.access(contentDir, fs.constants.R_OK);
+        const files = await fs.readdir(contentDir);
+        
+        const articles = await Promise.all(
+          files
+            .filter(file => file.endsWith(".md"))
+            .map(async (file) => {
+              try {
+                const filePath = path.join(contentDir, file);
+                await fs.access(filePath, fs.constants.R_OK);
+                const content = await fs.readFile(filePath, "utf-8");
+                const article = extractFrontmatter(content, path.basename(file, ".md"));
+                return article.meta;
+              } catch (error) {
+                console.error(`Errore nella lettura dell'articolo ${file}:`, error);
+                return null;
+              }
+            })
+        );
+        
+        // Filtra gli articoli null e ordina per data
+        const validArticles = articles
+          .filter((article): article is ArticleMeta => article !== null)
+          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+          
+        if (validArticles.length > 0) {
+          console.log(`✅ [STORAGE] Articoli caricati da filesystem: ${validArticles.length}`);
+          return validArticles;
+        }
       } catch (error) {
-        console.error("Directory content/articles non trovata o non accessibile:", error);
-        return [];
+        console.warn("⚠️ [STORAGE] Directory articles non accessibile, uso backup locale");
       }
-      
-      const files = await fs.readdir(contentDir);
-      
-      const articles = await Promise.all(
-        files
-          .filter(file => file.endsWith(".md"))
-          .map(async (file) => {
-            try {
-              const filePath = path.join(contentDir, file);
-              // Verifica i permessi del file
-              await fs.access(filePath, fs.constants.R_OK);
-              const content = await fs.readFile(filePath, "utf-8");
-              const article = extractFrontmatter(content, path.basename(file, ".md"));
-              return article.meta;
-            } catch (error) {
-              console.error(`Errore nella lettura dell'articolo ${file}:`, error);
-              return null;
-            }
-          })
+
+      // Fallback al backup locale
+      console.log("📁 [STORAGE] Uso backup locale degli articoli");
+      return (articlesBackup as ArticleMeta[]).sort((a, b) => 
+        new Date(b.date).getTime() - new Date(a.date).getTime()
       );
-      
-      // Filtra gli articoli null e ordina per data
-      return articles
-        .filter((article): article is ArticleMeta => article !== null)
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     } catch (error) {
-      console.error("Error reading articles directory:", error);
-      return [];
+      console.error("❌ [STORAGE] Errore nel recupero degli articoli:", error);
+      // Ultimo fallback: ritorna il backup
+      return (articlesBackup as ArticleMeta[]).sort((a, b) => 
+        new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
     }
   }
 
   async getArticleBySlug(slug: string): Promise<Article | undefined> {
     try {
+      // Prova prima a leggere dal filesystem
       const filePath = path.join("content", "articles", `${slug}.md`);
       
-      // Verifica se il file esiste
       try {
-        await fs.access(filePath);
+        await fs.access(filePath, fs.constants.R_OK);
+        const content = await fs.readFile(filePath, "utf-8");
+        const article = extractFrontmatter(content, slug);
+        console.log(`✅ [STORAGE] Articolo '${slug}' caricato da filesystem`);
+        return article;
       } catch (error) {
-        console.error(`Articolo non trovato: ${slug}`);
-        return undefined;
+        console.warn(`⚠️ [STORAGE] Articolo '${slug}' non trovato nel filesystem, uso backup`);
       }
-      
-      const content = await fs.readFile(filePath, "utf-8");
-      if (!content) {
-        console.error(`Contenuto vuoto per l'articolo: ${slug}`);
-        return undefined;
+
+      // Fallback al backup locale
+      const backup = articlesContentBackup as Record<string, Article>;
+      if (backup[slug]) {
+        console.log(`📁 [STORAGE] Articolo '${slug}' caricato da backup locale`);
+        return backup[slug];
       }
-      
-      const article = extractFrontmatter(content, slug);
-      if (!article || !article.meta) {
-        console.error(`Frontmatter non valido per l'articolo: ${slug}`);
-        return undefined;
-      }
-      
-      return article;
+
+      console.error(`❌ [STORAGE] Articolo '${slug}' non trovato neanche nel backup`);
+      return undefined;
     } catch (error) {
-      console.error(`Errore nella lettura dell'articolo (${slug}):`, error);
+      console.error(`❌ [STORAGE] Errore nel recupero dell'articolo '${slug}':`, error);
       return undefined;
     }
   }

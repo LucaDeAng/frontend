@@ -1,0 +1,72 @@
+[
+  {
+    "slug": "benvenuto",
+    "title": "Benvenuto in AI Hub - Il Tuo Portale per l'Intelligenza Artificiale",
+    "date": "2024-12-15",
+    "summary": "Esplora il futuro dell'AI con AI Hub: articoli, guide pratiche, e insights per professionisti e appassionati.",
+    "author": "AI Hub Team",
+    "category": "Generale",
+    "image": "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500&q=80",
+    "tags": ["AI", "Intelligenza Artificiale", "Tecnologia", "Innovazione"]
+  },
+  {
+    "slug": "ai-transformation-2025",
+    "title": "The AI Transformation of 2025: From Research Labs to Real-World Impact",
+    "date": "2024-12-14",
+    "summary": "Discover how artificial intelligence is reshaping industries and society as we enter 2025, with practical insights and real-world applications.",
+    "author": "Sarah Chen",
+    "category": "AI Trends",
+    "image": "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500&q=80",
+    "tags": ["AI", "2025", "Transformation", "Technology"]
+  },
+  {
+    "slug": "ai-marketing-transformation",
+    "title": "The AI Marketing Revolution: Transforming Customer Engagement in 2024",
+    "date": "2024-12-13",
+    "summary": "Discover how AI is revolutionizing marketing strategies, from personalized campaigns to predictive analytics, transforming the way businesses connect with customers.",
+    "author": "Marco Rossi",
+    "category": "AI Marketing",
+    "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500&q=80",
+    "tags": ["AI", "Marketing", "Customer Engagement", "Automation"]
+  },
+  {
+    "slug": "google-alpha-evolve",
+    "title": "Google AlphaEvolve: Pioneering Next-Gen AI Evolution",
+    "date": "2024-12-12",
+    "summary": "Explore Google's groundbreaking AlphaEvolve project that's pushing the boundaries of artificial intelligence evolution and self-improvement.",
+    "author": "Dr. Lisa Wang",
+    "category": "AI Research",
+    "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500&q=80",
+    "tags": ["Google", "AlphaEvolve", "AI Evolution", "Research"]
+  },
+  {
+    "slug": "generative-ai-business-impact",
+    "title": "Generative AI: Transforming Business Operations and Creative Industries",
+    "date": "2024-12-11",
+    "summary": "An in-depth analysis of how generative AI is revolutionizing business processes, creative workflows, and industry standards across multiple sectors.",
+    "author": "Alessandro Bianchi",
+    "category": "Business AI",
+    "image": "https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500&q=80",
+    "tags": ["Generative AI", "Business Transformation", "Creative Industries", "Operations"]
+  },
+  {
+    "slug": "future-of-work-ai",
+    "title": "The Future of Work: How AI is Reshaping Professional Landscapes",
+    "date": "2024-12-10",
+    "summary": "Explore how artificial intelligence is transforming the workplace, creating new opportunities while reshaping traditional job roles and skills requirements.",
+    "author": "Elena Rodriguez",
+    "category": "Future of Work",
+    "image": "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500&q=80",
+    "tags": ["Future of Work", "AI Impact", "Professional Development", "Career Evolution"]
+  },
+  {
+    "slug": "claude-4-breakthrough",
+    "title": "Claude 4.0: Anthropic's Revolutionary AI Breakthrough",
+    "date": "2024-12-09",
+    "summary": "Dive deep into Anthropic's latest AI model Claude 4.0, exploring its groundbreaking capabilities in reasoning, safety, and human-AI collaboration.",
+    "author": "Dr. James Mitchell",
+    "category": "AI Models",
+    "image": "https://images.unsplash.com/photo-1677756119517-756a188d2d94?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500&q=80",
+    "tags": ["Claude 4.0", "Anthropic", "AI Safety", "Breakthrough"]
+  }
+] 
