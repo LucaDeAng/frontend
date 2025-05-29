@@ -1,5 +1,5 @@
 #!/bin/sh
-DEBUG_FILE="/app/debug-articles.log"
+DEBUG_FILE="/tmp/debug-articles.log"
 
 # Funzione per scrivere sia in console che nel file
 log_output() {

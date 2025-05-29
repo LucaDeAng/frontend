@@ -660,7 +660,10 @@ ${content}`;
   // Debug endpoint temporaneo
   apiRouter.get("/debug/articles-log", async (req: Request, res: Response) => {
     try {
-      const debugFile = path.join("/app", "debug-articles.log");
+      // Usa /tmp invece di /app per evitare problemi di permessi su Render
+      const debugFile = process.env.NODE_ENV === 'production' 
+        ? path.join("/tmp", "debug-articles.log")
+        : path.join(process.cwd(), "debug-articles.log");
       const content = await fs.readFile(debugFile, "utf-8");
       res.set('Content-Type', 'text/plain');
       res.send(content);
