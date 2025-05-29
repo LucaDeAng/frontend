@@ -40,5 +40,9 @@ EXPOSE 4000
 # 8) Cambia all'utente non-root
 USER appuser
 
-# 9) Avvia il server
-CMD ["node", "dist/index.js"]
+# 9) Debug temporaneo - rimuovere dopo test
+COPY check-articles.sh /app/check-articles.sh
+RUN chmod +x /app/check-articles.sh
+
+# 10) Avvia il server
+CMD ["/app/check-articles.sh"]
