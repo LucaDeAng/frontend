@@ -58,20 +58,14 @@ app.use((req, res, next) => {
       const vite = await import("vite");
       const { createServer: createViteServer, createLogger } = vite;
       
-      // Import vite.config solo se disponibile
-      let viteConfig;
-      try {
-        const configModule = await import("../vite.config.js");
-        viteConfig = configModule.default;
-      } catch {
-        // Se vite.config non esiste, usa configurazione di base
-        viteConfig = {
-          root: path.resolve(process.cwd(), "client"),
-          build: {
-            outDir: path.resolve(process.cwd(), "dist/public"),
-          }
-        };
-      }
+      // Configurazione vite di base senza dipendere da file esterni
+      const viteConfig = {
+        root: path.resolve(process.cwd(), "client"),
+        build: {
+          outDir: path.resolve(process.cwd(), "dist/public"),
+        },
+        plugins: []
+      };
       
       const serverOptions = {
         middlewareMode: true,
