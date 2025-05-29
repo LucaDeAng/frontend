@@ -25,8 +25,8 @@ COPY --from=builder /app ./
 # 5) Rimuovi le dev-dependencies per snellire l'immagine
 RUN npm prune --production
 
-# 6) Imposta i permessi corretti per content/articles
-RUN mkdir -p content/articles && \
+# 6) Crea le directory necessarie e imposta i permessi
+RUN mkdir -p content/articles content/comments content/uploads && \
     chown -R appuser:appgroup /app && \
     chmod -R 755 /app/content
 
