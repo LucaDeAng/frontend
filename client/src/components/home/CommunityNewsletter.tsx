@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowRight, CheckCircle, Loader2, Mail } from 'lucide-react';
+import { ArrowRight, CheckCircle, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function CommunityNewsletter() {
@@ -85,7 +85,6 @@ export default function CommunityNewsletter() {
                     className="py-6 bg-black/40 border border-white/10 text-white rounded-lg focus:border-primary/30"
                     disabled={isSubmitting || isSuccess}
                   />
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
                 </div>
                 
                 <Button
