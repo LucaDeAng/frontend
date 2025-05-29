@@ -1,36 +1,24 @@
 import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-
 import { cn } from "@/lib/utils"
 
-const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-  {
-    variants: {
-      variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-)
-
-export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
-
-function Badge({ className, variant, ...props }: BadgeProps) {
-  return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
-  )
+export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+  variant?: 'primary' | 'accent' | 'highlight' | 'outline';
 }
 
-export { Badge, badgeVariants }
+const variants = {
+  primary: 'bg-[var(--color-primary)] text-white px-3 py-1 rounded-full text-xs font-semibold',
+  accent: 'bg-[var(--color-accent)] text-white px-3 py-1 rounded-full text-xs font-semibold',
+  highlight: 'bg-[var(--color-highlight)] text-black px-3 py-1 rounded-full text-xs font-semibold',
+  outline: 'border border-[var(--color-primary)] text-[var(--color-primary)] px-3 py-1 rounded-full text-xs font-semibold bg-transparent',
+};
+
+export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
+  ({ className, variant = 'primary', ...props }, ref) => (
+    <span
+      ref={ref}
+      className={cn(variants[variant], className)}
+      {...props}
+    />
+  )
+);
+Badge.displayName = 'Badge';

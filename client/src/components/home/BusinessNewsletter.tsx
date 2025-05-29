@@ -26,24 +26,22 @@ export default function BusinessNewsletter() {
     setIsSubmitting(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) throw new Error('Errore iscrizione');
       setIsSuccess(true);
-      
       toast({
         title: "Iscrizione completata",
         description: "Grazie per esserti iscritto alla newsletter!",
         variant: "default"
       });
-      
       setEmail('');
-      
-      // Reset success state after a while
       setTimeout(() => {
         setIsSuccess(false);
       }, 5000);
-      
     } catch (error) {
       toast({
         title: "Errore",

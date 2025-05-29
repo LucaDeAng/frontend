@@ -37,17 +37,18 @@ export default function FuturisticNewsletter() {
     setIsSubmitting(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Show typing effect in the terminal
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) throw new Error('Errore iscrizione');
+      // Mostra typing effect e successo come prima
       let phase = 0;
       setTypingPhase(phase);
-      
       const typeNextPhase = () => {
         const currentMessage = successMessages[phase];
         let charIndex = 0;
-        
         const typeChar = () => {
           if (charIndex < currentMessage.length) {
             setTypedText(currentMessage.substring(0, charIndex + 1));
@@ -60,47 +61,36 @@ export default function FuturisticNewsletter() {
                 setTypingPhase(phase);
                 typeNextPhase();
               } else {
-                // Completed all phases
                 setIsSuccess(true);
-                
                 toast({
                   title: "Iscrizione completata",
                   description: "Grazie per esserti iscritto alla newsletter!",
                   variant: "default"
                 });
-                
                 setEmail('');
               }
             }, 500);
           }
         };
-        
-        // Start typing
         typeChar();
       };
-      
-      // Begin typing effect
       typeNextPhase();
-      
     } catch (error) {
       toast({
         title: "Errore",
         description: "Si è verificato un errore durante l'iscrizione. Riprova più tardi.",
         variant: "destructive"
       });
-    } finally {
-      setTimeout(() => {
-        setIsSubmitting(false);
-        
-        // Reset the success state after a while
-        if (isSuccess) {
-          setTimeout(() => {
-            setIsSuccess(false);
-            setTypedText('');
-          }, 5000);
-        }
-      }, 2000);
     }
+    setTimeout(() => {
+      setIsSubmitting(false);
+      if (isSuccess) {
+        setTimeout(() => {
+          setIsSuccess(false);
+          setTypedText('');
+        }, 5000);
+      }
+    }, 2000);
   };
   
   const itemVariants = {

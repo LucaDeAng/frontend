@@ -28,36 +28,40 @@ export default function AboutMe() {
             transition={{ duration: 0.6, delay: 0.4 }}
           >
             <div className="text-center mb-8">
-              <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
-                <Brain className="w-16 h-16 text-white" />
+              <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center overflow-hidden shadow-lg">
+                <img 
+                  src="/avatar-luca-cartoon.png" 
+                  alt="Luca De Angelis cartoon avatar" 
+                  className="w-full h-full object-cover rounded-full" 
+                />
               </div>
               <h2 className="text-2xl font-bold text-white mb-2">Luca De Angelis</h2>
-              <p className="text-primary font-mono">AI Researcher & Content Creator</p>
+              <p className="text-primary font-mono">Business & Digital Consultant</p>
             </div>
 
             <div className="prose prose-invert max-w-none">
               <p className="text-gray-300 leading-relaxed text-lg">
-                Welcome to my AI Hub! I'm Luca De Angelis, a passionate artificial intelligence researcher and educator 
-                dedicated to making cutting-edge AI knowledge accessible to everyone.
+                Welcome to my Digital Strategy Hub! I'm Luca De Angelis, a business and digital consultant who partners with organisations to turn emerging technology—especially artificial intelligence—into measurable growth. Drawing on years of experience at the intersection of strategy, operations, and tech innovation, I translate complex concepts into actionable roadmaps that executives and teams can rally behind.
               </p>
-
               <p className="text-gray-300 leading-relaxed">
-                With a deep background in machine learning, natural language processing, and AI ethics, I bridge the gap 
-                between complex research and practical applications. My mission is to democratize AI education and empower 
-                individuals and organizations to harness artificial intelligence responsibly.
+                With a proven track record in digital transformation programmes, AI-driven product launches, and change management, my mission is to make advanced technology practical, profitable, and responsible for businesses of any size.
               </p>
 
               <h3 className="text-white text-xl font-bold mt-8 mb-4 flex items-center">
                 <Code className="w-5 h-5 mr-2 text-primary" />
-                What I Do
+                How I Help
               </h3>
-
               <ul className="text-gray-300 space-y-2">
-                <li>• Research and analyze the latest developments in AI and machine learning</li>
-                <li>• Create educational content that makes complex AI concepts understandable</li>
-                <li>• Develop practical AI tools and prompt libraries for real-world applications</li>
-                <li>• Share insights on responsible AI development and deployment</li>
+                <li>• Shape digital strategy – From market analysis to execution plans, I align technology initiatives with clear business objectives.</li>
+                <li>• Bridge business & AI – I demystify machine-learning, data, and automation so leaders can make confident, ROI-focused decisions.</li>
+                <li>• Design & deliver solutions – I oversee end-to-end rollout of AI and digital products, ensuring they scale and integrate smoothly with existing processes.</li>
+                <li>• Upskill teams – Workshops, coaching, and playbooks that embed a digital-first, data-driven culture across the organisation.</li>
+                <li>• Champion responsible innovation – Governance frameworks that balance speed, ethics, and compliance, safeguarding long-term value.</li>
               </ul>
+
+              <p className="text-gray-300 leading-relaxed mt-8">
+                Whether you're exploring your first AI pilot or orchestrating a company-wide digital overhaul, I'm here to turn vision into impact—responsibly, efficiently, and with lasting results.
+              </p>
 
               <h3 className="text-white text-xl font-bold mt-8 mb-4 flex items-center">
                 <Lightbulb className="w-5 h-5 mr-2 text-primary" />

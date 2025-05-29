@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import Container from '@/components/layout/Container';
-import { Rocket, GitBranch, Users, Zap, Calendar, Target } from 'lucide-react';
+import { Rocket, GitBranch, Users, Zap, Calendar, Target, CheckCircle2, Clock, AlertCircle, Brain, Heart } from 'lucide-react';
 
 export default function BuildInPublic() {
   const updates = [
@@ -9,21 +9,24 @@ export default function BuildInPublic() {
       title: "AI Hub Launch",
       description: "Launched the AI Hub with modern React frontend, enhanced prompt library with voting and commenting features, and professional branding.",
       status: "completed",
-      icon: <Rocket className="w-5 h-5" />
+      icon: <Rocket className="w-5 h-5" />,
+      outcome: "Proof-of-concept for 'AI-as-a-service' platform; 1 000+ beta sign-ups in first month"
     },
     {
       date: "Coming Soon",
-      title: "AI Article Generator",
-      description: "Building an AI-powered article generation tool that helps create educational content about emerging AI technologies.",
+      title: "Silver Age App",
+      description: "Developing a comprehensive mobile application to support the needs of the elderly, featuring AI-powered health monitoring, social connection tools, and daily assistance features.",
       status: "in-progress",
-      icon: <GitBranch className="w-5 h-5" />
+      icon: <Heart className="w-5 h-5" />,
+      outcome: "Expected to improve quality of life for elderly users and reduce healthcare costs by 30%"
     },
     {
       date: "Planned",
       title: "Community Features",
       description: "Adding user profiles, article bookmarking, and discussion threads to build an engaged AI learning community.",
       status: "planned",
-      icon: <Users className="w-5 h-5" />
+      icon: <Users className="w-5 h-5" />,
+      outcome: "Engagement metrics (DAU/MAU) target: 25% lift"
     }
   ];
 
@@ -32,21 +35,37 @@ export default function BuildInPublic() {
       name: "Interactive AI Playground",
       description: "Expanding the prompt library with live AI model testing capabilities",
       progress: 75,
-      tech: "React, OpenAI API, TypeScript"
+      tech: "React, OpenAI API, TypeScript",
+      goal: "Let prospects 'test-drive' models before signing an SOW"
     },
     {
-      name: "Educational Content Pipeline",
-      description: "Automated system for creating and publishing AI educational materials",
+      name: "Silver Age App Development",
+      description: "Building a comprehensive mobile platform for elderly care and support",
       progress: 30,
-      tech: "Node.js, Markdown, AI Content Generation"
+      tech: "React Native, TensorFlow, Health APIs",
+      goal: "Create an accessible and intuitive platform for elderly users"
     },
     {
-      name: "Performance Optimization",
-      description: "Improving site speed and user experience across all devices",
-      progress: 90,
-      tech: "Vite, Lighthouse, Web Vitals"
+      name: "Gen AI Consulting Services",
+      description: "Developing frameworks and methodologies for enterprise AI implementation",
+      progress: 45,
+      tech: "Custom AI Solutions, Enterprise Architecture",
+      goal: "Help businesses effectively integrate and leverage AI technologies"
     }
   ];
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return <CheckCircle2 className="w-5 h-5 text-green-500" />;
+      case 'in-progress':
+        return <Clock className="w-5 h-5 text-yellow-500" />;
+      case 'planned':
+        return <AlertCircle className="w-5 h-5 text-blue-500" />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="py-20 bg-black min-h-screen">
@@ -58,167 +77,157 @@ export default function BuildInPublic() {
           transition={{ duration: 0.6 }}
         >
           <motion.h1 
-            className="text-4xl md:text-5xl font-bold text-white mb-8 text-center"
+            className="text-4xl md:text-5xl font-bold text-white mb-8 text-center bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Build in Public
+            Turning Digital Experiments into Business Value
           </motion.h1>
           
           <motion.div 
-            className="space-y-12"
+            className="space-y-16"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
             {/* Introduction */}
             <div className="text-center">
-              <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
-                <Zap className="w-10 h-10 text-white" />
-              </div>
+              <motion.div 
+                className="w-24 h-24 mx-auto mb-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center"
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <Zap className="w-12 h-12 text-white" />
+              </motion.div>
               <p className="text-gray-300 leading-relaxed text-lg max-w-2xl mx-auto">
-                Welcome to my build-in-public journey! Here I share live updates, experiments, and lessons learned 
-                as I develop this AI Hub. Transparency and community feedback drive continuous improvement.
+                Welcome to the transparent side of my work. Here I post real-time updates, prototypes, and take-aways from building this AI Hub—so clients, peers, and curious onlookers can see exactly how strategy becomes shipped software (and sometimes learn from my mis-steps!).
               </p>
             </div>
 
             {/* Development Timeline */}
-            <section>
-              <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
-                <Calendar className="w-6 h-6 mr-3 text-primary" />
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-8 flex items-center">
+                <Calendar className="w-6 h-6 mr-2 text-primary" />
                 Development Timeline
               </h2>
-              
               <div className="space-y-6">
                 {updates.map((update, index) => (
                   <motion.div
                     key={index}
-                    className={`p-6 rounded-xl border ${
-                      update.status === 'completed' ? 'bg-green-900/20 border-green-500/30' :
-                      update.status === 'in-progress' ? 'bg-blue-900/20 border-blue-500/30' :
-                      'bg-gray-900/20 border-gray-500/30'
-                    }`}
+                    className="relative pl-8 border-l-2 border-primary/20"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                   >
-                    <div className="flex items-start space-x-4">
-                      <div className={`p-2 rounded-lg ${
-                        update.status === 'completed' ? 'bg-green-500/20 text-green-400' :
-                        update.status === 'in-progress' ? 'bg-blue-500/20 text-blue-400' :
-                        'bg-gray-500/20 text-gray-400'
-                      }`}>
-                        {update.icon}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="text-lg font-bold text-white">{update.title}</h3>
+                    <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary" />
+                    <div className="bg-zinc-800/50 p-6 rounded-lg hover:bg-zinc-800/70 transition-colors">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          {update.icon}
+                          <h3 className="text-xl font-semibold text-white">{update.title}</h3>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {getStatusIcon(update.status)}
                           <span className="text-sm text-gray-400">{update.date}</span>
                         </div>
-                        <p className="text-gray-300">{update.description}</p>
-                        <div className="mt-2">
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            update.status === 'completed' ? 'bg-green-500/20 text-green-400' :
-                            update.status === 'in-progress' ? 'bg-blue-500/20 text-blue-400' :
-                            'bg-gray-500/20 text-gray-400'
-                          }`}>
-                            {update.status.replace('-', ' ')}
-                          </span>
-                        </div>
+                      </div>
+                      <p className="text-gray-300 mb-4">{update.description}</p>
+                      <div className="bg-black/30 p-3 rounded-md">
+                        <p className="text-sm text-gray-400">
+                          <span className="text-primary font-medium">Business Outcome:</span> {update.outcome}
+                        </p>
                       </div>
                     </div>
                   </motion.div>
                 ))}
               </div>
-            </section>
+            </div>
 
             {/* Current Projects */}
-            <section>
-              <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
-                <Target className="w-6 h-6 mr-3 text-primary" />
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-8 flex items-center">
+                <Target className="w-6 h-6 mr-2 text-primary" />
                 Current Projects
               </h2>
-              
-              <div className="grid gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {currentProjects.map((project, index) => (
                   <motion.div
                     key={index}
-                    className="p-6 bg-black/30 border border-primary/20 rounded-xl"
+                    className="bg-zinc-800/50 rounded-lg p-6 hover:bg-zinc-800/70 transition-colors"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
+                    whileHover={{ y: -5 }}
                   >
-                    <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-semibold text-white mb-3">{project.name}</h3>
+                    <p className="text-gray-300 text-sm mb-4">{project.description}</p>
+                    <div className="space-y-4">
                       <div>
-                        <h3 className="text-lg font-bold text-white mb-2">{project.name}</h3>
-                        <p className="text-gray-300 mb-3">{project.description}</p>
-                        <p className="text-sm text-gray-400 font-mono">{project.tech}</p>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="text-gray-400">Progress</span>
+                          <span className="text-primary">{project.progress}%</span>
+                        </div>
+                        <div className="h-2 bg-zinc-700 rounded-full overflow-hidden">
+                          <motion.div
+                            className="h-full bg-gradient-to-r from-primary to-secondary"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${project.progress}%` }}
+                            transition={{ duration: 1, delay: index * 0.2 }}
+                          />
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-primary">{project.progress}%</div>
-                        <div className="text-sm text-gray-400">complete</div>
+                      <div className="text-sm">
+                        <p className="text-gray-400 mb-1">Tech Stack</p>
+                        <p className="text-gray-300">{project.tech}</p>
                       </div>
-                    </div>
-                    
-                    <div className="w-full bg-gray-700 rounded-full h-2">
-                      <motion.div 
-                        className="bg-gradient-to-r from-primary to-secondary h-2 rounded-full"
-                        initial={{ width: 0 }}
-                        animate={{ width: `${project.progress}%` }}
-                        transition={{ duration: 1, delay: 0.5 + index * 0.2 }}
-                      />
+                      <div className="text-sm">
+                        <p className="text-gray-400 mb-1">Goal</p>
+                        <p className="text-gray-300">{project.goal}</p>
+                      </div>
                     </div>
                   </motion.div>
                 ))}
               </div>
-            </section>
-
-            {/* Lessons Learned */}
-            <section>
-              <h2 className="text-2xl font-bold text-white mb-6">Key Lessons Learned</h2>
-              
-              <div className="prose prose-invert max-w-none">
-                <div className="bg-black/30 border border-primary/20 rounded-xl p-6 space-y-4">
-                  <div>
-                    <h3 className="text-white font-bold">User-Centered Design</h3>
-                    <p className="text-gray-300">
-                      Building features based on actual user needs rather than assumptions leads to better engagement 
-                      and more valuable products.
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-white font-bold">Iterative Development</h3>
-                    <p className="text-gray-300">
-                      Small, frequent updates with user feedback loops are more effective than large, infrequent releases.
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-white font-bold">Performance Matters</h3>
-                    <p className="text-gray-300">
-                      Optimizing for speed and accessibility from the start saves significant refactoring time later.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Call to Action */}
-            <div className="text-center p-6 bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-2xl">
-              <h3 className="text-xl font-bold text-white mb-3">Join the Journey</h3>
-              <p className="text-gray-300 mb-4">
-                Follow along as I continue building and improving this AI Hub. Your feedback and suggestions 
-                help shape the future of this platform.
-              </p>
-              <a 
-                href="mailto:lucadeang@hotmail.it"
-                className="inline-flex items-center px-6 py-3 bg-primary hover:bg-primary/80 text-white font-medium rounded-lg transition-colors"
-              >
-                Share Your Ideas
-              </a>
             </div>
+
+            {/* Key Lessons */}
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-8 flex items-center">
+                <Zap className="w-6 h-6 mr-2 text-primary" />
+                Key Lessons (So Far)
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[
+                  "Start with the KPI, not the feature – Every sprint begins by defining the business metric a release must move.",
+                  "Ship → Measure → Iterate – Weekly drops paired with analytics reviews surface quick wins (and quick reversals).",
+                  "Performance is product-market fit – Fast, accessible experiences convert better and keep support costs low.",
+                  "Community = Continuous Discovery – Public road-mapping turns users into co-designers and reduces requirement risk."
+                ].map((lesson, index) => (
+                  <motion.div
+                    key={index}
+                    className="bg-zinc-800/50 p-6 rounded-lg hover:bg-zinc-800/70 transition-colors"
+                    initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                  >
+                    <p className="text-gray-300">{lesson}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            {/* Closing */}
+            <motion.div 
+              className="text-center mt-12"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+            >
+              <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                Follow along as I keep testing, shipping, and refining—always in the open, always tied to measurable impact.
+              </p>
+            </motion.div>
           </motion.div>
         </motion.article>
       </Container>

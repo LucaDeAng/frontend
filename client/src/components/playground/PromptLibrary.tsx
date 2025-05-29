@@ -143,7 +143,7 @@ const PromptCard = ({
             variant="ghost" 
             size="sm" 
             onClick={() => onVote(id, true)}
-            className="flex items-center gap-1 text-gray-400 hover:text-green-500 hover:bg-green-500/10 p-2 h-8"
+            className="flex items-center gap-1 text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 p-2 h-8"
           >
             <ThumbsUp className="h-4 w-4" />
             <span className="text-xs font-medium">{votes}</span>
@@ -284,7 +284,7 @@ export default function PromptLibrary() {
       category: "Content",
       model: "GPT-3.5"
     }
-  ];
+  ]);
   
   // Extract unique categories and models
   const uniqueCategories = [...new Set(prompts.map(prompt => prompt.category))];

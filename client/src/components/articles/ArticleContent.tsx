@@ -5,19 +5,24 @@ import { Article } from '@shared/types';
 import { markdownToHtml } from '@/lib/markdown';
 import Container from '@/components/layout/Container';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Link } from 'wouter';
+import { Edit } from 'lucide-react';
 
 interface ArticleContentProps {
   article: Article;
+  isAdmin?: boolean;
 }
 
-export default function ArticleContent({ article }: ArticleContentProps) {
+export default function ArticleContent({ article, isAdmin = false }: ArticleContentProps) {
   const [htmlContent, setHtmlContent] = useState('');
   const { meta, content } = article;
-  const { title, date, author, category } = meta;
+  const { title, date, author, category, tags } = meta;
   
   useEffect(() => {
     const processContent = async () => {
-      const html = await markdownToHtml(content);
+      const contentWithoutTitle = content.replace(/^# .+\n?/, '');
+      const html = await markdownToHtml(contentWithoutTitle);
       setHtmlContent(html);
     };
     
@@ -31,19 +36,44 @@ export default function ArticleContent({ article }: ArticleContentProps) {
       <Container>
         <article className="max-w-3xl mx-auto p-6 bg-zinc-900 text-white rounded-lg shadow-lg">
           <header className="mb-10">
-            <div className="flex items-center text-sm text-gray-300 mb-3">
-              <span>{formattedDate}</span>
-              <span className="mx-2">•</span>
-              <span>{category}</span>
-              {author && (
-                <>
-                  <span className="mx-2">•</span>
-                  <span>by {author}</span>
-                </>
+            {/* Cover image */}
+            {meta.image && (
+              <div className="mb-6 rounded-xl overflow-hidden">
+                <img
+                  src={meta.image}
+                  alt={meta.title + ' - illustration'}
+                  className="w-full h-64 object-cover rounded-xl border border-primary/20"
+                  loading="lazy"
+                  style={{ maxHeight: '320px' }}
+                />
+              </div>
+            )}
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center text-sm text-gray-300">
+                <span>{formattedDate}</span>
+                <span className="mx-2">•</span>
+                <span>{category}</span>
+                {author && (
+                  <>
+                    <span className="mx-2">•</span>
+                    <span>by {author}</span>
+                  </>
+                )}
+              </div>
+              
+              {isAdmin && (
+                <Link href={`/admin/articles/${article.slug}`}>
+                  <Button
+                    className="border-primary/30 text-primary hover:bg-primary/10 h-9 px-3"
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    Modifica
+                  </Button>
+                </Link>
               )}
             </div>
             
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 break-words">
               {title}
             </h1>
           </header>

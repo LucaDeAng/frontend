@@ -26,24 +26,22 @@ export default function CommunityNewsletter() {
     setIsSubmitting(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) throw new Error('Subscription error');
       setIsSuccess(true);
-      
       toast({
         title: "Subscription successful",
         description: "Thank you for subscribing to our newsletter!",
         variant: "default"
       });
-      
       setEmail('');
-      
-      // Reset success state after a while
       setTimeout(() => {
         setIsSuccess(false);
       }, 5000);
-      
     } catch (error) {
       toast({
         title: "Error",

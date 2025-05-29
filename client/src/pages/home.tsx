@@ -25,28 +25,29 @@ export default function Home() {
         className="relative"
       >
         {/* Hero section with video background */}
-        <section className="relative py-28 md:py-36 overflow-hidden bg-black">
+        <section className="relative py-8 md:py-12 overflow-hidden bg-black">
           <div className="absolute inset-0 z-0 overflow-hidden">
             <video 
               autoPlay 
               loop 
               muted
-              className="w-full h-full object-cover opacity-30"
+              playsInline
+              className="w-full h-full object-cover opacity-60"
             >
-              <source src="https://d2vr5vtixzw9nj.cloudfront.net/hero-bg-dark.mp4" type="video/mp4" />
+              <source src="https://player.vimeo.com/external/3163534.sd.mp4" type="video/mp4" />
             </video>
-            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-black/80"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-black/70"></div>
           </div>
           
           <div className="container mx-auto px-6 md:px-8 relative z-10">
-            <div className="max-w-3xl mx-auto text-center">
+            <div className="max-w-3xl mx-auto text-center mt-8 md:mt-12">
               <motion.h1 
                 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
-                Your <span className="bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">AI Resource</span> Hub
+                Turning AI Vision <span className="bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">into Business Impact</span>
               </motion.h1>
               
               <motion.p 
@@ -55,7 +56,7 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
               >
-                Explore our educational content, best practices, and tools to help you leverage artificial intelligence effectively.
+                I help organizations translate emerging AI technologies into actionable strategies and measurable results. From roadmap to rollout, I bridge the gap between innovation and real-world value—responsibly, efficiently, and with a focus on impact.
               </motion.p>
               
               <motion.div
@@ -70,9 +71,8 @@ export default function Home() {
                     <span>Browse Articles</span>
                   </Button>
                 </Link>
-                
-                <Link href="/playground">
-                  <Button variant="outline" className="px-6 py-6 border-white/10 bg-black/40 text-white rounded-lg w-full sm:w-auto">
+                <Link href="/prompts">
+                  <Button className="px-6 py-6 border border-white/10 bg-black/40 text-white rounded-lg w-full sm:w-auto">
                     <Bot className="mr-2 h-5 w-5" />
                     <span>AI Prompts</span>
                   </Button>
@@ -81,6 +81,9 @@ export default function Home() {
             </div>
           </div>
         </section>
+        
+        {/* Newsletter signup */}
+        <CommunityNewsletter />
         
         {/* Key features section */}
         <section className="py-20 bg-black">
@@ -100,50 +103,47 @@ export default function Home() {
               </p>
             </motion.div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
               {[
                 {
-                  title: "Educational Articles",
-                  description: "In-depth articles about AI technologies, applications, and best practices to keep you informed.",
-                  icon: <Book className="h-10 w-10 text-primary" />,
-                  link: "/articles",
-                  delay: 0.1
+                  title: "Articles",
+                  description: "Curated articles, guides, and analysis on AI technologies and applications. Stay updated with the latest trends and best practices.",
+                  icon: <Book className="h-16 w-16 text-blue-400" />,
+                  link: "/articles"
                 },
                 {
                   title: "AI Prompt Library",
-                  description: "Collection of effective prompts for various AI tasks that you can copy directly to GPT.",
-                  icon: <Brain className="h-10 w-10 text-primary" />,
-                  link: "/playground",
-                  delay: 0.2
+                  description: "A professional collection of optimized prompts for various AI tasks. Ready to use with ChatGPT or other models.",
+                  icon: <Brain className="h-16 w-16 text-cyan-400" />,
+                  link: "/prompts"
                 },
                 {
-                  title: "Article Categories",
-                  description: "Browse our content by topics like AI ethics, machine learning, business applications, and more.",
-                  icon: <Brain className="h-10 w-10 text-primary" />,
-                  link: "/articles",
-                  delay: 0.3
+                  title: "Build in Public",
+                  description: "Follow the platform's development in real time: roadmap, updates, features, and full transparency on the AI Hub project.",
+                  icon: <Bot className="h-16 w-16 text-blue-300" />,
+                  link: "/build-in-public"
                 }
-              ].map((feature, index) => (
+              ].map((block, i) => (
                 <motion.div
-                  key={index}
+                  key={block.title}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: feature.delay }}
-                  className="bg-black/30 border border-white/10 rounded-xl p-6 hover:border-primary/30 transition-all duration-300 flex flex-col"
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.7, delay: i * 0.1 }}
+                  className="relative bg-[#06091A] rounded-[60px] border border-white/10 shadow-lg flex flex-col justify-between items-center text-center min-h-[420px] p-10 group overflow-hidden"
                 >
-                  <div className="rounded-full bg-primary/10 w-16 h-16 flex items-center justify-center mb-5">
-                    {feature.icon}
+                  <div className="flex-1 flex items-center justify-center w-full mb-6">
+                    {block.icon}
                   </div>
-                  
-                  <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-                  
-                  <p className="text-gray-400 mb-6 flex-1">{feature.description}</p>
-                  
-                  <Link href={feature.link} className="text-primary flex items-center font-medium hover:text-primary/80 transition-colors mt-auto">
-                    <span>Explore</span>
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
+                  <div className="w-full">
+                    <h3 className="mb-3 text-xl font-bold text-white text-left w-full">{block.title}</h3>
+                    <p className="text-gray-300 text-left w-full mb-8 text-base leading-relaxed">{block.description}</p>
+                    <Button asChild size="lg" className="rounded-full px-8 py-3 text-base font-semibold shadow bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-300 hover:opacity-90 group-hover:scale-105 transition-transform w-full">
+                      <Link href={block.link} className="flex items-center gap-2 justify-center">
+                        Explore <ArrowRight className="h-5 w-5" />
+                      </Link>
+                    </Button>
+                  </div>
                 </motion.div>
               ))}
             </div>
@@ -155,9 +155,6 @@ export default function Home() {
         
         {/* Featured articles section */}
         <ArticleShowcase />
-        
-        {/* Newsletter signup */}
-        <CommunityNewsletter />
       </motion.div>
     </>
   );

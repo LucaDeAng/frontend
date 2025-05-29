@@ -71,7 +71,7 @@ export default function Logo({
     >
       {/* Icon */}
       <motion.div 
-        className={`flex items-center justify-center w-8 h-8 ${colors.icon} ${colors.border} border rounded-md ${config.icon} font-bold`}
+        className={`flex items-center justify-center w-8 h-8 ${colors.icon} ${colors.border} border rounded-md ${config.icon} font-bold flex-shrink-0`}
         whileHover={{ scale: 1.05 }}
         transition={{ duration: 0.2 }}
       >
@@ -85,7 +85,7 @@ export default function Logo({
           <div className="flex items-baseline space-x-1">
             {/* Luca - emphasized */}
             <motion.span 
-              className={`font-bold tracking-wider ${colors.text}`}
+              className={`font-bold tracking-wider ${colors.text} whitespace-nowrap`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.1 }}
@@ -95,7 +95,7 @@ export default function Logo({
             
             {/* De Angelis - softer */}
             <motion.span 
-              className={`font-medium tracking-wide ${colors.accent}`}
+              className={`font-medium tracking-wide ${colors.accent} whitespace-nowrap`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.2 }}

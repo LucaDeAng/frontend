@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,10 +23,15 @@ import {
   Plus,
   Star,
   Flame,
-  SortDesc
+  SortDesc,
+  User
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import UserPromptDashboard from './UserPromptDashboard';
+import userPromptService from '@/services/userPromptService';
+import { useAuth } from '@/contexts/AuthContext';
+import { AuthDialog } from '@/components/auth/AuthDialog';
 
 // Types for our prompt system
 interface Comment {
@@ -46,6 +51,8 @@ interface Prompt {
   votes: number;
   comments: Comment[];
   dateAdded: string;
+  outputExample?: string;
+  copyCount?: number;
 }
 
 // Prompt card component
@@ -57,37 +64,88 @@ function PromptCard({ prompt, onVote, onComment }: {
   const [copied, setCopied] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
+  const [localCopyCount, setLocalCopyCount] = useState(prompt.copyCount || 0);
+  const [isFavorite, setIsFavorite] = useState(false);
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  
+  // Controlla se il prompt è nei preferiti
+  useEffect(() => {
+    if (isAuthenticated) {
+      const userData = userPromptService.getUserData();
+      setIsFavorite(userData.favorites.some(p => p.id === prompt.id));
+    }
+  }, [prompt.id, isAuthenticated]);
   
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(prompt.promptText);
       setCopied(true);
+      setLocalCopyCount(c => c + 1);
+      
+      if (isAuthenticated) {
+        // Aggiungi alla cronologia
+        userPromptService.addToHistory(prompt);
+      }
       
       toast({
-        title: "Copied to clipboard",
-        description: "The prompt has been copied and is ready to paste into GPT",
+        title: "Copiato negli appunti",
+        description: "Il prompt è stato copiato ed è pronto per essere incollato in GPT",
       });
-      
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       toast({
-        title: "Failed to copy",
-        description: "Please try again or copy manually",
+        title: "Errore nella copia",
+        description: "Si è verificato un errore durante la copia. Prova di nuovo o copia manualmente",
         variant: "destructive"
       });
     }
   };
   
   const handleAddComment = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Accesso richiesto",
+        description: "Devi accedere per aggiungere un commento",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (newComment.trim()) {
       onComment(prompt.id, newComment);
       setNewComment('');
       toast({
-        title: "Comment added",
-        description: "Your comment has been added to this prompt",
+        title: "Commento aggiunto",
+        description: "Il tuo commento è stato aggiunto al prompt",
       });
     }
+  };
+
+  const toggleFavorite = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Accesso richiesto",
+        description: "Devi accedere per aggiungere ai preferiti",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (isFavorite) {
+      userPromptService.removeFromFavorites(prompt.id);
+      toast({
+        title: "Rimosso dai preferiti",
+        description: "Il prompt è stato rimosso dai tuoi preferiti"
+      });
+    } else {
+      userPromptService.addToFavorites(prompt);
+      toast({
+        title: "Aggiunto ai preferiti",
+        description: "Il prompt è stato aggiunto ai tuoi preferiti"
+      });
+    }
+    setIsFavorite(!isFavorite);
   };
   
   return (
@@ -115,6 +173,12 @@ function PromptCard({ prompt, onVote, onComment }: {
       
       <div className="relative mt-4 bg-black/50 border border-white/10 rounded-lg p-4 mb-4">
         <p className="text-gray-300 text-sm whitespace-pre-wrap">{prompt.promptText}</p>
+        {prompt.outputExample && (
+          <div className="mt-4 p-3 bg-black/30 border-l-4 border-primary rounded">
+            <div className="text-xs text-primary font-bold mb-1">Output di esempio</div>
+            <pre className="text-gray-200 text-xs whitespace-pre-wrap">{prompt.outputExample}</pre>
+          </div>
+        )}
       </div>
       
       <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -127,12 +191,13 @@ function PromptCard({ prompt, onVote, onComment }: {
           {copied ? (
             <>
               <CheckCircle className="h-4 w-4" />
-              <span>Copied!</span>
+              <span>Copiato!</span>
             </>
           ) : (
             <>
               <ClipboardCopy className="h-4 w-4" />
-              <span>Copy to GPT</span>
+              <span>Copia in GPT</span>
+              <span className="ml-2 px-2 py-0.5 bg-primary/20 text-primary text-xs rounded-full">{localCopyCount}</span>
             </>
           )}
         </Button>
@@ -142,7 +207,7 @@ function PromptCard({ prompt, onVote, onComment }: {
             variant="ghost" 
             size="sm" 
             onClick={() => onVote(prompt.id)}
-            className="flex items-center gap-1 text-gray-400 hover:text-green-500 hover:bg-green-500/10 p-2 h-8"
+            className="flex items-center gap-1 text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 p-2 h-8"
           >
             <ThumbsUp className="h-4 w-4" />
             <span className="text-xs font-medium">{prompt.votes}</span>
@@ -157,12 +222,25 @@ function PromptCard({ prompt, onVote, onComment }: {
             <MessageSquare className="h-4 w-4" />
             <span className="text-xs font-medium">{prompt.comments.length}</span>
           </Button>
+
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={toggleFavorite}
+            className={`flex items-center gap-1 p-2 h-8 ${
+              isFavorite 
+                ? 'text-yellow-500 hover:text-yellow-400 hover:bg-yellow-500/10' 
+                : 'text-gray-400 hover:text-yellow-500 hover:bg-yellow-500/10'
+            }`}
+          >
+            <Star className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
+          </Button>
         </div>
       </div>
       
       {showComments && (
         <div className="mt-4 border-t border-white/10 pt-4">
-          <h4 className="text-sm font-medium text-white mb-3">Comments</h4>
+          <h4 className="text-sm font-medium text-white mb-3">Commenti</h4>
           
           {prompt.comments.length > 0 ? (
             <div className="space-y-3 mb-4">
@@ -177,12 +255,12 @@ function PromptCard({ prompt, onVote, onComment }: {
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-sm mb-4">No comments yet. Be the first to comment!</p>
+            <p className="text-gray-500 text-sm mb-4">Nessun commento ancora. Sii il primo a commentare!</p>
           )}
           
           <div className="flex gap-2">
             <Textarea
-              placeholder="Add your comment..."
+              placeholder="Aggiungi un commento..."
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               className="bg-black/40 border-white/10 text-white text-sm resize-none"
@@ -193,7 +271,7 @@ function PromptCard({ prompt, onVote, onComment }: {
               className="bg-primary hover:bg-primary/90 text-black"
               disabled={!newComment.trim()}
             >
-              Add
+              Aggiungi
             </Button>
           </div>
         </div>
@@ -210,7 +288,8 @@ function AddPromptDialog({ onAddPrompt }: { onAddPrompt: (prompt: Omit<Prompt, '
     description: '',
     promptText: '',
     category: '',
-    model: 'GPT-4o'
+    model: 'GPT-4o',
+    outputExample: '',
   });
   const { toast } = useToast();
 
@@ -223,17 +302,16 @@ function AddPromptDialog({ onAddPrompt }: { onAddPrompt: (prompt: Omit<Prompt, '
       });
       return;
     }
-
-    onAddPrompt(newPrompt);
+    onAddPrompt({ ...newPrompt, copyCount: 0 });
     setNewPrompt({
       title: '',
       description: '',
       promptText: '',
       category: '',
-      model: 'GPT-4o'
+      model: 'GPT-4o',
+      outputExample: '',
     });
     setOpen(false);
-    
     toast({
       title: "Prompt added",
       description: "Your prompt has been added to the library"
@@ -290,6 +368,19 @@ function AddPromptDialog({ onAddPrompt }: { onAddPrompt: (prompt: Omit<Prompt, '
               onChange={(e) => setNewPrompt({...newPrompt, promptText: e.target.value})}
               placeholder="Enter the full prompt text here..."
               className="bg-black/40 border-white/10 min-h-[150px]"
+            />
+          </div>
+          
+          <div className="grid gap-2">
+            <label htmlFor="outputExample" className="text-sm font-medium">
+              Output di esempio
+            </label>
+            <Textarea
+              id="outputExample"
+              value={newPrompt.outputExample}
+              onChange={(e) => setNewPrompt({...newPrompt, outputExample: e.target.value})}
+              placeholder="Esempio di output generato dal prompt..."
+              className="bg-black/40 border-white/10 min-h-[60px]"
             />
           </div>
           
@@ -351,11 +442,21 @@ function AddPromptDialog({ onAddPrompt }: { onAddPrompt: (prompt: Omit<Prompt, '
 }
 
 // Main component
+const TrendingNow = lazy(() => import('./TrendingNow'));
+const AiQuiz = lazy(() => import('./AiQuiz'));
+const AiTimeline = lazy(() => import('./AiTimeline'));
+const PodcastPlayer = lazy(() => import('./PodcastPlayer'));
+const VideoTutorial = lazy(() => import('./VideoTutorial'));
+
 export default function EnhancedPromptLibrary() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeCategory, setActiveCategory] = useState('all');
-  const [activeModel, setActiveModel] = useState('all');
-  const [sortBy, setSortBy] = useState('newest');
+  const { isAuthenticated, user } = useAuth();
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
+  const [prompts, setPrompts] = useState<Prompt[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedModel, setSelectedModel] = useState<string>('');
+  const [sortBy, setSortBy] = useState<'votes' | 'date'>('votes');
   const { toast } = useToast();
   
   // Sample prompts data with votes and comments
@@ -478,236 +579,273 @@ export default function EnhancedPromptLibrary() {
   
   // Handle voting
   const handleVote = (id: number) => {
-    setPrompts(
-      prompts.map(prompt => 
-        prompt.id === id ? { ...prompt, votes: prompt.votes + 1 } : prompt
-      )
-    );
-    toast({
-      title: "Vote added",
-      description: "Thanks for voting on this prompt!"
-    });
+    if (!isAuthenticated) {
+      setShowAuthDialog(true);
+      return;
+    }
+    setPrompts(prompts.map(prompt => 
+      prompt.id === id ? { ...prompt, votes: prompt.votes + 1 } : prompt
+    ));
   };
   
   // Handle adding comments
   const handleAddComment = (id: number, text: string) => {
-    setPrompts(
-      prompts.map(prompt => {
-        if (prompt.id === id) {
-          const newComment = {
-            id: Date.now(),
-            userName: "User",
-            text,
-            date: format(new Date(), 'MMMM d, yyyy')
-          };
-          return { 
-            ...prompt, 
-            comments: [...prompt.comments, newComment]
-          };
-        }
-        return prompt;
-      })
-    );
+    if (!isAuthenticated) {
+      setShowAuthDialog(true);
+      return;
+    }
+    const newComment = {
+      id: Date.now(),
+      userName: user?.username || 'Utente',
+      text,
+      date: format(new Date(), 'dd/MM/yyyy HH:mm')
+    };
+    setPrompts(prompts.map(prompt => 
+      prompt.id === id ? { ...prompt, comments: [...prompt.comments, newComment] } : prompt
+    ));
   };
   
   // Handle adding new prompts
   const handleAddPrompt = (newPromptData: Omit<Prompt, 'id' | 'votes' | 'comments' | 'dateAdded'>) => {
+    if (!isAuthenticated) {
+      setShowAuthDialog(true);
+      return;
+    }
     const newPrompt: Prompt = {
       ...newPromptData,
-      id: prompts.length + 1,
+      id: Date.now(),
       votes: 0,
       comments: [],
-      dateAdded: format(new Date(), 'yyyy-MM-dd')
+      dateAdded: format(new Date(), 'dd/MM/yyyy HH:mm')
     };
-    
     setPrompts([newPrompt, ...prompts]);
   };
   
   // Filter and sort prompts
   const filteredPrompts = prompts.filter(prompt => {
-    const matchesSearch = searchTerm === '' || 
-      prompt.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      prompt.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      prompt.promptText.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = searchQuery === '' || 
+      prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      prompt.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      prompt.promptText.toLowerCase().includes(searchQuery.toLowerCase());
       
-    const matchesCategory = activeCategory === 'all' || prompt.category === activeCategory;
-    const matchesModel = activeModel === 'all' || prompt.model === activeModel;
+    const matchesCategory = selectedCategory === 'all' || prompt.category === selectedCategory;
+    const matchesModel = selectedModel === 'all' || prompt.model === selectedModel;
     
     return matchesSearch && matchesCategory && matchesModel;
   });
   
   // Sort prompts based on selected criteria
   const sortedPrompts = [...filteredPrompts].sort((a, b) => {
-    if (sortBy === 'newest') {
-      return new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime();
-    } else if (sortBy === 'popular') {
+    if (sortBy === 'votes') {
       return b.votes - a.votes;
-    } else if (sortBy === 'most-comments') {
-      return b.comments.length - a.comments.length;
+    } else if (sortBy === 'date') {
+      return new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime();
     }
     return 0;
   });
   
   // Clear filters
   const clearFilters = () => {
-    setSearchTerm('');
-    setActiveCategory('all');
-    setActiveModel('all');
-    setSortBy('newest');
+    setSearchQuery('');
+    setSelectedCategory('all');
+    setSelectedModel('all');
+    setSortBy('votes');
+  };
+  
+  // Aggiorno copyCount globale quando si copia
+  const handleCopy = (id: number) => {
+    setPrompts(
+      prompts.map(prompt => 
+        prompt.id === id ? { ...prompt, copyCount: (prompt.copyCount || 0) + 1 } : prompt
+      )
+    );
   };
   
   return (
-    <div className="mt-4">
+    <div className="container mx-auto p-4">
+      {/* Trending Now con lazy loading */}
+      <Suspense fallback={<div className="mb-8 text-gray-400">Caricamento trending...</div>}>
+        <TrendingNow prompts={prompts} />
+      </Suspense>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-white">Prompt Library</h2>
-        <AddPromptDialog onAddPrompt={handleAddPrompt} />
-      </div>
-      
-      <div className="mb-8">
-        <div className="relative mb-6">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-          <Input
-            type="text"
-            placeholder="Search for prompts by keyword or phrase..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 py-6 bg-black/30 border-white/10 focus:border-primary/30 rounded-lg"
-          />
-          {searchTerm && (
-            <button 
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-white transition-colors"
-              onClick={() => setSearchTerm('')}
-            >
-              <X className="h-4 w-4" />
-            </button>
+        <h1 className="text-3xl font-bold">Prompt Library</h1>
+        <div className="flex gap-2">
+          {isAuthenticated ? (
+            <>
+              <Button onClick={() => setShowDashboard(!showDashboard)}>
+                {showDashboard ? 'Torna alla Libreria' : 'Il Tuo Dashboard'}
+              </Button>
+              <Button onClick={() => setShowAuthDialog(true)}>Aggiungi Prompt</Button>
+            </>
+          ) : (
+            <Button onClick={() => setShowAuthDialog(true)}>Accedi per Contribuire</Button>
           )}
         </div>
-        
-        <div className="flex flex-wrap gap-4 justify-between items-start">
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-sm font-medium text-white mb-2">Category</h3>
-              <div className="flex flex-wrap gap-2">
-                {categories.map(category => (
-                  <button
-                    key={category}
-                    className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
-                      activeCategory === category
-                        ? 'bg-primary text-black font-medium'
-                        : 'bg-black/50 text-gray-300 hover:bg-white/10'
-                    }`}
-                    onClick={() => setActiveCategory(category)}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
+      </div>
+      
+      {showDashboard ? (
+        <UserPromptDashboard />
+      ) : (
+        <>
+          <div className="mb-8">
+            <div className="relative mb-6">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+              <Input
+                type="text"
+                placeholder="Search for prompts by keyword or phrase..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 py-6 bg-black/30 border-white/10 focus:border-primary/30 rounded-lg"
+              />
+              {searchQuery && (
+                <button 
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-white transition-colors"
+                  onClick={() => setSearchQuery('')}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </div>
             
-            <div>
-              <h3 className="text-sm font-medium text-white mb-2">Model</h3>
-              <div className="flex flex-wrap gap-2">
-                {models.map(model => (
-                  <button
-                    key={model}
-                    className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
-                      activeModel === model
-                        ? 'bg-primary text-black font-medium'
-                        : 'bg-black/50 text-gray-300 hover:bg-white/10'
-                    }`}
-                    onClick={() => setActiveModel(model)}
+            <div className="flex flex-wrap gap-4 justify-between items-start">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-sm font-medium text-white mb-2">Category</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {categories.map(category => (
+                      <button
+                        key={category}
+                        className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
+                          selectedCategory === category
+                            ? 'bg-primary text-black font-medium'
+                            : 'bg-black/50 text-gray-300 hover:bg-white/10'
+                        }`}
+                        onClick={() => setSelectedCategory(category)}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="text-sm font-medium text-white mb-2">Model</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {models.map(model => (
+                      <button
+                        key={model}
+                        className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
+                          selectedModel === model
+                            ? 'bg-primary text-black font-medium'
+                            : 'bg-black/50 text-gray-300 hover:bg-white/10'
+                        }`}
+                        onClick={() => setSelectedModel(model)}
+                      >
+                        {model}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-sm font-medium text-white mb-2">Sort By</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      className={`flex items-center px-3 py-1.5 rounded-full text-sm transition-colors ${
+                        sortBy === 'votes'
+                          ? 'bg-primary text-black font-medium'
+                          : 'bg-black/50 text-gray-300 hover:bg-white/10'
+                      }`}
+                      onClick={() => setSortBy('votes')}
+                    >
+                      <Flame className="h-3.5 w-3.5 mr-1.5" />
+                      <span>Most Voted</span>
+                    </button>
+                    
+                    <button
+                      className={`flex items-center px-3 py-1.5 rounded-full text-sm transition-colors ${
+                        sortBy === 'date'
+                          ? 'bg-primary text-black font-medium'
+                          : 'bg-black/50 text-gray-300 hover:bg-white/10'
+                      }`}
+                      onClick={() => setSortBy('date')}
+                    >
+                      <SortDesc className="h-3.5 w-3.5 mr-1.5" />
+                      <span>Newest</span>
+                    </button>
+                  </div>
+                </div>
+                
+                {(searchQuery || selectedCategory !== 'all' || selectedModel !== 'all' || sortBy !== 'votes') && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={clearFilters}
+                    className="px-3 py-1.5 h-auto bg-black/30 border-white/10 hover:bg-white/10 text-white"
                   >
-                    {model}
-                  </button>
-                ))}
+                    <X className="h-4 w-4 mr-2" />
+                    Clear filters
+                  </Button>
+                )}
               </div>
             </div>
           </div>
           
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-sm font-medium text-white mb-2">Sort By</h3>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  className={`flex items-center px-3 py-1.5 rounded-full text-sm transition-colors ${
-                    sortBy === 'newest'
-                      ? 'bg-primary text-black font-medium'
-                      : 'bg-black/50 text-gray-300 hover:bg-white/10'
-                  }`}
-                  onClick={() => setSortBy('newest')}
-                >
-                  <SortDesc className="h-3.5 w-3.5 mr-1.5" />
-                  <span>Newest</span>
-                </button>
-                
-                <button
-                  className={`flex items-center px-3 py-1.5 rounded-full text-sm transition-colors ${
-                    sortBy === 'popular'
-                      ? 'bg-primary text-black font-medium'
-                      : 'bg-black/50 text-gray-300 hover:bg-white/10'
-                  }`}
-                  onClick={() => setSortBy('popular')}
-                >
-                  <Flame className="h-3.5 w-3.5 mr-1.5" />
-                  <span>Most Voted</span>
-                </button>
-                
-                <button
-                  className={`flex items-center px-3 py-1.5 rounded-full text-sm transition-colors ${
-                    sortBy === 'most-comments'
-                      ? 'bg-primary text-black font-medium'
-                      : 'bg-black/50 text-gray-300 hover:bg-white/10'
-                  }`}
-                  onClick={() => setSortBy('most-comments')}
-                >
-                  <MessageSquare className="h-3.5 w-3.5 mr-1.5" />
-                  <span>Most Comments</span>
-                </button>
+          <div className="mb-4 flex justify-between items-center">
+            <h2 className="text-xl font-bold text-white">
+              {sortedPrompts.length > 0 ? (
+                <>{sortedPrompts.length} {sortedPrompts.length === 1 ? 'Prompt' : 'Prompts'} Found</>
+              ) : (
+                'No Prompts Found'
+              )}
+            </h2>
+          </div>
+          
+          <div className="grid grid-cols-1 gap-6">
+            {sortedPrompts.length > 0 ? (
+              sortedPrompts.map((prompt) => (
+                <PromptCard
+                  key={prompt.id}
+                  prompt={prompt}
+                  onVote={handleVote}
+                  onComment={handleAddComment}
+                />
+              ))
+            ) : (
+              <div className="text-center py-16 bg-black/30 border border-white/10 rounded-xl">
+                <p className="text-gray-400">No prompts found matching your criteria.</p>
+                <p className="text-gray-500 text-sm mt-2">Try adjusting your search or filters.</p>
               </div>
-            </div>
-            
-            {(searchTerm || activeCategory !== 'all' || activeModel !== 'all' || sortBy !== 'newest') && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={clearFilters}
-                className="px-3 py-1.5 h-auto bg-black/30 border-white/10 hover:bg-white/10 text-white"
-              >
-                <X className="h-4 w-4 mr-2" />
-                Clear filters
-              </Button>
             )}
           </div>
+        </>
+      )}
+
+      {/* Sezione funzionalità extra */}
+      <div className="mt-12 border-t border-white/10 pt-8">
+        <h2 className="text-2xl font-bold text-primary mb-6">Esplora e Impara con l'AI</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <Suspense fallback={<div className="mb-8 text-gray-400">Caricamento quiz...</div>}>
+            <AiQuiz />
+          </Suspense>
+          <Suspense fallback={<div className="mb-8 text-gray-400">Caricamento timeline...</div>}>
+            <AiTimeline />
+          </Suspense>
+          <Suspense fallback={<div className="mb-8 text-gray-400">Caricamento podcast...</div>}>
+            <PodcastPlayer />
+          </Suspense>
+          <Suspense fallback={<div className="mb-8 text-gray-400">Caricamento video tutorial...</div>}>
+            <VideoTutorial />
+          </Suspense>
         </div>
       </div>
-      
-      <div className="mb-4 flex justify-between items-center">
-        <h2 className="text-xl font-bold text-white">
-          {sortedPrompts.length > 0 ? (
-            <>{sortedPrompts.length} {sortedPrompts.length === 1 ? 'Prompt' : 'Prompts'} Found</>
-          ) : (
-            'No Prompts Found'
-          )}
-        </h2>
-      </div>
-      
-      <div className="grid grid-cols-1 gap-6">
-        {sortedPrompts.length > 0 ? (
-          sortedPrompts.map((prompt) => (
-            <PromptCard
-              key={prompt.id}
-              prompt={prompt}
-              onVote={handleVote}
-              onComment={handleAddComment}
-            />
-          ))
-        ) : (
-          <div className="text-center py-16 bg-black/30 border border-white/10 rounded-xl">
-            <p className="text-gray-400">No prompts found matching your criteria.</p>
-            <p className="text-gray-500 text-sm mt-2">Try adjusting your search or filters.</p>
-          </div>
-        )}
-      </div>
+
+      <AuthDialog 
+        open={showAuthDialog} 
+        onOpenChange={setShowAuthDialog}
+      />
     </div>
   );
 }

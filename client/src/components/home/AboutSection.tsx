@@ -25,11 +25,11 @@ export default function AboutSection() {
             </motion.div>
             
             <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">
-              Bridging AI Innovation with <span className="text-primary">Real-World Solutions</span>
+              <span className="text-gradient">Turning AI Vision</span> <span className="text-gradient">into Business Impact</span>
             </h2>
             
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              Passionate about transforming complex AI concepts into accessible, practical solutions that drive meaningful change across industries.
+              I partner with organizations to turn emerging technology—especially artificial intelligence—into measurable growth. My approach blends technical expertise with strategic thinking, translating complex AI concepts into actionable roadmaps that drive real-world value.
             </p>
           </div>
 
@@ -50,9 +50,9 @@ export default function AboutSection() {
                 </div>
                 
                 <div className="text-center lg:text-left">
-                  <h3 className="text-2xl font-bold text-white mb-4">AI Researcher & Innovation Strategist</h3>
+                  <h3 className="text-2xl font-bold text-gradient mb-4">AI Consultant & Digital Strategist</h3>
                   <p className="text-gray-300 leading-relaxed">
-                    With a deep passion for artificial intelligence and its transformative potential, I specialize in making cutting-edge AI technologies accessible and applicable to real-world challenges. My approach combines technical expertise with strategic thinking to help organizations harness the power of AI responsibly and effectively.
+                    With a proven track record in digital transformation, AI-driven product launches, and change management, I help businesses make advanced technology practical, profitable, and responsible. Whether you're exploring your first AI pilot or orchestrating a company-wide digital overhaul, I turn vision into impact—responsibly, efficiently, and with lasting results.
                   </p>
                 </div>
               </div>
@@ -69,18 +69,18 @@ export default function AboutSection() {
               {[
                 {
                   icon: <Code className="h-6 w-6" />,
-                  title: "AI Implementation",
-                  description: "Translating AI research into practical business solutions with measurable impact."
+                  title: "Digital Strategy & Roadmaps",
+                  description: "Aligning technology initiatives with business objectives and delivering actionable plans for AI adoption."
                 },
                 {
                   icon: <Lightbulb className="h-6 w-6" />,
-                  title: "Innovation Strategy",
-                  description: "Helping organizations identify and capitalize on AI-driven opportunities for growth."
+                  title: "Business & AI Bridging",
+                  description: "Demystifying machine learning, data, and automation so leaders can make confident, ROI-focused decisions."
                 },
                 {
                   icon: <Users className="h-6 w-6" />,
-                  title: "Team Development",
-                  description: "Building AI-literate teams and fostering cultures of innovation and continuous learning."
+                  title: "Team Enablement & Culture",
+                  description: "Workshops, coaching, and playbooks to embed a digital-first, data-driven culture across the organisation."
                 }
               ].map((item, index) => (
                 <motion.div
@@ -95,55 +95,13 @@ export default function AboutSection() {
                     {item.icon}
                   </div>
                   <div>
-                    <h4 className="text-lg font-semibold text-white mb-2">{item.title}</h4>
+                    <h4 className="text-lg font-semibold text-gradient mb-2">{item.title}</h4>
                     <p className="text-gray-400 text-sm">{item.description}</p>
                   </div>
                 </motion.div>
               ))}
             </motion.div>
           </div>
-
-          {/* Achievement Highlights */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-            className="grid md:grid-cols-3 gap-8"
-          >
-            {[
-              {
-                icon: <Award className="h-8 w-8" />,
-                metric: "50+",
-                label: "AI Projects Delivered",
-                description: "Successfully implemented across various industries"
-              },
-              {
-                icon: <Target className="h-8 w-8" />,
-                metric: "95%",
-                label: "Client Success Rate",
-                description: "Achieving measurable business outcomes"
-              },
-              {
-                icon: <Users className="h-8 w-8" />,
-                metric: "200+",
-                label: "Professionals Trained",
-                description: "In AI concepts and implementation strategies"
-              }
-            ].map((stat, index) => (
-              <div
-                key={index}
-                className="text-center p-6 rounded-xl bg-black/20 border border-white/10 hover:border-primary/30 transition-colors"
-              >
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-4">
-                  {stat.icon}
-                </div>
-                <div className="text-3xl font-bold text-primary mb-2">{stat.metric}</div>
-                <div className="text-lg font-semibold text-white mb-2">{stat.label}</div>
-                <div className="text-sm text-gray-400">{stat.description}</div>
-              </div>
-            ))}
-          </motion.div>
 
           {/* Contact & Mission Statement */}
           <motion.div
@@ -171,8 +129,7 @@ export default function AboutSection() {
               <div className="bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-2xl p-8">
                 <h3 className="text-2xl font-bold text-white mb-4">My Mission</h3>
                 <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mx-auto">
-                  To democratize AI knowledge and empower individuals and organizations to harness artificial intelligence 
-                  as a force for positive change, innovation, and sustainable growth in our rapidly evolving digital landscape.
+                  To make advanced AI accessible, actionable, and responsible for every business—bridging the gap between innovation and impact, and empowering people to thrive in the age of artificial intelligence.
                 </p>
               </div>
             </div>

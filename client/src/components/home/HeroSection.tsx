@@ -93,6 +93,7 @@ export default function HeroSection() {
                 src="https://images.unsplash.com/photo-1531746790731-6c087fecd65a?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&h=700&q=80" 
                 alt="Modern tech workspace with AI elements" 
                 className="rounded-xl w-full h-auto object-cover" 
+                loading="lazy"
               />
               
               {/* Glassmorphism effects */}

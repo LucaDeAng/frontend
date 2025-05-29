@@ -7,9 +7,11 @@ export interface ArticleMeta {
   author: string;
   category: string;
   image?: string;
+  tags: string[];
 }
 
 export interface Article {
+  slug: string;
   meta: ArticleMeta;
   content: string;
 }

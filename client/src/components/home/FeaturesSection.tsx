@@ -54,7 +54,7 @@ export default function FeaturesSection() {
       icon: <Code className="h-6 w-6" />,
       title: "AI Playground",
       description: "Sperimenta con modelli di intelligenza artificiale direttamente nel browser, senza bisogno di installazioni.",
-      gradient: "from-emerald-500 to-green-600",
+      gradient: "from-blue-500 to-blue-600",
       delay: 0.2
     },
     {

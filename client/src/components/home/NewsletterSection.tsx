@@ -27,15 +27,17 @@ export default function NewsletterSection() {
     setIsSubmitting(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) throw new Error('Errore iscrizione');
       toast({
         title: "Iscrizione Completata",
         description: "Grazie per esserti iscritto alla nostra newsletter!",
         variant: "default"
       });
-      
       setIsSuccess(true);
       setTimeout(() => setIsSuccess(false), 5000);
       setEmail('');
@@ -125,7 +127,7 @@ export default function NewsletterSection() {
                   <motion.div 
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="flex items-center justify-center space-x-2 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 py-4 px-6 rounded-xl border border-green-200 dark:border-green-800"
+                    className="flex items-center justify-center space-x-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 py-4 px-6 rounded-xl border border-blue-200 dark:border-blue-800"
                   >
                     <Check className="h-5 w-5" />
                     <span>Grazie per l'iscrizione! A presto.</span>

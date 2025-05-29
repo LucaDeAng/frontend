@@ -58,7 +58,7 @@ export default function CustomCursor() {
     default: {
       x: position.x,
       y: position.y,
-      backgroundColor: 'rgba(163, 255, 174, 0.6)',
+      backgroundColor: 'rgba(34, 139, 230, 0.6)',
       mixBlendMode: 'difference' as 'difference',
       height: 20,
       width: 20,
@@ -69,7 +69,7 @@ export default function CustomCursor() {
       y: position.y,
       height: 36,
       width: 36,
-      backgroundColor: 'rgba(163, 255, 174, 0.9)',
+      backgroundColor: 'rgba(56, 189, 248, 0.9)',
       mixBlendMode: 'difference' as 'difference',
       border: '2px solid rgba(255, 255, 255, 0.8)',
     },

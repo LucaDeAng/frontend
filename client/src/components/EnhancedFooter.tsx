@@ -11,13 +11,21 @@ export default function EnhancedFooter() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email.trim()) {
-      // Here you would integrate with your newsletter service
+    if (!email.trim() || !email.includes('@')) return;
+    try {
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) throw new Error('Errore iscrizione');
       setSubscribed(true);
       setEmail('');
       setTimeout(() => setSubscribed(false), 3000);
+    } catch (err) {
+      alert('Errore durante l\'iscrizione. Riprova.');
     }
   };
 
@@ -134,7 +142,7 @@ export default function EnhancedFooter() {
                     viewport={{ once: true }}
                     transition={{ delay: linkIndex * 0.05 + sectionIndex * 0.1 }}
                   >
-                    {link.external ? (
+                    {('external' in link && link.external) ? (
                       <a
                         href={link.path}
                         className="flex items-center text-gray-400 hover:text-primary transition-colors duration-200 group"
@@ -202,7 +210,7 @@ export default function EnhancedFooter() {
 
             {subscribed && (
               <motion.div
-                className="mt-4 p-4 bg-green-500/20 border border-green-500/30 rounded-lg text-green-400"
+                className="mt-4 p-4 bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-400"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}

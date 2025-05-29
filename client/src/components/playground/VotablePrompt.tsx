@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import promptsData from '../../../../content/prompts.json';
 
 // Types
 interface Comment {
@@ -36,119 +37,42 @@ interface Prompt {
   createdAt: string;
 }
 
+// Prompt extra forniti dall'utente
+const extraPrompts = [
+  {
+    title: "Business Model Innovation",
+    description: "Suggest innovative alternatives to the current business model using emerging trends.",
+    prompt: "Analyze our current business model and suggest innovative alternatives that align with emerging market trends and evolving customer needs. Provide examples and cite reputable sources.",
+    category: "Business Design",
+    model: "perplexity"
+  },
+  // ...altri prompt forniti, stesso formato...
+];
+
+// Mappo tutti i prompt per avere il campo 'text' richiesto dal componente
+const mappedPrompts = [
+  ...((promptsData as any[]).map((p, i) => ({
+    ...p,
+    text: p.text || p.promptText || '',
+    id: p.id || i + 1,
+    votes: p.votes || 0,
+    comments: p.comments || [],
+    createdAt: p.createdAt || new Date().toISOString(),
+  }))),
+  ...extraPrompts.map((p, i) => ({
+    ...p,
+    text: p.prompt,
+    id: 100 + i + 1,
+    votes: 0,
+    comments: [],
+    createdAt: new Date().toISOString(),
+  }))
+];
+
 // Main component
 export default function VotablePrompt() {
-  // State for all prompts
-  const [prompts, setPrompts] = useState<Prompt[]>([
-    {
-      id: 1,
-      title: "Email Marketing Campaign Generator",
-      description: "Create professional email marketing campaigns",
-      text: "Generate a compelling email marketing campaign for [product/service] targeting [audience]. Include a catchy subject line, engaging opening paragraph, 3-4 key benefits with brief descriptions, a clear call-to-action, and a professional sign-off. The tone should be [tone: professional/friendly/urgent] and the goal is to [goal: increase sales/drive traffic/boost engagement].",
-      category: "Marketing",
-      model: "GPT-4o",
-      votes: 42,
-      createdAt: "2025-04-15",
-      comments: [
-        {
-          id: 1,
-          userName: "MarketingPro",
-          text: "Used this for our product launch and saw a 25% increase in open rates!",
-          date: "May 1, 2025"
-        },
-        {
-          id: 2,
-          userName: "EmailGuru",
-          text: "Great structure, I'd add a PS line at the end for even better conversions.",
-          date: "May 8, 2025"
-        }
-      ]
-    },
-    {
-      id: 2,
-      title: "Technical Documentation Writer",
-      description: "Create clear technical documentation for software features",
-      text: "Create comprehensive technical documentation for [feature name] in [product/software]. Include:\n\n1. A high-level overview of the feature (1-2 paragraphs)\n2. Detailed explanation of how to configure and use the feature\n3. Examples of common use cases with code snippets or screenshots\n4. Troubleshooting section addressing 3-5 common issues\n5. Any limitations or known issues\n\nUse a clear, concise style appropriate for [audience: developers/end users/administrators].",
-      category: "Technical",
-      model: "GPT-4o",
-      votes: 35,
-      createdAt: "2025-04-20",
-      comments: [
-        {
-          id: 3,
-          userName: "DevLead",
-          text: "This saved our team hours of documentation work!",
-          date: "May 2, 2025"
-        }
-      ]
-    },
-    {
-      id: 3,
-      title: "Social Media Content Calendar",
-      description: "Create a month of engaging social media content",
-      text: "Create a 30-day social media content calendar for [business type] focusing on [primary goal: brand awareness/engagement/conversions]. For each day, include:\n\n1. Content theme or topic\n2. Post copy (under 280 characters for Twitter compatibility)\n3. Hashtag suggestions (3-5 relevant tags)\n4. Content type (image, video, poll, carousel, etc.)\n5. Best time to post\n\nEnsure content aligns with [brand voice: professional/casual/funny] and incorporates industry trends like [trend 1] and [trend 2].",
-      category: "Social Media",
-      model: "GPT-4o",
-      votes: 51,
-      createdAt: "2025-04-05",
-      comments: [
-        {
-          id: 4,
-          userName: "SocialMediaManager",
-          text: "The variety of content this generates is amazing!",
-          date: "April 20, 2025"
-        },
-        {
-          id: 5,
-          userName: "DigitalMarketer",
-          text: "Love how it includes hashtag suggestions - very thorough.",
-          date: "April 28, 2025"
-        },
-        {
-          id: 6,
-          userName: "ContentCreator",
-          text: "Used this for a client and they were very impressed with the results.",
-          date: "May 10, 2025"
-        }
-      ]
-    },
-    {
-      id: 4,
-      title: "Product Description Optimizer",
-      description: "Create SEO-friendly e-commerce product descriptions",
-      text: "Write a compelling product description for [product name], which is a [product category/type]. The description should:\n\n1. Start with an attention-grabbing headline\n2. Include 3-4 paragraphs highlighting key features and benefits\n3. Incorporate relevant keywords: [keyword 1], [keyword 2], [keyword 3]\n4. Use bullet points to list technical specifications\n5. End with a persuasive call-to-action\n\nTarget audience is [audience demographic] and the tone should be [desired tone]. Focus on how the product solves the problem of [common pain point].",
-      category: "E-commerce",
-      model: "GPT-4o",
-      votes: 38,
-      createdAt: "2025-04-18",
-      comments: []
-    },
-    {
-      id: 5,
-      title: "Data Analysis Report Generator",
-      description: "Create comprehensive reports from data analysis",
-      text: "Create a detailed data analysis report based on the following information:\n\n[Insert data points, metrics, or observations here]\n\nThe report should include:\n1. An executive summary highlighting key findings (max 150 words)\n2. Methodology section explaining how data was collected and analyzed\n3. Detailed analysis with relevant charts and graphs described in text format\n4. Identification of 3-5 significant trends or patterns\n5. Actionable recommendations based on the findings\n6. Limitations of the current analysis and suggestions for future research\n\nThe target audience is [audience: executives/technical team/general audience] and should maintain a [tone: formal/balanced/simplified] approach to explaining statistical concepts.",
-      category: "Data Science",
-      model: "GPT-4o",
-      votes: 45,
-      createdAt: "2025-04-10",
-      comments: [
-        {
-          id: 7,
-          userName: "DataScientist",
-          text: "The structure this provides is perfect for client presentations.",
-          date: "April 25, 2025"
-        },
-        {
-          id: 8,
-          userName: "AnalyticsManager",
-          text: "I appreciate how it includes limitations section - very professional.",
-          date: "May 5, 2025"
-        }
-      ]
-    }
-  ]);
-
+  const [prompts, setPrompts] = useState<Prompt[]>(mappedPrompts);
+  const [loading, setLoading] = useState(false);
   // State for categories, filtering and sorting
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -161,6 +85,10 @@ export default function VotablePrompt() {
     category: '',
     model: 'GPT-4o'
   });
+
+  useEffect(() => {
+    console.log('PROMPTS FROM JSON:', prompts);
+  }, [prompts]);
 
   // Extract unique categories
   const categories = ['All', ...Array.from(new Set(prompts.map(prompt => prompt.category)))];
@@ -295,7 +223,7 @@ export default function VotablePrompt() {
             variant="ghost"
             size="sm"
             onClick={addVote}
-            className="flex items-center gap-2 text-gray-400 hover:text-green-500 hover:bg-green-500/10"
+            className="flex items-center gap-2 text-gray-400 hover:text-blue-500 hover:bg-blue-500/10"
           >
             <ThumbsUp className="h-4 w-4" />
             <span>{prompt.votes}</span>

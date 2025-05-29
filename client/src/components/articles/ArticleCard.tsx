@@ -9,7 +9,7 @@ interface ArticleCardProps {
 }
 
 export default function ArticleCard({ article }: ArticleCardProps) {
-  const { title, date, summary, category, slug, image } = article;
+  const { title, date, summary, category, slug, image, tags } = article;
 
   // ← if there's no title, render nothing
   if (!title) return null;
@@ -44,6 +44,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
           src={imageUrl} 
           alt={`${title} - illustration`} 
           className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-80"></div>
 

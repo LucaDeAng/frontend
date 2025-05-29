@@ -13,6 +13,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   getArticles(): Promise<ArticleMeta[]>;
   getArticleBySlug(slug: string): Promise<Article | undefined>;
+  saveEmail(email: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -36,7 +37,25 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentId++;
-    const user: User = { ...insertUser, id };
+    const now = new Date();
+    const user: User = {
+      ...insertUser,
+      id,
+      createdAt: now,
+      updatedAt: now,
+      lastLoginAt: null,
+      password: insertUser.password ?? null,
+      displayName: insertUser.displayName ?? null,
+      avatar: insertUser.avatar ?? null,
+      bio: insertUser.bio ?? null,
+      preferences: {
+        theme: (insertUser.preferences?.theme ?? "light") as "light" | "dark",
+        emailNotifications: insertUser.preferences?.emailNotifications ?? false,
+        categories: (insertUser.preferences?.categories ?? []) as string[]
+      },
+      isVerified: insertUser.isVerified ?? null,
+      loginProvider: insertUser.loginProvider ?? null
+    };
     this.users.set(id, user);
     return user;
   }
@@ -70,11 +89,46 @@ export class MemStorage implements IStorage {
   async getArticleBySlug(slug: string): Promise<Article | undefined> {
     try {
       const filePath = path.join("content", "articles", `${slug}.md`);
+      
+      // Verifica se il file esiste
+      try {
+        await fs.access(filePath);
+      } catch (error) {
+        console.error(`Articolo non trovato: ${slug}`);
+        return undefined;
+      }
+      
       const content = await fs.readFile(filePath, "utf-8");
-      return extractFrontmatter(content, slug);
+      if (!content) {
+        console.error(`Contenuto vuoto per l'articolo: ${slug}`);
+        return undefined;
+      }
+      
+      const article = extractFrontmatter(content, slug);
+      if (!article || !article.meta) {
+        console.error(`Frontmatter non valido per l'articolo: ${slug}`);
+        return undefined;
+      }
+      
+      return article;
     } catch (error) {
-      console.error(`Error reading article file (${slug}):`, error);
+      console.error(`Errore nella lettura dell'articolo (${slug}):`, error);
       return undefined;
+    }
+  }
+
+  async saveEmail(email: string): Promise<void> {
+    const filePath = path.join("content", "newsletter.json");
+    let emails: string[] = [];
+    try {
+      const data = await fs.readFile(filePath, "utf-8");
+      emails = JSON.parse(data);
+    } catch (e) {
+      // Se il file non esiste, emails resta []
+    }
+    if (!emails.includes(email)) {
+      emails.push(email);
+      await fs.writeFile(filePath, JSON.stringify(emails, null, 2), "utf-8");
     }
   }
 }

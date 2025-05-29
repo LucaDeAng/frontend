@@ -2,10 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'wouter';
 import { 
   Brain, Menu, X, ChevronRight, Code, FileText, BookOpen, 
-  Sparkles, Lightbulb, Bot, Search, ChevronDown, Home, User, Hammer 
+  Sparkles, Lightbulb, Bot, Search, ChevronDown, Home, User, Hammer, ArrowUp, Settings 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Logo from './Logo';
+import { useQuery } from '@tanstack/react-query';
 
 export default function EnhancedHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -16,13 +17,27 @@ export default function EnhancedHeader() {
   const [location] = useLocation();
   const searchRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const offset = window.scrollY;
-      setScrolled(offset > 50);
-    };
+  // Ricerca avanzata
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchType, setSearchType] = useState<'article'>('article');
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    return JSON.parse(localStorage.getItem('recentSearches') || '[]');
+  });
 
-    window.addEventListener('scroll', handleScroll);
+  useEffect(() => {
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const offset = window.scrollY;
+          setScrolled(offset > 50);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -31,6 +46,20 @@ export default function EnhancedHeader() {
       searchRef.current.focus();
     }
   }, [searchOpen]);
+
+  useEffect(() => {
+    if (searchQuery.length > 1) {
+      setSearchLoading(true);
+      fetch(`/api/search?q=${encodeURIComponent(searchQuery)}&type=${searchType}`)
+        .then(res => res.json())
+        .then(data => {
+          setSearchResults(data);
+          setSearchLoading(false);
+        });
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchQuery, searchType]);
 
   // Article categories for dropdown
   const articleCategories = [
@@ -51,31 +80,44 @@ export default function EnhancedHeader() {
     { 
       title: 'Articles', 
       path: '/articles', 
-      icon: <BookOpen className="h-4 w-4" />, 
-      hasDropdown: true,
-      dropdown: articleCategories
+      icon: <BookOpen className="h-4 w-4" /> 
     },
     { 
       title: 'Prompts', 
       path: '/playground', 
       icon: <Bot className="h-4 w-4" /> 
     },
-    { 
-      title: 'About Me', 
-      path: '/about', 
-      icon: <User className="h-4 w-4" /> 
-    },
-    { 
-      title: 'Build in Public', 
-      path: '/build-in-public', 
-      icon: <Hammer className="h-4 w-4" /> 
+    {
+      title: 'About & Build',
+      custom: true,
+      render: () => (
+        <div className="flex items-center gap-2">
+          <Link href="/about">
+            <span className="flex items-center gap-1 text-gray-300 hover:text-primary transition-colors font-mono text-sm">
+              <User className="h-4 w-4" />
+              About Me
+            </span>
+          </Link>
+          <span className="text-gray-500">|</span>
+          <Link href="/build-in-public">
+            <span className="flex items-center gap-1 text-gray-300 hover:text-primary transition-colors font-mono text-sm">
+              <Hammer className="h-4 w-4" />
+              Build in Public
+            </span>
+          </Link>
+        </div>
+      )
     }
   ];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // Navigate to articles with search query
+      // Salva ricerca recente
+      const updated = [searchQuery, ...recentSearches.filter(s => s !== searchQuery)].slice(0, 5);
+      setRecentSearches(updated);
+      localStorage.setItem('recentSearches', JSON.stringify(updated));
+      // Vai alla pagina risultati
       window.location.href = `/articles?search=${encodeURIComponent(searchQuery)}`;
       setSearchOpen(false);
       setSearchQuery('');
@@ -91,7 +133,7 @@ export default function EnhancedHeader() {
       }`}
     >
       <div className="container mx-auto px-6 md:px-12">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/">
             <motion.div 
@@ -107,19 +149,20 @@ export default function EnhancedHeader() {
             </motion.div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          {/* Desktop Navigation centrata */}
+          <nav className="hidden md:flex items-center space-x-8 flex-grow justify-center">
             {navigationItems.map((item) => {
-              const isActive = location === item.path || (item.hasDropdown && location.startsWith('/articles'));
-              
+              if (item.custom && item.render) {
+                return (
+                  <div key={item.title} className="relative px-4 py-2">
+                    {item.render()}
+                  </div>
+                );
+              }
+              const isActive = location === item.path;
               return (
-                <div 
-                  key={item.path} 
-                  className="relative"
-                  onMouseEnter={() => item.hasDropdown && setArticlesDropdownOpen(true)}
-                  onMouseLeave={() => item.hasDropdown && setArticlesDropdownOpen(false)}
-                >
-                  <Link href={item.path}>
+                <div key={item.path} className="relative">
+                  <Link href={item.path || '#'}>
                     <motion.div
                       className={`group relative px-4 py-2 font-mono text-sm ${
                         isActive 
@@ -129,16 +172,8 @@ export default function EnhancedHeader() {
                       whileHover={{ y: -1 }}
                       whileTap={{ y: 0 }}
                     >
-                      <span className={`${isActive ? 'text-primary' : ''}`}>
-                        {item.icon}
-                      </span>
+                      <span className={`${isActive ? 'text-primary' : ''}`}>{item.icon}</span>
                       <span>{item.title}</span>
-                      {item.hasDropdown && (
-                        <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${
-                          articlesDropdownOpen ? 'rotate-180' : ''
-                        }`} />
-                      )}
-                      
                       {/* Active indicator */}
                       <motion.span
                         className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-primary to-secondary"
@@ -149,99 +184,113 @@ export default function EnhancedHeader() {
                       />
                     </motion.div>
                   </Link>
-
-                  {/* Dropdown Menu */}
-                  <AnimatePresence>
-                    {item.hasDropdown && articlesDropdownOpen && (
-                      <motion.div
-                        className="absolute top-full left-0 mt-2 w-64 bg-black/95 backdrop-blur-xl border border-primary/20 rounded-xl shadow-2xl overflow-hidden"
-                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        {item.dropdown?.map((dropdownItem, index) => (
-                          <Link key={dropdownItem.path} href={dropdownItem.path}>
-                            <motion.div
-                              className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-primary/10 transition-colors duration-200"
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: index * 0.05 }}
-                            >
-                              {dropdownItem.icon}
-                              <span className="font-mono text-sm">{dropdownItem.title}</span>
-                            </motion.div>
-                          </Link>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </div>
               );
             })}
           </nav>
 
-          {/* Search and Mobile Menu */}
-          <div className="flex items-center space-x-4">
-            {/* Search Bar */}
-            <div className="relative">
-              <AnimatePresence>
-                {searchOpen ? (
-                  <motion.form
-                    onSubmit={handleSearch}
-                    className="flex items-center"
-                    initial={{ width: 0, opacity: 0 }}
-                    animate={{ width: 'auto', opacity: 1 }}
-                    exit={{ width: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <input
-                      ref={searchRef}
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search articles..."
-                      className="w-64 px-4 py-2 bg-black/50 border border-primary/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-primary transition-colors"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setSearchOpen(false)}
-                      className="ml-2 p-2 text-gray-400 hover:text-white transition-colors"
+          {/* Icona Preferenze e Search/Menu mobile a destra */}
+          <div className="flex items-center gap-2 ml-auto">
+            <Link href="/preferences">
+              <span className="flex items-center text-xs text-gray-400 hover:text-primary transition-colors gap-1" title="Preferenze">
+                <Settings className="w-4 h-4" />
+              </span>
+            </Link>
+            {/* Search and Mobile Menu */}
+            <div className="flex items-center space-x-4">
+              {/* Search Bar */}
+              <div className="relative">
+                <AnimatePresence>
+                  {searchOpen ? (
+                    <motion.div
+                      initial={{ width: 0, opacity: 0 }}
+                      animate={{ width: 360, opacity: 1 }}
+                      exit={{ width: 0, opacity: 0 }}
+                      className="absolute right-0 z-50"
                     >
-                      <X className="h-4 w-4" />
+                      <form onSubmit={handleSearch} className="flex items-center bg-zinc-900 border border-primary/30 rounded-lg px-3 py-2 shadow-lg w-80">
+                        <Search className="h-4 w-4 text-primary mr-2" />
+                        <input
+                          ref={searchRef}
+                          type="text"
+                          value={searchQuery}
+                          onChange={e => setSearchQuery(e.target.value)}
+                          className="bg-transparent outline-none text-white flex-1"
+                          placeholder="Cerca articoli, prompt, risorse..."
+                          autoFocus
+                        />
+                        <button 
+                          type="button" 
+                          onClick={() => setSearchOpen(false)} 
+                          className="ml-2 text-gray-400 hover:text-white"
+                          aria-label="Chiudi ricerca"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </form>
+                      {/* Filtri */}
+                      <div className="flex space-x-2 mt-2 px-1">
+                        <button onClick={() => setSearchType('article')} className={`px-2 py-1 rounded text-xs ${searchType==='article' ? 'bg-primary text-black' : 'bg-zinc-800 text-gray-300'}`}>Articoli</button>
+                        {/* <button ...>Prompt</button> <button ...>Risorse</button> */}
+                      </div>
+                      {/* Risultati live */}
+                      <div className="bg-zinc-900 border border-primary/20 rounded-lg mt-2 max-h-80 overflow-y-auto shadow-xl w-80">
+                        {searchLoading && <div className="p-4 text-gray-400">Caricamento...</div>}
+                        {!searchLoading && searchQuery && searchResults.length === 0 && (
+                          <div className="p-4 text-gray-400">Nessun risultato</div>
+                        )}
+                        {!searchLoading && searchResults.map((r, i) => (
+                          <Link href={`/article/${r.slug}`} key={r.slug} onClick={() => setSearchOpen(false)}>
+                            <div className="p-3 border-b border-white/5 hover:bg-primary/10 cursor-pointer">
+                              <div className="font-bold text-white" dangerouslySetInnerHTML={{__html: r.highlight.title || r.title}} />
+                              <div className="text-xs text-gray-400 mt-1" dangerouslySetInnerHTML={{__html: r.highlight.summary || r.summary}} />
+                            </div>
+                          </Link>
+                        ))}
+                        {/* Suggerimenti e ricerche recenti */}
+                        {!searchQuery && recentSearches.length > 0 && (
+                          <div className="p-2">
+                            <div className="text-xs text-gray-400 mb-1">Ricerche recenti:</div>
+                            <div className="flex flex-wrap gap-2">
+                              {recentSearches.map((s, i) => (
+                                <button key={i} onClick={() => setSearchQuery(s)} className="px-2 py-1 bg-zinc-800 rounded text-xs text-gray-300 hover:bg-primary/20">{s}</button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <button 
+                      onClick={() => setSearchOpen(true)} 
+                      className="text-gray-400 hover:text-white"
+                      aria-label="Apri ricerca"
+                    >
+                      <Search className="h-5 w-5" />
                     </button>
-                  </motion.form>
-                ) : (
-                  <motion.button
-                    onClick={() => setSearchOpen(true)}
-                    className="p-2 text-gray-400 hover:text-white transition-colors"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <Search className="h-5 w-5" />
-                  </motion.button>
-                )}
-              </AnimatePresence>
-            </div>
+                  )}
+                </AnimatePresence>
+              </div>
 
-            {/* Mobile Menu Button */}
-            <motion.button
-              className="flex md:hidden p-2 rounded-lg bg-black/30 border border-primary/20"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              whileTap={{ scale: 0.9 }}
-            >
-              <motion.div
-                initial={{ rotate: 0 }}
-                animate={{ rotate: mobileMenuOpen ? 90 : 0 }}
-                transition={{ duration: 0.3 }}
+              {/* Mobile Menu Button */}
+              <motion.button
+                className="flex md:hidden p-2 rounded-lg bg-black/30 border border-primary/20"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                whileTap={{ scale: 0.9 }}
               >
-                {mobileMenuOpen ? (
-                  <X className="h-5 w-5 text-primary" />
-                ) : (
-                  <Menu className="h-5 w-5 text-primary" />
-                )}
-              </motion.div>
-            </motion.button>
+                <motion.div
+                  initial={{ rotate: 0 }}
+                  animate={{ rotate: mobileMenuOpen ? 90 : 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {mobileMenuOpen ? (
+                    <X className="h-5 w-5 text-primary" />
+                  ) : (
+                    <Menu className="h-5 w-5 text-primary" />
+                  )}
+                </motion.div>
+              </motion.button>
+            </div>
           </div>
         </div>
       </div>
@@ -282,7 +331,7 @@ export default function EnhancedHeader() {
                       transition={{ delay: index * 0.1 + 0.2 }}
                     >
                       <Link 
-                        href={item.path} 
+                        href={item.path || '#'} 
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         <div className={`flex items-center space-x-4 p-4 rounded-lg border ${
@@ -297,24 +346,6 @@ export default function EnhancedHeader() {
                           <ChevronRight className="h-4 w-4 opacity-50 ml-auto" />
                         </div>
                       </Link>
-
-                      {/* Mobile Dropdown Items */}
-                      {item.hasDropdown && (
-                        <div className="mt-2 ml-6 space-y-2">
-                          {item.dropdown?.map((dropdownItem) => (
-                            <Link 
-                              key={dropdownItem.path} 
-                              href={dropdownItem.path}
-                              onClick={() => setMobileMenuOpen(false)}
-                            >
-                              <div className="flex items-center space-x-3 p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
-                                {dropdownItem.icon}
-                                <span className="font-mono text-sm">{dropdownItem.title}</span>
-                              </div>
-                            </Link>
-                          ))}
-                        </div>
-                      )}
                     </motion.li>
                   ))}
                 </ul>

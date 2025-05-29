@@ -16,7 +16,13 @@ import CustomCursor from "@/components/ui/cursor";
 import ScrollProgress from "@/components/ui/scroll-progress";
 import ReadingProgress from "@/components/ui/reading-progress";
 import ParticleBackground from "@/components/ui/particle-background";
+import FluidCursor from "@/components/ui/fluid-cursor";
 import Lenis from "@studio-freight/lenis";
+import AdminLogin from "@/pages/AdminLogin";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import TagPage from "@/pages/tag";
+import CategoryPage from "@/pages/category";
+import PreferencesPage from '@/pages/preferences';
 
 function App() {
   // Initialize smooth scrolling with Lenis
@@ -24,19 +30,34 @@ function App() {
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
+      direction: 'vertical',
+      gestureDirection: 'vertical',
       smooth: true,
+      mouseMultiplier: 1,
       smoothTouch: false,
       touchMultiplier: 2,
+      infinite: false,
     });
 
-    function raf(time: number) {
+    function raf(time) {
       lenis.raf(time);
       requestAnimationFrame(raf);
     }
 
     requestAnimationFrame(raf);
+
+    // Recupera preferenza tema e applica classe
+    fetch('/api/user/preferences')
+      .then(res => res.json())
+      .then(prefs => {
+        if (prefs.theme === 'dark') {
+          document.body.classList.add('dark');
+          document.body.classList.remove('light');
+        } else {
+          document.body.classList.add('light');
+          document.body.classList.remove('dark');
+        }
+      });
 
     return () => {
       lenis.destroy();
@@ -45,8 +66,20 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-black text-white">
-      {/* Custom cursor */}
+      {/* Custom cursors */}
       <CustomCursor />
+      <FluidCursor 
+        SIM_RESOLUTION={128}
+        DYE_RESOLUTION={1024}
+        DENSITY_DISSIPATION={2.5}
+        VELOCITY_DISSIPATION={1.5}
+        PRESSURE={0.8}
+        CURL={2}
+        SPLAT_RADIUS={0.3}
+        SPLAT_FORCE={4000}
+        SHADING={true}
+        COLOR_UPDATE_SPEED={5}
+      />
       
       {/* Enhanced progress indicators */}
       <ScrollProgress />
@@ -66,7 +99,15 @@ function App() {
             <Route path="/playground" component={Playground} />
             <Route path="/about" component={AboutMe} />
             <Route path="/build-in-public" component={BuildInPublic} />
-            <Route path="/admin" component={Admin} />
+            <Route path="/admin/login" component={AdminLogin} />
+            <Route path="/admin">
+              <ProtectedRoute>
+                <Admin />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/tag/:tag" component={TagPage} />
+            <Route path="/category/:category" component={CategoryPage} />
+            <Route path="/preferences" component={PreferencesPage} />
             <Route component={NotFound} />
           </Switch>
         </AnimatePresence>

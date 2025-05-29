@@ -17,7 +17,8 @@ import {
   Sparkles,
   Lightbulb,
   Rocket,
-  Bot
+  Bot,
+  Mail
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,9 +31,34 @@ import { ArticleMeta, PlaygroundRequest, PlaygroundResponse } from '@shared/type
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 
+// Lista di tag predefiniti
+const TAGS = [
+  'AI',
+  'Machine Learning',
+  'Business',
+  'Prompt Engineering',
+  'Marketing',
+  'Ricerca',
+  'Tecnologia',
+  'Creatività',
+  'Etica',
+  'Automazione',
+  'Innovazione',
+  'Produttività',
+  'Design',
+  'Sviluppo',
+];
+
+const PROMPT_MODELS = [
+  'ChatGPT', 'Claude', 'Gemini', 'Llama', 'Mistral', 'Other'
+];
+const PROMPT_CATEGORIES = [
+  'Business', 'Creatività', 'Programmazione', 'Marketing', 'Ricerca', 'Educazione', 'Altro'
+];
+
 export default function AdminDashboard() {
   const { toast } = useToast();
-  const [selectedTab, setSelectedTab] = useState<'articles' | 'create' | 'playground'>('articles');
+  const [selectedTab, setSelectedTab] = useState<'articles' | 'create' | 'prompts' | 'newsletter'>('articles');
   const [editingArticle, setEditingArticle] = useState<ArticleMeta | null>(null);
   const [copiedPrompt, setCopiedPrompt] = useState(false);
   
@@ -43,22 +69,35 @@ export default function AdminDashboard() {
     summary: '',
     category: '',
     content: '',
-    author: 'Admin'
+    author: 'Luca De Angelis',
+    image: '',
+    tags: [] as string[],
   });
   
-  // Playground state
-  const [playgroundInput, setPlaygroundInput] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [playgroundResult, setPlaygroundResult] = useState<string | null>(null);
-  const [playgroundSettings, setPlaygroundSettings] = useState({
-    model: 'gpt-4o',
-    temperature: 0.7,
-    maxTokens: 1000
+  // Prompt state
+  const [editingPrompt, setEditingPrompt] = useState<any | null>(null);
+  const [promptForm, setPromptForm] = useState({
+    title: '',
+    description: '',
+    promptText: '',
+    model: '',
+    category: '',
+    outputExample: '',
   });
   
   // Fetch articles
   const { data: articles, isLoading, error, refetch } = useQuery<ArticleMeta[]>({
     queryKey: ['/api/articles'],
+  });
+  
+  // Fetch prompts
+  const { data: prompts, refetch: refetchPrompts } = useQuery<any[]>({
+    queryKey: ['/api/prompts'],
+  });
+  
+  // Query per gli iscritti newsletter
+  const { data: newsletterEmails = [], refetch: refetchNewsletter } = useQuery<string[]>({
+    queryKey: ['/api/newsletter-subscribers'],
   });
   
   // Handle form input changes
@@ -88,7 +127,9 @@ export default function AdminDashboard() {
       summary: '',
       category: '',
       content: '',
-      author: 'Admin'
+      author: 'Luca De Angelis',
+      image: '',
+      tags: [],
     });
     setEditingArticle(null);
   };
@@ -114,21 +155,31 @@ export default function AdminDashboard() {
     };
     
     try {
-      // For demo purposes, we'll simulate the API call
       toast({
         title: "Processing",
-        description: "Creating new article...",
+        description: editingArticle ? "Updating article..." : "Creating new article...",
       });
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const token = localStorage.getItem('adminToken');
+      const method = editingArticle ? 'PUT' : 'POST';
+      const url = editingArticle ? `/api/admin/articles/${formData.slug}` : '/api/admin/articles';
       
-      // Show success message
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(articleData),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to save article');
+      }
+      
       toast({
         title: "Success!",
-        description: editingArticle 
-          ? "Article updated successfully" 
-          : "New article created successfully",
+        description: editingArticle ? "Article updated successfully" : "New article created successfully",
         variant: "default"
       });
       
@@ -143,7 +194,7 @@ export default function AdminDashboard() {
     } catch (error) {
       toast({
         title: "Error",
-        description: "There was a problem creating the article. Please try again.",
+        description: "There was a problem saving the article. Please try again.",
         variant: "destructive"
       });
     }
@@ -158,7 +209,9 @@ export default function AdminDashboard() {
       summary: article.summary,
       category: article.category,
       content: '# ' + article.title + '\n\nArticle content goes here...',
-      author: article.author
+      author: article.author,
+      image: article.image || '',
+      tags: article.tags || [],
     });
     setSelectedTab('create');
   };
@@ -170,23 +223,29 @@ export default function AdminDashboard() {
     }
     
     try {
-      // For demo purposes, we'll simulate the API call
       toast({
         title: "Processing",
         description: "Deleting article...",
       });
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const token = localStorage.getItem('adminToken');
+      const response = await fetch(`/api/admin/articles/${slug}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
       
-      // Show success message
+      if (!response.ok) {
+        throw new Error('Errore durante la cancellazione');
+      }
+      
       toast({
         title: "Success!",
         description: "Article deleted successfully",
         variant: "default"
       });
       
-      // Refresh articles list
       refetch();
     } catch (error) {
       toast({
@@ -194,6 +253,75 @@ export default function AdminDashboard() {
         description: "There was a problem deleting the article. Please try again.",
         variant: "destructive"
       });
+    }
+  };
+  
+  // Prompt handlers
+  const resetPromptForm = () => {
+    setPromptForm({
+      title: '',
+      description: '',
+      promptText: '',
+      model: '',
+      category: '',
+      outputExample: '',
+    });
+    setEditingPrompt(null);
+  };
+  const handlePromptInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setPromptForm(prev => ({ ...prev, [name]: value }));
+  };
+  const handlePromptSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!promptForm.title || !promptForm.promptText || !promptForm.model || !promptForm.category) {
+      toast({ title: 'Missing fields', description: 'Fill all required fields', variant: 'destructive' });
+      return;
+    }
+    const token = localStorage.getItem('adminToken');
+    const method = editingPrompt ? 'PUT' : 'POST';
+    const url = editingPrompt ? `/api/prompts/${editingPrompt.id}` : '/api/prompts';
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(promptForm),
+    });
+    if (res.ok) {
+      toast({ title: 'Success', description: editingPrompt ? 'Prompt updated' : 'Prompt created' });
+      resetPromptForm();
+      refetchPrompts();
+      setSelectedTab('prompts');
+    } else {
+      toast({ title: 'Error', description: 'Failed to save prompt', variant: 'destructive' });
+    }
+  };
+  const handleEditPrompt = (prompt: any) => {
+    setEditingPrompt(prompt);
+    setPromptForm({
+      title: prompt.title,
+      description: prompt.description,
+      promptText: prompt.promptText,
+      model: prompt.model,
+      category: prompt.category,
+      outputExample: prompt.outputExample || '',
+    });
+    setSelectedTab('prompts');
+  };
+  const handleDeletePrompt = async (id: number) => {
+    if (!confirm('Delete this prompt?')) return;
+    const token = localStorage.getItem('adminToken');
+    const res = await fetch(`/api/prompts/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    if (res.ok) {
+      toast({ title: 'Prompt deleted' });
+      refetchPrompts();
+    } else {
+      toast({ title: 'Error', description: 'Failed to delete prompt', variant: 'destructive' });
     }
   };
   
@@ -245,6 +373,28 @@ export default function AdminDashboard() {
               <div className="flex items-center space-x-2">
                 <Plus className="w-4 h-4" />
                 <span>{editingArticle ? 'Edit Article' : 'Create New Article'}</span>
+              </div>
+            </button>
+            
+            <button 
+              className={`py-3 px-5 font-medium ${selectedTab === 'prompts' ? 'text-primary border-b-2 border-primary' : 'text-gray-400 hover:text-white'}`}
+              onClick={() => { setSelectedTab('prompts'); resetPromptForm(); }}
+            >
+              <div className="flex items-center space-x-2">
+                <Bot className="w-4 h-4" />
+                <span>Prompt Management</span>
+              </div>
+            </button>
+            
+            <button 
+              className={`py-3 px-5 font-medium ${
+                selectedTab === 'newsletter' ? 'text-primary border-b-2 border-primary' : 'text-gray-400 hover:text-white'
+              }`}
+              onClick={() => setSelectedTab('newsletter')}
+            >
+              <div className="flex items-center space-x-2">
+                <Mail className="w-4 h-4" />
+                <span>Newsletter</span>
               </div>
             </button>
           </div>
@@ -308,7 +458,6 @@ export default function AdminDashboard() {
                               <td className="py-4 px-4 text-right">
                                 <div className="flex items-center justify-end space-x-2">
                                   <Button 
-                                    size="sm" 
                                     variant="outline" 
                                     className="h-8 border-primary/30 text-primary hover:bg-primary/20"
                                     onClick={() => handleEditArticle(article)}
@@ -316,7 +465,7 @@ export default function AdminDashboard() {
                                     <Edit className="h-3.5 w-3.5" />
                                   </Button>
                                   <Button 
-                                    size="sm" 
+                                    size="sm"
                                     variant="outline" 
                                     className="h-8 border-destructive/30 text-destructive hover:bg-destructive/20"
                                     onClick={() => handleDeleteArticle(article.slug)}
@@ -324,7 +473,6 @@ export default function AdminDashboard() {
                                     <Trash2 className="h-3.5 w-3.5" />
                                   </Button>
                                   <Button 
-                                    size="sm" 
                                     variant="outline" 
                                     className="h-8 border-white/30 hover:bg-white/10"
                                     asChild
@@ -358,7 +506,6 @@ export default function AdminDashboard() {
                   </h2>
                   {editingArticle && (
                     <Button 
-                      variant="outline" 
                       className="border-white/30 hover:bg-white/10"
                       onClick={resetForm}
                     >
@@ -483,6 +630,48 @@ More content here...
                     </p>
                   </div>
                   
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-400 mb-1">
+                      Immagine di anteprima (URL)
+                    </label>
+                    <Input
+                      name="image"
+                      value={formData.image}
+                      onChange={handleInputChange}
+                      className="bg-black/20 border-white/10 focus:border-primary/30"
+                      placeholder="https://..."
+                    />
+                    <p className="text-xs text-gray-500">Inserisci l'URL di un'immagine per l'anteprima dell'articolo.</p>
+                    {formData.image && (
+                      <img src={formData.image} alt="Anteprima" className="mt-2 max-h-32 rounded border border-white/10" loading="lazy" />
+                    )}
+                  </div>
+                  
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-400 mb-1">
+                      Tag (seleziona uno o più)
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {TAGS.map(tag => (
+                        <label key={tag} className="flex items-center space-x-2 bg-black/20 border border-white/10 rounded px-2 py-1 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={formData.tags.includes(tag)}
+                            onChange={e => {
+                              setFormData(prev => ({
+                                ...prev,
+                                tags: e.target.checked
+                                  ? [...prev.tags, tag]
+                                  : prev.tags.filter(t => t !== tag)
+                              }));
+                            }}
+                          />
+                          <span className="text-xs text-gray-300">{tag}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  
                   <div className="flex justify-end">
                     <Button
                       type="submit"
@@ -493,6 +682,131 @@ More content here...
                     </Button>
                   </div>
                 </form>
+              </div>
+            )}
+            
+            {/* Prompt Management Tab */}
+            {selectedTab === 'prompts' && (
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-bold text-white">Prompt Library</h2>
+                  <Button className="bg-primary hover:bg-primary/90 text-black" onClick={resetPromptForm}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    New Prompt
+                  </Button>
+                </div>
+                {/* Lista prompt */}
+                <div className="overflow-x-auto mb-8">
+                  <table className="w-full">
+                    <thead className="bg-black/40 border-b border-white/10">
+                      <tr>
+                        <th className="py-3 px-4 text-left text-sm text-gray-400 font-medium">Title</th>
+                        <th className="py-3 px-4 text-left text-sm text-gray-400 font-medium">Model</th>
+                        <th className="py-3 px-4 text-left text-sm text-gray-400 font-medium">Category</th>
+                        <th className="py-3 px-4 text-left text-sm text-gray-400 font-medium">Copies</th>
+                        <th className="py-3 px-4 text-left text-sm text-gray-400 font-medium">Votes</th>
+                        <th className="py-3 px-4 text-right text-sm text-gray-400 font-medium">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {prompts?.map((prompt) => (
+                        <tr key={prompt.id} className="border-b border-white/5 hover:bg-white/5">
+                          <td className="py-4 px-4 text-white font-medium">{prompt.title}</td>
+                          <td className="py-4 px-4 text-gray-300">{prompt.model}</td>
+                          <td className="py-4 px-4 text-gray-300">{prompt.category}</td>
+                          <td className="py-4 px-4 text-gray-300">{prompt.copyCount || 0}</td>
+                          <td className="py-4 px-4 text-gray-300">{prompt.votes || 0}</td>
+                          <td className="py-4 px-4 text-right">
+                            <div className="flex items-center justify-end space-x-2">
+                              <Button variant="outline" className="h-8 border-primary/30 text-primary hover:bg-primary/20" onClick={() => handleEditPrompt(prompt)}>
+                                <Edit className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button size="sm" variant="outline" className="h-8 border-destructive/30 text-destructive hover:bg-destructive/20" onClick={() => handleDeletePrompt(prompt.id)}>
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {/* Form prompt */}
+                <form onSubmit={handlePromptSubmit} className="bg-black/20 border border-white/10 rounded-lg p-6 max-w-2xl mx-auto">
+                  <h3 className="text-lg font-bold text-white mb-4">{editingPrompt ? 'Edit Prompt' : 'New Prompt'}</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400 mb-1">Title*</label>
+                      <Input name="title" value={promptForm.title} onChange={handlePromptInput} className="bg-black/20 border-white/10 focus:border-primary/30" placeholder="Prompt title" required />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400 mb-1">Model*</label>
+                      <select name="model" value={promptForm.model} onChange={handlePromptInput} className="w-full bg-black/20 border border-white/10 rounded px-3 py-2 text-white">
+                        <option value="">Select model</option>
+                        {PROMPT_MODELS.map(m => <option key={m} value={m}>{m}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400 mb-1">Category*</label>
+                      <select name="category" value={promptForm.category} onChange={handlePromptInput} className="w-full bg-black/20 border border-white/10 rounded px-3 py-2 text-white">
+                        <option value="">Select category</option>
+                        {PROMPT_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400 mb-1">Description</label>
+                      <Input name="description" value={promptForm.description} onChange={handlePromptInput} className="bg-black/20 border-white/10 focus:border-primary/30" placeholder="Short description" />
+                    </div>
+                  </div>
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-400 mb-1">Prompt Text*</label>
+                    <Textarea name="promptText" value={promptForm.promptText} onChange={handlePromptInput} className="bg-black/20 border-white/10 focus:border-primary/30 min-h-[80px]" placeholder="Prompt text..." required />
+                  </div>
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-400 mb-1">Output Example</label>
+                    <Textarea name="outputExample" value={promptForm.outputExample} onChange={handlePromptInput} className="bg-black/20 border-white/10 focus:border-primary/30 min-h-[60px]" placeholder="Expected output example..." />
+                  </div>
+                  <div className="flex justify-end">
+                    <Button type="submit" className="bg-primary hover:bg-primary/90 text-black px-6">
+                      <Save className="w-4 h-4 mr-2" />
+                      {editingPrompt ? 'Update Prompt' : 'Create Prompt'}
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            )}
+            
+            {/* Newsletter Tab */}
+            {selectedTab === 'newsletter' && (
+              <div className="p-6">
+                <h2 className="text-xl font-bold text-white mb-6">Newsletter Subscribers</h2>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-black/40 border-b border-white/10">
+                      <tr>
+                        <th className="py-3 px-4 text-left text-sm text-gray-400 font-medium">Email</th>
+                        <th className="py-3 px-4 text-left text-sm text-gray-400 font-medium">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {newsletterEmails.length === 0 ? (
+                        <tr><td colSpan={2} className="py-6 text-center text-gray-500">No subscribers yet.</td></tr>
+                      ) : (
+                        newsletterEmails.map((email, idx) => (
+                          <tr key={email} className="border-b border-white/5 hover:bg-white/5">
+                            <td className="py-4 px-4 text-white font-mono">{email}</td>
+                            <td className="py-4 px-4">
+                              <Button
+                                className="bg-primary/10 text-primary border border-primary/20 px-3 py-1 text-xs"
+                                onClick={() => {navigator.clipboard.writeText(email)}}
+                              >Copy</Button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>
