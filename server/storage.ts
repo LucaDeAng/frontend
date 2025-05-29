@@ -63,26 +63,40 @@ export class MemStorage implements IStorage {
   async getArticles(): Promise<ArticleMeta[]> {
     try {
       const contentDir = path.join("content", "articles");
+      
+      // Verifica se la directory esiste
+      try {
+        await fs.access(contentDir);
+      } catch (error) {
+        console.error("Directory content/articles non trovata:", error);
+        return [];
+      }
+      
       const files = await fs.readdir(contentDir);
       
       const articles = await Promise.all(
         files
           .filter(file => file.endsWith(".md"))
           .map(async (file) => {
-            const slug = path.basename(file, ".md");
-            const content = await fs.readFile(path.join(contentDir, file), "utf-8");
-            const article = extractFrontmatter(content, slug);
-            return article.meta;
+            try {
+              const slug = path.basename(file, ".md");
+              const content = await fs.readFile(path.join(contentDir, file), "utf-8");
+              const article = extractFrontmatter(content, slug);
+              return article.meta;
+            } catch (error) {
+              console.error(`Errore nella lettura dell'articolo ${file}:`, error);
+              return null;
+            }
           })
       );
       
-      // Sort articles by date (newest first)
-      return articles.sort((a, b) => 
-        new Date(b.date).getTime() - new Date(a.date).getTime()
-      );
+      // Filtra gli articoli null e ordina per data
+      return articles
+        .filter((article): article is ArticleMeta => article !== null)
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     } catch (error) {
       console.error("Error reading articles directory:", error);
-      throw error; // Re-throw to see the actual error
+      return []; // Ritorna un array vuoto invece di lanciare l'errore
     }
   }
 
