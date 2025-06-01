@@ -258,7 +258,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   async function sendWelcomeEmail(email: string) {
     try {
       console.log('📮 Configurazione trasporto email...');
-      const transporter = nodemailer.createTransporter({
+      const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: Number(process.env.SMTP_PORT) || 587,
         secure: false,
