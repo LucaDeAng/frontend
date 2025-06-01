@@ -741,14 +741,26 @@ More content here...
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-400 mb-1">Model*</label>
-                      <select name="model" value={promptForm.model} onChange={handlePromptInput} className="w-full bg-black/20 border border-white/10 rounded px-3 py-2 text-white">
+                      <select 
+                        name="model" 
+                        value={promptForm.model} 
+                        onChange={handlePromptInput} 
+                        title="Select AI model"
+                        className="w-full bg-black/20 border border-white/10 rounded px-3 py-2 text-white"
+                      >
                         <option value="">Select model</option>
                         {PROMPT_MODELS.map(m => <option key={m} value={m}>{m}</option>)}
                       </select>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-400 mb-1">Category*</label>
-                      <select name="category" value={promptForm.category} onChange={handlePromptInput} className="w-full bg-black/20 border border-white/10 rounded px-3 py-2 text-white">
+                      <select 
+                        name="category" 
+                        value={promptForm.category} 
+                        onChange={handlePromptInput} 
+                        title="Select prompt category"
+                        className="w-full bg-black/20 border border-white/10 rounded px-3 py-2 text-white"
+                      >
                         <option value="">Select category</option>
                         {PROMPT_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                       </select>
@@ -779,33 +791,19 @@ More content here...
             {/* Newsletter Tab */}
             {selectedTab === 'newsletter' && (
               <div className="p-6">
-                <h2 className="text-xl font-bold text-white mb-6">Newsletter Subscribers</h2>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-black/40 border-b border-white/10">
-                      <tr>
-                        <th className="py-3 px-4 text-left text-sm text-gray-400 font-medium">Email</th>
-                        <th className="py-3 px-4 text-left text-sm text-gray-400 font-medium">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {newsletterEmails.length === 0 ? (
-                        <tr><td colSpan={2} className="py-6 text-center text-gray-500">No subscribers yet.</td></tr>
-                      ) : (
-                        newsletterEmails.map((email, idx) => (
-                          <tr key={email} className="border-b border-white/5 hover:bg-white/5">
-                            <td className="py-4 px-4 text-white font-mono">{email}</td>
-                            <td className="py-4 px-4">
-                              <Button
-                                className="bg-primary/10 text-primary border border-primary/20 px-3 py-1 text-xs"
-                                onClick={() => {navigator.clipboard.writeText(email)}}
-                              >Copy</Button>
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
+                <div className="text-center py-12">
+                  <Mail className="w-16 h-16 text-primary mx-auto mb-4" />
+                  <h2 className="text-2xl font-bold text-white mb-2">Newsletter Management</h2>
+                  <p className="text-gray-400 mb-6">
+                    Manage subscribers, create and send email campaigns from the dedicated page
+                  </p>
+                  <Button 
+                    className="bg-primary hover:bg-primary/90 text-black px-6 py-3"
+                    onClick={() => window.location.href = '/admin/newsletter'}
+                  >
+                    <Mail className="w-4 h-4 mr-2" />
+                    Open Newsletter Management
+                  </Button>
                 </div>
               </div>
             )}

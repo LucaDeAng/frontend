@@ -1,0 +1,68 @@
+[
+  {
+    "id": 1748781333188,
+    "subject": "ddd",
+    "content": "prova",
+    "htmlContent": "prova",
+    "status": "sent",
+    "sentCount": 4,
+    "recipientsCount": 4,
+    "createdAt": "2025-06-01T12:35:33.188Z",
+    "sentAt": "2025-06-01T13:05:38.392Z"
+  },
+  {
+    "id": 1748781589138,
+    "subject": "xxz",
+    "content": "z<xxz",
+    "htmlContent": "z<xxz",
+    "status": "sent",
+    "sentCount": 0,
+    "recipientsCount": 4,
+    "createdAt": "2025-06-01T12:39:49.138Z",
+    "sentAt": "2025-06-01T12:39:58.645Z"
+  },
+  {
+    "id": 1748781967000,
+    "subject": "aasa",
+    "content": "aasas",
+    "htmlContent": "aasas",
+    "status": "failed",
+    "sentCount": 0,
+    "recipientsCount": 4,
+    "createdAt": "2025-06-01T12:46:07.000Z",
+    "sentAt": "2025-06-01T12:46:14.804Z"
+  },
+  {
+    "id": 1748782107302,
+    "subject": "adsds",
+    "content": "sdaddasds",
+    "htmlContent": "sdaddasds",
+    "status": "sent",
+    "sentCount": 4,
+    "recipientsCount": 4,
+    "createdAt": "2025-06-01T12:48:27.302Z",
+    "sentAt": "2025-06-01T12:48:35.978Z"
+  },
+  {
+    "id": 1748783662157,
+    "subject": "Ciao Love",
+    "content": "Ciao {{name}},\n\nSiamo entusiasti di condividere con te le ultime novità dal mondo dell'intelligenza artificiale!\n\n🚀 **Questa settimana in AI:**\n• Nuovi sviluppi in ChatGPT e modelli linguistici\n• Applicazioni innovative dell'AI nel business\n• Tool e risorse per iniziare con l'AI\n\n💡 **Articolo della settimana:**\nScopri come l'AI può trasformare il tuo business con esempi pratici e case study reali.\n\n👉 (https://genai4business.com)\n\nA presto!\nIl team GenAI4Business",
+    "htmlContent": "\n<div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background: #f8fafc;\">\n  <div style=\"background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;\">\n    <h1 style=\"color: white; margin: 0; font-size: 28px; font-weight: 700;\">GenAI4Business Newsletter</h1>\n    <p style=\"color: #e2e8f0; margin: 10px 0 0 0; font-size: 16px;\">La tua dose settimanale di AI</p>\n  </div>\n  \n  <div style=\"background: white; padding: 40px 30px;\">\n    <p style=\"font-size: 16px; line-height: 1.6; color: #374151; margin-bottom: 25px;\">\n      Ciao! 👋<br><br>\n      Siamo entusiasti di condividere con te le ultime novità dal mondo dell'intelligenza artificiale!\n    </p>\n    \n    <div style=\"background: #f0f9ff; border-left: 4px solid #0ea5e9; padding: 20px; margin: 25px 0;\">\n      <h2 style=\"color: #0c4a6e; margin: 0 0 15px 0; font-size: 20px;\">🚀 Questa settimana in AI</h2>\n      <ul style=\"color: #374151; line-height: 1.6; margin: 0;\">\n        <li>Nuovi sviluppi in ChatGPT e modelli linguistici</li>\n        <li>Applicazioni innovative dell'AI nel business</li>\n        <li>Tool e risorse per iniziare con l'AI</li>\n      </ul>\n    </div>\n    \n    <div style=\"background: #ecfdf5; border-radius: 12px; padding: 25px; margin: 25px 0;\">\n      <h3 style=\"color: #065f46; margin: 0 0 15px 0; font-size: 18px;\">💡 Articolo della settimana</h3>\n      <p style=\"color: #374151; line-height: 1.6; margin: 0 0 20px 0;\">\n        Scopri come l'AI può trasformare il tuo business con esempi pratici e case study reali.\n      </p>\n      <a href=\"https://genai4business.com\" style=\"display: inline-block; background: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600;\">\n        Leggi l'articolo completo →\n      </a>\n    </div>\n    \n    <p style=\"font-size: 16px; line-height: 1.6; color: #374151; margin-top: 30px;\">\n      A presto!<br>\n      <strong>Il team GenAI4Business</strong>\n    </p>\n  </div>\n  \n  <div style=\"background: #1f2937; padding: 25px 30px; text-align: center;\">\n    <p style=\"color: #9ca3af; font-size: 14px; margin: 0;\">\n      Hai ricevuto questa email perché sei iscritto alla newsletter di GenAI4Business<br>\n      <a href=\"#\" style=\"color: #60a5fa;\">Annulla iscrizione</a>\n    </p>\n  </div>\n</div>",
+    "status": "sent",
+    "sentCount": 4,
+    "recipientsCount": 4,
+    "createdAt": "2025-06-01T13:14:22.157Z",
+    "sentAt": "2025-06-01T13:14:37.978Z"
+  },
+  {
+    "id": 1748784252818,
+    "subject": "Newsletter !",
+    "content": "i {{Name}},\n\nThanks for joining the Genai4Business community! We’re excited to have you on board.\n\nWhat to Expect\n\nMonthly Insights: Simple, real-world tips on how AI can boost your business.\n\nCurated Resources: Access to free tools, articles, and videos tailored for small and medium enterprises.\n\nRelevant Updates: Brief news on data privacy and best practices to keep your communications clean and compliant.\n\nStay Connected\n\nAdd newsletter@genai4business.com to your contacts so you don’t miss any updates.\n\nVisit our blog for extra content: https://www.genai4business.com/blog\n\nFollow us on LinkedIn: https://www.linkedin.com/company/genai4business\n\nIf you ever have questions or feedback, simply reply to this email. We’re here to help!\n\nLooking forward to sharing valuable AI insights with you.\n\nBest regards,\nThe Genai4Business Team\nhttps://www.genai4business.com",
+    "htmlContent": "i {{Name}},\n\nThanks for joining the Genai4Business community! We’re excited to have you on board.\n\nWhat to Expect\n\nMonthly Insights: Simple, real-world tips on how AI can boost your business.\n\nCurated Resources: Access to free tools, articles, and videos tailored for small and medium enterprises.\n\nRelevant Updates: Brief news on data privacy and best practices to keep your communications clean and compliant.\n\nStay Connected\n\nAdd newsletter@genai4business.com to your contacts so you don’t miss any updates.\n\nVisit our blog for extra content: https://www.genai4business.com/blog\n\nFollow us on LinkedIn: https://www.linkedin.com/company/genai4business\n\nIf you ever have questions or feedback, simply reply to this email. We’re here to help!\n\nLooking forward to sharing valuable AI insights with you.\n\nBest regards,\nThe Genai4Business Team\nhttps://www.genai4business.com",
+    "status": "sent",
+    "sentCount": 4,
+    "recipientsCount": 4,
+    "createdAt": "2025-06-01T13:24:12.818Z",
+    "sentAt": "2025-06-01T13:24:26.270Z"
+  }
+]

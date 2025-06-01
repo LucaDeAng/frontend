@@ -32,11 +32,15 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
+    host: '0.0.0.0',
+    port: 3000,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'http://127.0.0.1:3002',
         changeOrigin: true,
         secure: false,
+        timeout: 5000,
+        ws: false,
       }
     }
   },

@@ -12,6 +12,15 @@ import multer from 'multer';
 import Fuse from 'fuse.js';
 import fsSync from 'fs';
 import nodemailer from 'nodemailer';
+import { db } from "./db";
+import { 
+  subscribers, 
+  newsletterCampaigns, 
+  newsletterSends,
+  InsertNewsletterCampaign,
+  InsertNewsletterSend
+} from "@shared/schema";
+import { eq, desc, sql } from "drizzle-orm";
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
@@ -110,57 +119,114 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Subscribe to newsletter
   apiRouter.post("/subscribe", async (req: Request, res: Response) => {
+    console.log('📧 Richiesta iscrizione newsletter ricevuta:', req.body);
+    
     const { email } = req.body;
-    if (!email || !email.includes('@')) return res.status(400).json({ error: 'Invalid email' });
-    await storage.saveEmail(email);
-
-    // Invia email di benvenuto
-    try {
-      const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT) || 587,
-        secure: false,
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
-        },
-      });
-      const html = `
-        <div style="background: linear-gradient(135deg, #0f172a 0%, #2563eb 100%); padding: 0; min-height: 600px; font-family: Inter, Arial, sans-serif;">
-          <div style="max-width: 600px; margin: 0 auto; background: rgba(30,41,59,0.98); border-radius: 24px; box-shadow: 0 8px 32px rgba(37,99,235,0.15); padding: 40px; position: relative; top: 0;">
-            <div style="text-align:center; margin-bottom:32px;">
-              <img src='https://aihub.dev/logo.png' alt='AI Hub Logo' style='height:48px; margin-bottom:16px;' />
-              <h1 style="color: #2563eb; font-size: 32px; font-weight: 800; margin: 32px 0 16px;">Welcome to AI Hub!</h1>
-            </div>
-            <div style="color: #f1f5f9; font-size: 18px; line-height: 1.6; margin-bottom: 32px;">
-              <p>Hi and welcome! 🎉<br><br>
-              You've just joined a growing community of AI enthusiasts, professionals, and learners.<br><br>
-              <b>What's next?</b><br>
-              - Explore our latest articles, guides, and resources<br>
-              - Get inspired by real-world AI use cases<br>
-              - Access exclusive content and updates<br><br>
-              <a href="https://aihub.dev" style="display:inline-block; background:#2563eb; color:#fff; border-radius:8px; padding:14px 32px; font-weight:700; text-decoration:none; font-size:18px; margin-top:16px;">Visit AI Hub</a>
-              </p>
-            </div>
-            <div style="text-align: center; color: #94a3b8; font-size: 14px; margin-top: 48px;">
-              You received this email because you subscribed to <b>AI Hub</b>.<br />
-              <a href="#" style="color: #60a5fa; text-decoration: underline;">Unsubscribe</a>
-            </div>
-          </div>
-        </div>
-      `;
-      await transporter.sendMail({
-        from: process.env.SMTP_FROM || 'AI Hub <no-reply@aihub.dev>',
-        to: email,
-        subject: 'Welcome to AI Hub! 🚀',
-        html,
-      });
-    } catch (err) {
-      console.error('Error sending welcome email:', err);
-      // Non blocco la risposta all'utente
+    if (!email || !email.includes('@')) {
+      console.log('❌ Email non valida:', email);
+      return res.status(400).json({ error: 'Invalid email' });
     }
 
-    res.status(200).json({ success: true });
+    try {
+      console.log('📁 Usando sistema file JSON per iscrizione:', email);
+      
+      // Sistema principale: file JSON (sempre funzionante)
+      const filePath = path.join('content', 'newsletter.json');
+      let emails: string[] = [];
+      
+      // Assicurati che la directory content esista
+      const contentDir = path.join('content');
+      if (!fsSync.existsSync(contentDir)) {
+        fsSync.mkdirSync(contentDir, { recursive: true });
+        console.log('✅ Directory content creata');
+      }
+      
+      // Leggi file esistente
+      try {
+        if (fsSync.existsSync(filePath)) {
+          const data = await fs.readFile(filePath, 'utf-8');
+          emails = JSON.parse(data);
+          console.log('📋 Caricati', emails.length, 'iscritti esistenti');
+        }
+      } catch (e) {
+        console.log('⚠️ File newsletter.json non trovato, creo nuovo');
+        emails = [];
+      }
+      
+      // Controlla duplicati
+      if (emails.includes(email)) {
+        console.log('⚠️ Email già iscritta:', email);
+        return res.status(409).json({ error: 'Email già iscritta alla newsletter' });
+      }
+      
+      // Aggiungi nuova email
+      emails.push(email);
+      
+      // Salva nel file
+      await fs.writeFile(filePath, JSON.stringify(emails, null, 2));
+      console.log('✅ Iscritto salvato in newsletter.json:', email);
+
+      // Invia email di benvenuto
+      try {
+        console.log('📮 Configurazione trasporto email...');
+        const transporter = nodemailer.createTransport({
+          host: process.env.SMTP_HOST,
+          port: Number(process.env.SMTP_PORT) || 587,
+          secure: false,
+          auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+          },
+        });
+        
+        console.log('📧 Invio email di benvenuto a:', email);
+        const html = `
+          <div style="background: linear-gradient(135deg, #0f172a 0%, #2563eb 100%); padding: 0; min-height: 600px; font-family: Inter, Arial, sans-serif;">
+            <div style="max-width: 600px; margin: 0 auto; background: rgba(30,41,59,0.98); border-radius: 24px; box-shadow: 0 8px 32px rgba(37,99,235,0.15); padding: 40px; position: relative; top: 0;">
+              <div style="text-align:center; margin-bottom:32px;">
+                <img src='https://genai4business.com/logo.png' alt='GenAI4Business Logo' style='height:48px; margin-bottom:16px;' />
+                <h1 style="color: #2563eb; font-size: 32px; font-weight: 800; margin: 32px 0 16px;">Welcome to GenAI4Business!</h1>
+              </div>
+              <div style="color: #f1f5f9; font-size: 18px; line-height: 1.6; margin-bottom: 32px;">
+                <p>Hello and welcome! 🎉<br><br>
+                You've just joined a growing community of enthusiasts, professionals, and students passionate about Generative AI for business.<br><br>
+                <b>What's next?</b><br>
+                - Explore our latest articles, guides, and resources<br>
+                - Get inspired by real-world AI use cases for business<br>
+                - Access exclusive content and updates<br><br>
+                <a href="https://genai4business.com" style="display:inline-block; background:#2563eb; color:#fff; border-radius:8px; padding:14px 32px; font-weight:700; text-decoration:none; font-size:18px; margin-top:16px;">Visit GenAI4Business</a>
+                </p>
+              </div>
+              <div style="text-align: center; color: #94a3b8; font-size: 14px; margin-top: 48px;">
+                You received this email because you subscribed to <b>GenAI4Business</b> newsletter.<br />
+                <a href="mailto:info@genai4business.com?subject=Unsubscribe&body=Please remove ${email} from the newsletter" style="color: #60a5fa; text-decoration: underline;">Unsubscribe</a>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        await transporter.sendMail({
+          from: process.env.SMTP_FROM || 'GenAI4Business <no-reply@genai4business.com>',
+          to: email,
+          subject: 'Welcome to GenAI4Business! 🚀',
+          html,
+        });
+        console.log('✅ Email di benvenuto inviata con successo a:', email);
+      } catch (emailError) {
+        console.error('⚠️ Errore invio email (ma iscrizione salvata):', emailError);
+        // Non blocco la risposta - l'iscrizione è comunque avvenuta
+      }
+
+      res.status(200).json({ 
+        success: true, 
+        message: 'Iscrizione completata con successo!',
+        email: email
+      });
+      
+    } catch (error) {
+      console.error('❌ Errore nell\'iscrizione:', error);
+      res.status(500).json({ error: 'Errore durante l\'iscrizione' });
+    }
   });
   
   // Admin API routes for content management
@@ -637,6 +703,445 @@ ${content}`;
     }
     // Se in futuro vuoi aggiungere la data, qui puoi restituire un array di oggetti { email, date }
     res.json(emails);
+  });
+
+  // Nuove API per la gestione della newsletter
+
+  // Ottieni tutti gli iscritti alla newsletter
+  apiRouter.get('/admin/newsletter/subscribers', authMiddleware, adminMiddleware, async (req: Request, res: Response) => {
+    try {
+      console.log('📋 Richiesta lista iscritti newsletter');
+      
+      // Sistema principale: file JSON
+      const filePath = path.join('content', 'newsletter.json');
+      let emails: string[] = [];
+      
+      try {
+        if (fsSync.existsSync(filePath)) {
+          const data = await fs.readFile(filePath, 'utf-8');
+          emails = JSON.parse(data);
+          console.log('✅ Caricati', emails.length, 'iscritti da newsletter.json');
+        }
+      } catch (e) {
+        console.log('⚠️ Errore lettura newsletter.json:', e);
+        emails = [];
+      }
+      
+      // Converti in formato richiesto dal componente
+      const subscribers = emails.map((email, index) => ({
+        id: index + 1,
+        email: email,
+        createdAt: new Date().toISOString() // Data fittizia per ora
+      }));
+      
+      res.json(subscribers);
+    } catch (error) {
+      console.error('Errore nel recupero degli iscritti:', error);
+      res.status(500).json({ error: 'Errore nel recupero degli iscritti' });
+    }
+  });
+
+  // Elimina un iscritto
+  apiRouter.delete('/admin/newsletter/subscribers/:id', authMiddleware, adminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { email } = req.body;
+      
+      console.log('🗑️ Richiesta cancellazione iscritto:', email);
+      
+      // Sistema principale: file JSON
+      const filePath = path.join('content', 'newsletter.json');
+      let emails: string[] = [];
+      
+      try {
+        if (fsSync.existsSync(filePath)) {
+          const data = await fs.readFile(filePath, 'utf-8');
+          emails = JSON.parse(data);
+        }
+      } catch (e) {
+        console.log('⚠️ Errore lettura newsletter.json:', e);
+        return res.status(500).json({ error: 'Errore nella lettura del file iscritti' });
+      }
+      
+      // Rimuovi l'email
+      const originalLength = emails.length;
+      emails = emails.filter(e => e !== email);
+      
+      if (emails.length === originalLength) {
+        return res.status(404).json({ error: 'Iscritto non trovato' });
+      }
+      
+      // Salva il file aggiornato
+      await fs.writeFile(filePath, JSON.stringify(emails, null, 2));
+      console.log('✅ Iscritto rimosso da newsletter.json:', email);
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Errore nella cancellazione dell\'iscritto:', error);
+      res.status(500).json({ error: 'Errore nella cancellazione dell\'iscritto' });
+    }
+  });
+
+  // Ottieni tutte le campagne newsletter
+  apiRouter.get('/admin/newsletter/campaigns', authMiddleware, adminMiddleware, async (req: Request, res: Response) => {
+    try {
+      // Per ora usiamo un file JSON semplice per le campagne
+      const campaignsPath = path.join('content', 'newsletter-campaigns.json');
+      let campaigns = [];
+      
+      try {
+        if (fsSync.existsSync(campaignsPath)) {
+          const data = await fs.readFile(campaignsPath, 'utf-8');
+          campaigns = JSON.parse(data);
+        }
+      } catch (e) {
+        console.log('⚠️ Errore lettura campagne:', e);
+        campaigns = [];
+      }
+      
+      res.json(campaigns);
+    } catch (error) {
+      console.error('Errore nel recupero delle campagne:', error);
+      res.status(500).json({ error: 'Errore nel recupero delle campagne' });
+    }
+  });
+
+  // Crea una nuova campagna newsletter
+  apiRouter.post('/admin/newsletter/campaigns', authMiddleware, adminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const { subject, content, htmlContent } = req.body;
+      
+      if (!subject || !content) {
+        return res.status(400).json({ error: 'Subject e content sono obbligatori' });
+      }
+
+      const campaignsPath = path.join('content', 'newsletter-campaigns.json');
+      let campaigns = [];
+      
+      try {
+        if (fsSync.existsSync(campaignsPath)) {
+          const data = await fs.readFile(campaignsPath, 'utf-8');
+          campaigns = JSON.parse(data);
+        }
+      } catch (e) {
+        campaigns = [];
+      }
+
+      const newCampaign = {
+        id: Date.now(),
+        subject,
+        content,
+        htmlContent: htmlContent || content,
+        status: 'draft',
+        sentCount: 0,
+        recipientsCount: 0,
+        createdAt: new Date().toISOString()
+      };
+
+      campaigns.push(newCampaign);
+      await fs.writeFile(campaignsPath, JSON.stringify(campaigns, null, 2));
+      
+      res.status(201).json(newCampaign);
+    } catch (error) {
+      console.error('Errore nella creazione della campagna:', error);
+      res.status(500).json({ error: 'Errore nella creazione della campagna' });
+    }
+  });
+
+  // Invia una campagna newsletter
+  apiRouter.post('/admin/newsletter/campaigns/:id/send', authMiddleware, adminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const campaignId = parseInt(id);
+
+      console.log('🚀 [CAMPAIGN] Avvio invio campagna:', campaignId);
+
+      // Carica campagne
+      const campaignsPath = path.join('content', 'newsletter-campaigns.json');
+      let campaigns = [];
+      
+      try {
+        if (fsSync.existsSync(campaignsPath)) {
+          const data = await fs.readFile(campaignsPath, 'utf-8');
+          campaigns = JSON.parse(data);
+          console.log('📋 [CAMPAIGN] Campagne caricate:', campaigns.length);
+        }
+      } catch (e) {
+        console.log('❌ [CAMPAIGN] Errore caricamento campagne:', e);
+        return res.status(500).json({ error: 'Errore nel caricamento delle campagne' });
+      }
+
+      const campaignIndex = campaigns.findIndex((c: any) => c.id === campaignId);
+      if (campaignIndex === -1) {
+        console.log('❌ [CAMPAIGN] Campagna non trovata:', campaignId);
+        return res.status(404).json({ error: 'Campagna non trovata' });
+      }
+
+      const campaign = campaigns[campaignIndex];
+      console.log('📧 [CAMPAIGN] Campagna trovata:', campaign.subject);
+      
+      // Carica subscribers
+      const subscribersPath = path.join('content', 'newsletter.json');
+      let emails: string[] = [];
+      
+      try {
+        if (fsSync.existsSync(subscribersPath)) {
+          const data = await fs.readFile(subscribersPath, 'utf-8');
+          emails = JSON.parse(data);
+          console.log('📋 [CAMPAIGN] Iscritti caricati:', emails.length);
+          console.log('📋 [CAMPAIGN] Lista iscritti:', emails);
+        } else {
+          console.log('❌ [CAMPAIGN] File newsletter.json non trovato');
+        }
+      } catch (e) {
+        console.log('❌ [CAMPAIGN] Errore caricamento iscritti:', e);
+        return res.status(500).json({ error: 'Errore nel caricamento degli iscritti' });
+      }
+
+      if (emails.length === 0) {
+        console.log('⚠️ [CAMPAIGN] Nessun iscritto trovato');
+        // Aggiorna campagna come fallita
+        campaigns[campaignIndex] = {
+          ...campaign,
+          status: 'failed',
+          sentAt: new Date().toISOString(),
+          recipientsCount: 0,
+          sentCount: 0
+        };
+        await fs.writeFile(campaignsPath, JSON.stringify(campaigns, null, 2));
+        return res.json({ success: false, sentCount: 0, failedCount: 0, totalSubscribers: 0, error: 'Nessun iscritto trovato' });
+      }
+
+      // Configura il trasportatore email
+      console.log('📮 [CAMPAIGN] Configurazione email...');
+      console.log('📮 [CAMPAIGN] SMTP Host:', process.env.SMTP_HOST || 'Non configurato');
+      console.log('📮 [CAMPAIGN] SMTP User:', process.env.SMTP_USER || 'Non configurato');
+      
+      // Controlla se SMTP è configurato
+      const isSmtpConfigured = process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS;
+      
+      if (!isSmtpConfigured) {
+        console.log('⚠️ [CAMPAIGN] SMTP non configurato - modalità DEMO attivata');
+        
+        // Modalità demo: simula l'invio
+        let sentCount = 0;
+        let failedCount = 0;
+
+        console.log('📧 [CAMPAIGN] Simulazione invio a', emails.length, 'iscritti...');
+        
+        for (const email of emails) {
+          console.log('📧 [CAMPAIGN] Simulazione invio a:', email);
+          
+          // Simula un piccolo delay come se stesse inviando
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
+          // Simula successo per tutti in modalità demo
+          sentCount++;
+          console.log('✅ [CAMPAIGN] Email simulata inviata con successo a:', email);
+        }
+
+        console.log('📊 [CAMPAIGN] Risultati simulazione - Successi:', sentCount, 'Errori:', failedCount);
+
+        // Aggiorna la campagna con i risultati della simulazione
+        campaigns[campaignIndex] = {
+          ...campaign,
+          status: 'sent',
+          sentAt: new Date().toISOString(),
+          recipientsCount: emails.length,
+          sentCount: sentCount
+        };
+        
+        await fs.writeFile(campaignsPath, JSON.stringify(campaigns, null, 2));
+
+        return res.json({ 
+          success: true, 
+          sentCount, 
+          failedCount, 
+          totalSubscribers: emails.length,
+          demo: true,
+          message: 'Campagna inviata in modalità demo (SMTP non configurato)'
+        });
+      }
+      
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT) || 587,
+        secure: false,
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+
+      let sentCount = 0;
+      let failedCount = 0;
+
+      console.log('📧 [CAMPAIGN] Inizio invio reale a', emails.length, 'iscritti...');
+      
+      // Invia email a tutti gli iscritti
+      for (const email of emails) {
+        try {
+          console.log('📧 [CAMPAIGN] Invio a:', email);
+          
+          const htmlTemplate = `
+            <div style="background: linear-gradient(135deg, #0f172a 0%, #2563eb 100%); padding: 0; min-height: 600px; font-family: Inter, Arial, sans-serif;">
+              <div style="max-width: 600px; margin: 0 auto; background: rgba(30,41,59,0.98); border-radius: 24px; box-shadow: 0 8px 32px rgba(37,99,235,0.15); padding: 40px; position: relative; top: 0;">
+                <div style="text-align:center; margin-bottom:32px;">
+                  <img src='https://genai4business.com/logo.png' alt='GenAI4Business Logo' style='height:48px; margin-bottom:16px;' />
+                  <h1 style="color: #2563eb; font-size: 28px; font-weight: 800; margin: 16px 0;">GenAI4Business Newsletter</h1>
+                </div>
+                <div style="color: #f1f5f9; font-size: 16px; line-height: 1.6; margin-bottom: 32px;">
+                  ${campaign.htmlContent || campaign.content.replace(/\n/g, '<br>')}
+                </div>
+                <div style="text-align: center; color: #94a3b8; font-size: 14px; margin-top: 48px;">
+                  You received this email because you subscribed to <b>GenAI4Business</b> newsletter.<br />
+                  <a href="mailto:info@genai4business.com?subject=Unsubscribe&body=Please remove ${email} from the newsletter" style="color: #60a5fa; text-decoration: underline;">Unsubscribe</a>
+                </div>
+              </div>
+            </div>
+          `;
+
+          await transporter.sendMail({
+            from: process.env.SMTP_FROM || 'GenAI4Business <no-reply@genai4business.com>',
+            to: email,
+            subject: campaign.subject,
+            html: htmlTemplate,
+          });
+
+          sentCount++;
+          console.log('✅ [CAMPAIGN] Email inviata con successo a:', email);
+        } catch (error) {
+          console.error(`❌ [CAMPAIGN] Errore nell'invio a ${email}:`, error);
+          failedCount++;
+        }
+      }
+
+      console.log('📊 [CAMPAIGN] Risultati invio - Successi:', sentCount, 'Errori:', failedCount);
+
+      // Aggiorna la campagna con i risultati
+      campaigns[campaignIndex] = {
+        ...campaign,
+        status: sentCount > 0 ? 'sent' : 'failed',
+        sentAt: new Date().toISOString(),
+        recipientsCount: emails.length,
+        sentCount: sentCount
+      };
+      
+      await fs.writeFile(campaignsPath, JSON.stringify(campaigns, null, 2));
+
+      res.json({ 
+        success: sentCount > 0, 
+        sentCount, 
+        failedCount, 
+        totalSubscribers: emails.length 
+      });
+
+    } catch (error) {
+      console.error('❌ [CAMPAIGN] Errore nell\'invio della campagna:', error);
+      res.status(500).json({ error: 'Errore nell\'invio della campagna' });
+    }
+  });
+
+  // Reset campagna per permettere il reinvio
+  apiRouter.put('/admin/newsletter/campaigns/:id/reset', authMiddleware, adminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const campaignId = parseInt(id);
+
+      console.log('🔄 [CAMPAIGN] Reset campagna:', campaignId);
+
+      // Carica campagne
+      const campaignsPath = path.join('content', 'newsletter-campaigns.json');
+      let campaigns = [];
+      
+      try {
+        if (fsSync.existsSync(campaignsPath)) {
+          const data = await fs.readFile(campaignsPath, 'utf-8');
+          campaigns = JSON.parse(data);
+        }
+      } catch (e) {
+        console.log('❌ [CAMPAIGN] Errore caricamento campagne:', e);
+        return res.status(500).json({ error: 'Errore nel caricamento delle campagne' });
+      }
+
+      const campaignIndex = campaigns.findIndex((c: any) => c.id === campaignId);
+      if (campaignIndex === -1) {
+        console.log('❌ [CAMPAIGN] Campagna non trovata:', campaignId);
+        return res.status(404).json({ error: 'Campagna non trovata' });
+      }
+
+      const campaign = campaigns[campaignIndex];
+      
+      if (campaign.status === 'draft') {
+        console.log('⚠️ [CAMPAIGN] Campagna già in stato draft:', campaignId);
+        return res.status(400).json({ error: 'La campagna è già in stato draft' });
+      }
+
+      // Reset della campagna a stato draft
+      campaigns[campaignIndex] = {
+        ...campaign,
+        status: 'draft',
+        sentAt: null,
+        sentCount: 0,
+        recipientsCount: 0
+      };
+      
+      await fs.writeFile(campaignsPath, JSON.stringify(campaigns, null, 2));
+      
+      console.log('✅ [CAMPAIGN] Campagna resettata a draft:', campaignId);
+      
+      res.json({ 
+        success: true, 
+        message: 'Campagna resettata con successo',
+        campaign: campaigns[campaignIndex]
+      });
+
+    } catch (error) {
+      console.error('❌ [CAMPAIGN] Errore nel reset della campagna:', error);
+      res.status(500).json({ error: 'Errore nel reset della campagna' });
+    }
+  });
+
+  // Ottieni statistiche newsletter
+  apiRouter.get('/admin/newsletter/stats', authMiddleware, adminMiddleware, async (req: Request, res: Response) => {
+    try {
+      // Conta iscritti
+      const subscribersPath = path.join('content', 'newsletter.json');
+      let emails: string[] = [];
+      
+      try {
+        if (fsSync.existsSync(subscribersPath)) {
+          const data = await fs.readFile(subscribersPath, 'utf-8');
+          emails = JSON.parse(data);
+        }
+      } catch (e) {
+        emails = [];
+      }
+
+      // Conta campagne
+      const campaignsPath = path.join('content', 'newsletter-campaigns.json');
+      let campaigns = [];
+      
+      try {
+        if (fsSync.existsSync(campaignsPath)) {
+          const data = await fs.readFile(campaignsPath, 'utf-8');
+          campaigns = JSON.parse(data);
+        }
+      } catch (e) {
+        campaigns = [];
+      }
+
+      const sentCampaigns = campaigns.filter((c: any) => c.status === 'sent').length;
+
+      res.json({
+        totalSubscribers: emails.length,
+        totalCampaigns: campaigns.length,
+        sentCampaigns: sentCampaigns
+      });
+    } catch (error) {
+      console.error('Errore nel recupero delle statistiche:', error);
+      res.status(500).json({ error: 'Errore nel recupero delle statistiche' });
+    }
   });
 
   // GET top 50 prompts from internet

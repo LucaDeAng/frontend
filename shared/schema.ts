@@ -50,6 +50,41 @@ export const insertSubscriberSchema = createInsertSchema(subscribers).omit({
 export type InsertSubscriber = z.infer<typeof insertSubscriberSchema>;
 export type Subscriber = typeof subscribers.$inferSelect;
 
+// Newsletter campaigns table
+export const newsletterCampaigns = pgTable("newsletter_campaigns", {
+  id: serial("id").primaryKey(),
+  subject: text("subject").notNull(),
+  content: text("content").notNull(),
+  htmlContent: text("html_content"),
+  recipientsCount: integer("recipients_count").default(0),
+  sentCount: integer("sent_count").default(0),
+  openCount: integer("open_count").default(0),
+  clickCount: integer("click_count").default(0),
+  status: text("status").notNull().default('draft'), // 'draft', 'sending', 'sent', 'failed'
+  sentAt: timestamp("sent_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => ({
+  statusIdx: index("newsletter_campaigns_status_idx").on(table.status),
+  sentAtIdx: index("newsletter_campaigns_sent_at_idx").on(table.sentAt),
+}));
+
+// Newsletter sends tracking table
+export const newsletterSends = pgTable("newsletter_sends", {
+  id: serial("id").primaryKey(),
+  campaignId: integer("campaign_id").notNull().references(() => newsletterCampaigns.id, { onDelete: 'cascade' }),
+  subscriberId: integer("subscriber_id").notNull().references(() => subscribers.id, { onDelete: 'cascade' }),
+  sentAt: timestamp("sent_at").notNull().defaultNow(),
+  opened: boolean("opened").default(false),
+  openedAt: timestamp("opened_at"),
+  clicked: boolean("clicked").default(false),
+  clickedAt: timestamp("clicked_at"),
+}, (table) => ({
+  campaignSubscriberUnique: unique("campaign_subscriber_send").on(table.campaignId, table.subscriberId),
+  campaignIdx: index("newsletter_sends_campaign_idx").on(table.campaignId),
+  subscriberIdx: index("newsletter_sends_subscriber_idx").on(table.subscriberId),
+}));
+
 // Enhanced Users table for authentication and personalization
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -75,12 +110,12 @@ export const users = pgTable("users", {
 }));
 
 // Comments table
-export const comments = pgTable("comments", {
+export const comments: any = pgTable("comments", {
   id: serial("id").primaryKey(),
   articleId: integer("article_id").notNull().references(() => articles.id, { onDelete: 'cascade' }),
   userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
   content: text("content").notNull(),
-  parentId: integer("parent_id").references(() => comments.id, { onDelete: 'cascade' }),
+  parentId: integer("parent_id").references((): any => comments.id, { onDelete: 'cascade' }),
   likes: integer("likes").default(0),
   isEdited: boolean("is_edited").default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -193,6 +228,26 @@ export const ratingsRelations = relations(articleRatings, ({ one }) => ({
   }),
 }));
 
+// Newsletter relations
+export const subscribersRelations = relations(subscribers, ({ many }) => ({
+  sends: many(newsletterSends),
+}));
+
+export const newsletterCampaignsRelations = relations(newsletterCampaigns, ({ many }) => ({
+  sends: many(newsletterSends),
+}));
+
+export const newsletterSendsRelations = relations(newsletterSends, ({ one }) => ({
+  campaign: one(newsletterCampaigns, {
+    fields: [newsletterSends.campaignId],
+    references: [newsletterCampaigns.id],
+  }),
+  subscriber: one(subscribers, {
+    fields: [newsletterSends.subscriberId],
+    references: [subscribers.id],
+  }),
+}));
+
 // Updated schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -231,6 +286,26 @@ export const insertSocialShareSchema = createInsertSchema(socialShares).omit({
   createdAt: true,
 });
 
+export const insertNewsletterCampaignSchema = createInsertSchema(newsletterCampaigns).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  recipientsCount: true,
+  sentCount: true,
+  openCount: true,
+  clickCount: true,
+  sentAt: true,
+});
+
+export const insertNewsletterSendSchema = createInsertSchema(newsletterSends).omit({
+  id: true,
+  sentAt: true,
+  opened: true,
+  openedAt: true,
+  clicked: true,
+  clickedAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertComment = z.infer<typeof insertCommentSchema>;
@@ -243,3 +318,7 @@ export type InsertSearchQuery = z.infer<typeof insertSearchQuerySchema>;
 export type SearchQuery = typeof searchQueries.$inferSelect;
 export type InsertSocialShare = z.infer<typeof insertSocialShareSchema>;
 export type SocialShare = typeof socialShares.$inferSelect;
+export type InsertNewsletterCampaign = z.infer<typeof insertNewsletterCampaignSchema>;
+export type NewsletterCampaign = typeof newsletterCampaigns.$inferSelect;
+export type InsertNewsletterSend = z.infer<typeof insertNewsletterSendSchema>;
+export type NewsletterSend = typeof newsletterSends.$inferSelect;

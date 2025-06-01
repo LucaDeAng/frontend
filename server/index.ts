@@ -1,3 +1,13 @@
+// Carica le variabili d'ambiente dal file .env
+import dotenv from 'dotenv';
+dotenv.config();
+
+// Debug: verifica che le variabili SMTP siano caricate
+console.log('🔧 [DEBUG] Configurazioni SMTP caricate:');
+console.log('🔧 [DEBUG] SMTP_HOST:', process.env.SMTP_HOST ? '✅ Configurato' : '❌ Non configurato');
+console.log('🔧 [DEBUG] SMTP_USER:', process.env.SMTP_USER ? '✅ Configurato' : '❌ Non configurato');
+console.log('🔧 [DEBUG] SMTP_PASS:', process.env.SMTP_PASS ? '✅ Configurato' : '❌ Non configurato');
+
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import cors from 'cors';
@@ -8,7 +18,7 @@ const app = express();
 
 // Configurazione CORS
 app.use(cors({
-  origin: ['http://localhost:5000', 'http://127.0.0.1:5000'],
+  origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:5000', 'http://127.0.0.1:5000'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
@@ -71,7 +81,7 @@ app.use((req, res, next) => {
     });
   });
 
-  const port = process.env.PORT || 5000;
+  const port = process.env.PORT || 3002;
   const host = "0.0.0.0";
 
   server.listen({

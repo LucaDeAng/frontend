@@ -23,14 +23,14 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import TagPage from "@/pages/tag";
 import CategoryPage from "@/pages/category";
 import PreferencesPage from '@/pages/preferences';
+import Newsletter from '@/pages/admin/Newsletter';
 
 function App() {
   // Initialize smooth scrolling with Lenis
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      direction: 'vertical',
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       gestureDirection: 'vertical',
       smooth: true,
       mouseMultiplier: 1,
@@ -39,7 +39,7 @@ function App() {
       infinite: false,
     });
 
-    function raf(time) {
+    function raf(time: number) {
       lenis.raf(time);
       requestAnimationFrame(raf);
     }
@@ -103,6 +103,11 @@ function App() {
             <Route path="/admin">
               <ProtectedRoute>
                 <Admin />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/admin/newsletter">
+              <ProtectedRoute>
+                <Newsletter />
               </ProtectedRoute>
             </Route>
             <Route path="/tag/:tag" component={TagPage} />

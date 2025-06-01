@@ -16,8 +16,8 @@ export default function CommunityNewsletter() {
     
     if (!email || !email.includes('@')) {
       toast({
-        title: "Error",
-        description: "Please enter a valid email address.",
+        title: "Errore",
+        description: "Inserisci un indirizzo email valido.",
         variant: "destructive"
       });
       return;
@@ -31,11 +31,27 @@ export default function CommunityNewsletter() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
-      if (!res.ok) throw new Error('Subscription error');
+      
+      if (res.status === 409) {
+        // Email già iscritta
+        toast({
+          title: "Email già iscritta",
+          description: "Questa email è già iscritta alla nostra newsletter!",
+          variant: "default"
+        });
+        setEmail('');
+        return;
+      }
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Subscription error');
+      }
+      
       setIsSuccess(true);
       toast({
-        title: "Subscription successful",
-        description: "Thank you for subscribing to our newsletter!",
+        title: "Iscrizione completata!",
+        description: "Grazie per esserti iscritto alla nostra newsletter!",
         variant: "default"
       });
       setEmail('');
@@ -43,9 +59,10 @@ export default function CommunityNewsletter() {
         setIsSuccess(false);
       }, 5000);
     } catch (error) {
+      console.error('Newsletter subscription error:', error);
       toast({
-        title: "Error",
-        description: "There was an error processing your subscription. Please try again later.",
+        title: "Errore",
+        description: "Si è verificato un errore durante l'iscrizione. Riprova più tardi.",
         variant: "destructive"
       });
     } finally {
