@@ -31,12 +31,7 @@ function App() {
     const lenis = new Lenis({
       duration: 0.8,
       easing: (t: number) => 1 - Math.pow(1 - t, 3), // Cubic ease-out più fluido
-      smooth: true,
-      mouseMultiplier: 1.5, // Aumentato per scroll più responsivo
-      smoothTouch: false,
-      touchMultiplier: 2,
-      infinite: false,
-      wheelMultiplier: 1.2, // Aggiunto per migliorare la responsività della rotellina
+      wheelMultiplier: 1.2, // Miglior responsività della rotellina
       normalizeWheel: true, // Normalizza le differenze tra browser
     });
 
