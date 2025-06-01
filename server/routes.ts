@@ -12,15 +12,6 @@ import multer from 'multer';
 import Fuse from 'fuse.js';
 import fsSync from 'fs';
 import nodemailer from 'nodemailer';
-import { db } from "./db";
-import { 
-  subscribers, 
-  newsletterCampaigns, 
-  newsletterSends,
-  InsertNewsletterCampaign,
-  InsertNewsletterSend
-} from "@shared/schema";
-import { eq, desc, sql } from "drizzle-orm";
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
@@ -172,6 +163,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log('🗄️ [PROD] Salvando iscrizione nel database PostgreSQL:', email);
         
         try {
+          // Import dinamico del database solo in produzione
+          const { db } = await import("./db");
+          const { subscribers } = await import("@shared/schema");
+          const { eq } = await import("drizzle-orm");
+          
           // Controlla se email già esiste
           const existingSubscriber = await db.select().from(subscribers).where(eq(subscribers.email, email)).limit(1);
           
@@ -777,6 +773,11 @@ ${content}`;
         console.log('🗄️ [PROD] Caricando iscritti da database per API pubblica');
         
         try {
+          // Import dinamico del database solo in produzione
+          const { db } = await import("./db");
+          const { subscribers } = await import("@shared/schema");
+          const { desc } = await import("drizzle-orm");
+          
           const dbSubscribers = await db.select().from(subscribers).orderBy(desc(subscribers.createdAt));
           const emails = dbSubscribers.map(sub => sub.email);
           console.log('✅ [PROD] Restituiti', emails.length, 'iscritti da database');
@@ -821,6 +822,11 @@ ${content}`;
         console.log('🗄️ [PROD] Usando database PostgreSQL per iscritti');
         
         try {
+          // Import dinamico del database solo in produzione
+          const { db } = await import("./db");
+          const { subscribers } = await import("@shared/schema");
+          const { desc } = await import("drizzle-orm");
+          
           const dbSubscribers = await db.select().from(subscribers).orderBy(desc(subscribers.createdAt));
           console.log('✅ [PROD] Caricati', dbSubscribers.length, 'iscritti da database');
           
@@ -882,6 +888,11 @@ ${content}`;
         console.log('🗄️ [PROD] Cancellando iscritto dal database PostgreSQL:', email);
         
         try {
+          // Import dinamico del database solo in produzione
+          const { db } = await import("./db");
+          const { subscribers } = await import("@shared/schema");
+          const { eq } = await import("drizzle-orm");
+          
           const result = await db.delete(subscribers).where(eq(subscribers.email, email)).returning();
           
           if (result.length === 0) {
