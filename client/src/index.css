@@ -330,7 +330,7 @@
 /* Only dark mode - overriding any light mode */
 html {
   color-scheme: dark;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   overflow-x: hidden;
   overscroll-behavior: none;
 }
@@ -714,7 +714,7 @@ body {
 
 /* Aggiungo le regole per lo scrolling fluido */
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   /* Ottimizzazione per scroll più fluido */
   overflow-x: hidden;
   overscroll-behavior: none;
@@ -724,10 +724,14 @@ html {
   -webkit-overflow-scrolling: touch;
   /* Migliore supporto per trackpad */
   overscroll-behavior-y: none;
+  /* Scroll behavior ultra-veloce */
+  scroll-behavior: auto;
 }
 
 header, footer {
   will-change: transform;
+  /* Ultra-fast scroll performance */
+  transform: translateZ(0);
 }
 
 /* Ottimizzazioni aggiuntive per scroll fluido */
@@ -823,44 +827,59 @@ img, video, iframe {
 }
 
 .scrolling * {
-  animation-duration: 0.01ms !important;
-  animation-delay: 0.01ms !important;
-  transition-duration: 0.01ms !important;
-  transition-delay: 0.01ms !important;
+  animation-duration: 0.001ms !important;
+  animation-delay: 0.001ms !important;
+  transition-duration: 0.001ms !important;
+  transition-delay: 0.001ms !important;
+  /* Forza GPU per tutto durante scroll */
+  transform: translateZ(0) !important;
+  will-change: transform !important;
 }
 
-/* Ottimizzazioni per scroll fluido real-time */
+/* Ottimizzazioni per scroll fluido real-time ultra-veloce */
 body.scrolling {
   /* Disabilita smooth scroll nativo durante Lenis scroll */
   scroll-behavior: auto;
+  /* Forza hardware acceleration totale */
+  -webkit-transform: translate3d(0,0,0);
+  transform: translate3d(0,0,0);
 }
 
-/* Contenimento per animazioni pesanti */
+/* Contenimento per animazioni pesanti ultra-ottimizzato */
 .heavy-animation {
   /* Contenimento per ridurre repaints */
   contain: layout style paint size;
   /* Layer isolation per GPU */
   isolation: isolate;
+  /* Forza compositing layer */
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
-/* Ottimizzazioni specifiche per componenti animati */
+/* Ottimizzazioni specifiche per componenti animati ultra-performance */
 .framer-motion {
   /* Forza GPU acceleration per Framer Motion */
-  transform: translateZ(0);
-  will-change: transform, opacity;
+  transform: translateZ(0) !important;
+  will-change: transform, opacity !important;
+  /* Riduce texture memory */
+  backface-visibility: hidden !important;
+  perspective: 1000px !important;
 }
 
-/* Riduci complessità durante scroll */
-@media (prefers-reduced-motion: no-preference) {
-  .scrolling .motion-safe\\:animate-pulse {
-    animation: none !important;
-  }
-  
-  .scrolling .motion-safe\\:animate-bounce {
-    animation: none !important;
-  }
-  
-  .scrolling .motion-safe\\:animate-spin {
-    animation: none !important;
-  }
+/* Ultra-optimized scroll per mouse wheel */
+::-webkit-scrollbar {
+  /* Hardware accelerated scrollbar ultra-veloce */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Performance boost per tutti gli elementi durante scroll */
+.scrolling body * {
+  /* Disabilita complex filters durante scroll */
+  filter: none !important;
+  backdrop-filter: none !important;
+  /* Riduce complessità visuale */
+  text-shadow: none !important;
+  box-shadow: none !important;
 }

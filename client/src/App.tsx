@@ -29,9 +29,9 @@ function App() {
   // Initialize smooth scrolling with Lenis
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 0.6, // Ancora più veloce
-      easing: (t: number) => t, // Linear per massima performance
-      wheelMultiplier: 2, // Più responsivo
+      duration: 0.3, // Ancora più veloce per scroll immediato
+      easing: (t: number) => t, // Linear per zero lag
+      wheelMultiplier: 3, // Molto più responsivo
     });
 
     let isScrolling = false;
@@ -48,7 +48,7 @@ function App() {
       scrollTimeout = setTimeout(() => {
         document.body.classList.remove('scrolling');
         isScrolling = false;
-      }, 150); // Riabilita animazioni dopo 150ms di inattività
+      }, 100); // Riabilita ancora più velocemente
     });
 
     function raf(time: number) {
@@ -56,19 +56,8 @@ function App() {
       requestAnimationFrame(raf);
     }
 
-    // Usa scheduler con priorità alta per scroll fluido
-    const startRAF = () => {
-      if ('scheduler' in window && 'postTask' in window.scheduler) {
-        // Usa scheduler API per priorità alta
-        window.scheduler.postTask(() => {
-          requestAnimationFrame(raf);
-        }, { priority: 'user-blocking' });
-      } else {
-        requestAnimationFrame(raf);
-      }
-    };
-
-    startRAF();
+    // RAF ottimizzato senza scheduler API per evitare errori
+    requestAnimationFrame(raf);
 
     // Recupera preferenza tema e applica classe
     fetch('/api/user/preferences')
