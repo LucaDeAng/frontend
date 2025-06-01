@@ -17,7 +17,7 @@ export default function CommunityNewsletter() {
     if (!email || !email.includes('@')) {
       toast({
         title: "Errore",
-        description: "Inserisci un indirizzo email valido.",
+        description: "Per favore inserisci un indirizzo email valido.",
         variant: "destructive"
       });
       return;
@@ -33,7 +33,15 @@ export default function CommunityNewsletter() {
       });
       
       if (res.status === 409) {
-        // Email già iscritta
+        // Email già iscritta - Analytics event
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'newsletter_duplicate_attempt', {
+            event_category: 'engagement',
+            event_label: 'Newsletter subscription',
+            value: 1
+          });
+        }
+        
         toast({
           title: "Email già iscritta",
           description: "Questa email è già iscritta alla nostra newsletter!",
@@ -48,6 +56,15 @@ export default function CommunityNewsletter() {
         throw new Error(errorData.error || 'Subscription error');
       }
       
+      // Success - Analytics event
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'newsletter_signup_success', {
+          event_category: 'conversion',
+          event_label: 'Newsletter subscription',
+          value: 1
+        });
+      }
+      
       setIsSuccess(true);
       toast({
         title: "Iscrizione completata!",
@@ -60,6 +77,16 @@ export default function CommunityNewsletter() {
       }, 5000);
     } catch (error) {
       console.error('Newsletter subscription error:', error);
+      
+      // Error - Analytics event
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'newsletter_signup_error', {
+          event_category: 'error',
+          event_label: 'Newsletter subscription',
+          value: 1
+        });
+      }
+      
       toast({
         title: "Errore",
         description: "Si è verificato un errore durante l'iscrizione. Riprova più tardi.",
