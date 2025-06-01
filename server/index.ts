@@ -17,8 +17,47 @@ import fs from 'fs';
 const app = express();
 
 // Configurazione CORS
+const allowedOrigins = [
+  'http://localhost:3000', 
+  'http://127.0.0.1:3000', 
+  'http://localhost:5000', 
+  'http://127.0.0.1:5000',
+  'http://localhost:3001',
+  'http://127.0.0.1:3001'
+];
+
+// Aggiungi domini di produzione se disponibili
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
+
+// Per Render, permetti tutti i domini *.onrender.com in produzione
+if (process.env.NODE_ENV === 'production') {
+  allowedOrigins.push(/https:\/\/.*\.onrender\.com$/);
+}
+
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:5000', 'http://127.0.0.1:5000'],
+  origin: (origin, callback) => {
+    // Permetti richieste senza origin (es. app mobile, Postman)
+    if (!origin) return callback(null, true);
+    
+    // Controlla se l'origin è nella lista degli allowedOrigins
+    const isAllowed = allowedOrigins.some(allowedOrigin => {
+      if (typeof allowedOrigin === 'string') {
+        return origin === allowedOrigin;
+      } else if (allowedOrigin instanceof RegExp) {
+        return allowedOrigin.test(origin);
+      }
+      return false;
+    });
+    
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      console.log(`🚫 Origin non consentito: ${origin}`);
+      callback(new Error('Non consentito da CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
