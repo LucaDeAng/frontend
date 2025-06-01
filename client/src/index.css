@@ -332,16 +332,23 @@ html {
   color-scheme: dark;
   scroll-behavior: smooth;
   overflow-x: hidden;
+  overscroll-behavior: none;
 }
 
 body {
   overflow-x: hidden;
   scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
 }
 
 * {
   scrollbar-width: thin;
   scrollbar-color: hsl(var(--primary)) hsl(var(--background));
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000;
+  perspective: 1000;
 }
 
 /* Webkit scrollbars */
@@ -703,12 +710,46 @@ body {
 /* Aggiungo le regole per lo scrolling fluido */
 html {
   scroll-behavior: smooth;
+  /* Ottimizzazione per scroll più fluido */
+  overflow-x: hidden;
+  overscroll-behavior: none;
 }
 
 .scroll-container, body {
   -webkit-overflow-scrolling: touch;
+  /* Migliore supporto per trackpad */
+  overscroll-behavior-y: none;
 }
 
 header, footer {
   will-change: transform;
+}
+
+/* Ottimizzazioni aggiuntive per scroll fluido */
+* {
+  /* Migliore performance per scroll con molti elementi */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000;
+  perspective: 1000;
+}
+
+/* Ottimizzazione per dispositivi touch */
+@media (hover: none) and (pointer: coarse) {
+  body {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+}
+
+/* Miglioramento specifico per mouse wheel */
+:root {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--primary), 0.8) transparent;
+}
+
+/* Fix per conflitti con Framer Motion durante lo scroll */
+[data-scroll-locked] {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
 }

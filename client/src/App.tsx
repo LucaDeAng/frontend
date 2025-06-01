@@ -29,14 +29,16 @@ function App() {
   // Initialize smooth scrolling with Lenis
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      duration: 0.8,
+      easing: (t: number) => 1 - Math.pow(1 - t, 3), // Cubic ease-out più fluido
       gestureDirection: 'vertical',
       smooth: true,
-      mouseMultiplier: 1,
+      mouseMultiplier: 1.5, // Aumentato per scroll più responsivo
       smoothTouch: false,
       touchMultiplier: 2,
       infinite: false,
+      wheelMultiplier: 1.2, // Aggiunto per migliorare la responsività della rotellina
+      normalizeWheel: true, // Normalizza le differenze tra browser
     });
 
     function raf(time: number) {
