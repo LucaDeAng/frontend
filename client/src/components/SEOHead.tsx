@@ -16,8 +16,8 @@ interface SEOHeadProps {
 }
 
 export function SEOHead({
-  title = "AI Hub - Il Tuo Portale per l'Intelligenza Artificiale",
-  description = "Esplora il futuro dell'AI con AI Hub: articoli, guide pratiche, insights e risorse per professionisti e appassionati di intelligenza artificiale.",
+  title = "AI Hub - Your Gateway to Artificial Intelligence",
+  description = "Explore the future of AI with AI Hub: articles, practical guides, insights and resources for professionals and AI enthusiasts.",
   image = "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=630&q=80",
   url = "https://genai4business.com",
   type = "website",
@@ -39,7 +39,7 @@ export function SEOHead({
       <meta property="og:url" content={url} />
       <meta property="og:type" content={type} />
       <meta property="og:site_name" content="AI Hub" />
-      <meta property="og:locale" content="it_IT" />
+      <meta property="og:locale" content="en_US" />
       
       {/* Twitter Card Meta Tags */}
       <meta name="twitter:card" content="summary_large_image" />

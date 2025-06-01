@@ -11,10 +11,10 @@ export default function Home() {
   return (
     <>
       <Helmet>
-        <title>AI Hub | Artificial Intelligence Resources</title>
-        <meta name="description" content="Explore our educational resources on AI, including articles, prompts, and tools to help you leverage artificial intelligence effectively." />
-        <meta property="og:title" content="AI Hub | Artificial Intelligence Resources" />
-        <meta property="og:description" content="Explore our educational resources on AI, including articles, prompts, and tools to help you leverage artificial intelligence effectively." />
+        <title>AI Hub | Artificial Intelligence Business Solutions</title>
+        <meta name="description" content="Transform your business with cutting-edge AI solutions. Expert consulting, strategy, and implementation for generative AI and machine learning technologies." />
+        <meta property="og:title" content="AI Hub | Artificial Intelligence Business Solutions" />
+        <meta property="og:description" content="Transform your business with cutting-edge AI solutions. Expert consulting, strategy, and implementation for generative AI and machine learning technologies." />
         <meta property="og:type" content="website" />
       </Helmet>
       
@@ -47,7 +47,7 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
-                Turning AI Vision <span className="bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">into Business Impact</span>
+                Transforming AI Vision <span className="bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">into Business Impact</span>
               </motion.h1>
               
               <motion.p 

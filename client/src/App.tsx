@@ -17,7 +17,6 @@ import ScrollProgress from "@/components/ui/scroll-progress";
 import ReadingProgress from "@/components/ui/reading-progress";
 import ParticleBackground from "@/components/ui/particle-background";
 import FluidCursor from "@/components/ui/fluid-cursor";
-import Lenis from "@studio-freight/lenis";
 import AdminLogin from "@/pages/AdminLogin";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import TagPage from "@/pages/tag";
@@ -26,38 +25,27 @@ import PreferencesPage from '@/pages/preferences';
 import Newsletter from '@/pages/admin/Newsletter';
 
 function App() {
-  // Initialize smooth scrolling with Lenis
+  // Native smooth scroll with custom optimizations
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: 0.3, // Ancora più veloce per scroll immediato
-      easing: (t: number) => t, // Linear per zero lag
-      wheelMultiplier: 3, // Molto più responsivo
-    });
-
-    let isScrolling = false;
-    let scrollTimeout: NodeJS.Timeout;
-
-    // Ottimizzazione per disabilitare animazioni durante scroll
-    lenis.on('scroll', () => {
-      if (!isScrolling) {
-        document.body.classList.add('scrolling');
-        isScrolling = true;
-      }
+    // Disabilita scroll a step e implementa scroll fluido nativo
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
       
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        document.body.classList.remove('scrolling');
-        isScrolling = false;
-      }, 100); // Riabilita ancora più velocemente
-    });
+      const delta = e.deltaY;
+      const scrollSpeed = 2; // Velocità scroll personalizzata
+      
+      window.scrollBy({
+        top: delta * scrollSpeed,
+        behavior: 'auto' // Scroll immediato senza smooth nativo
+      });
+    };
 
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-
-    // RAF ottimizzato senza scheduler API per evitare errori
-    requestAnimationFrame(raf);
+    // Ottimizzazioni per scroll fluido
+    document.documentElement.style.scrollBehavior = 'auto';
+    document.body.style.scrollBehavior = 'auto';
+    
+    // Event listener per wheel personalizzato
+    window.addEventListener('wheel', handleWheel, { passive: false });
 
     // Recupera preferenza tema e applica classe
     fetch('/api/user/preferences')
@@ -73,9 +61,9 @@ function App() {
       });
 
     return () => {
-      clearTimeout(scrollTimeout);
-      document.body.classList.remove('scrolling');
-      lenis.destroy();
+      window.removeEventListener('wheel', handleWheel);
+      document.documentElement.style.scrollBehavior = '';
+      document.body.style.scrollBehavior = '';
     };
   }, []);
 
