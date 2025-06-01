@@ -29,14 +29,25 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 // Configurazione multer per usare /tmp in produzione e public/uploads in locale
 const uploadsDir = process.env.NODE_ENV === 'production' ? '/tmp/uploads' : path.join('public', 'uploads');
 
-// Assicuriamoci che la directory esista
+// Assicuriamoci che la directory esista (solo se siamo in grado di crearla)
 try {
   if (!fsSync.existsSync(uploadsDir)) {
+    // In produzione, /tmp/uploads dovrebbe essere sempre creabile
+    // In sviluppo, creiamo public/uploads se possibile
     fsSync.mkdirSync(uploadsDir, { recursive: true });
     console.log(`✅ Directory uploads creata: ${uploadsDir}`);
+  } else {
+    console.log(`📁 Directory uploads già esistente: ${uploadsDir}`);
   }
 } catch (error) {
   console.warn('⚠️ Impossibile creare la directory uploads:', error);
+  
+  // Se in produzione e /tmp/uploads non è creabile, questo è un problema serio
+  if (process.env.NODE_ENV === 'production') {
+    console.error('❌ CRITICO: Impossibile creare directory uploads in produzione');
+  } else {
+    console.warn('⚠️ In sviluppo: uploads potrebbero non funzionare senza la directory');
+  }
 }
 
 // Configurazione multer con DiskStorage personalizzato per Render
@@ -156,106 +167,145 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      console.log('📁 Usando sistema file JSON per iscrizione:', email);
-      
-      // Sistema principale: file JSON (sempre funzionante)
-      const filePath = path.join('content', 'newsletter.json');
-      let emails: string[] = [];
-      
-      // Assicurati che la directory content esista
-      const contentDir = path.join('content');
-      if (!fsSync.existsSync(contentDir)) {
-        fsSync.mkdirSync(contentDir, { recursive: true });
-        console.log('✅ Directory content creata');
-      }
-      
-      // Leggi file esistente
-      try {
-        if (fsSync.existsSync(filePath)) {
-          const data = await fs.readFile(filePath, 'utf-8');
-          emails = JSON.parse(data);
-          console.log('📋 Caricati', emails.length, 'iscritti esistenti');
+      if (process.env.NODE_ENV === 'production') {
+        // PRODUZIONE: Usa database PostgreSQL
+        console.log('🗄️ [PROD] Salvando iscrizione nel database PostgreSQL:', email);
+        
+        try {
+          // Controlla se email già esiste
+          const existingSubscriber = await db.select().from(subscribers).where(eq(subscribers.email, email)).limit(1);
+          
+          if (existingSubscriber.length > 0) {
+            console.log('⚠️ [PROD] Email già iscritta:', email);
+            return res.status(409).json({ error: 'Email già iscritta alla newsletter' });
+          }
+          
+          // Inserisci nuovo iscritto
+          const newSubscriber = await db.insert(subscribers).values({ email }).returning();
+          console.log('✅ [PROD] Iscritto salvato nel database:', email);
+          
+          // Invia email di benvenuto
+          await sendWelcomeEmail(email);
+          
+          return res.status(200).json({ 
+            success: true, 
+            message: 'Iscrizione completata con successo!',
+            email: email
+          });
+          
+        } catch (dbError: any) {
+          console.error('❌ [PROD] Errore database during subscription:', dbError);
+          if (dbError.code === '23505') { // PostgreSQL unique constraint violation
+            return res.status(409).json({ error: 'Email già iscritta alla newsletter' });
+          }
+          return res.status(500).json({ error: 'Errore durante l\'iscrizione al database' });
         }
-      } catch (e) {
-        console.log('⚠️ File newsletter.json non trovato, creo nuovo');
-        emails = [];
-      }
-      
-      // Controlla duplicati
-      if (emails.includes(email)) {
-        console.log('⚠️ Email già iscritta:', email);
-        return res.status(409).json({ error: 'Email già iscritta alla newsletter' });
-      }
-      
-      // Aggiungi nuova email
-      emails.push(email);
-      
-      // Salva nel file
-      await fs.writeFile(filePath, JSON.stringify(emails, null, 2));
-      console.log('✅ Iscritto salvato in newsletter.json:', email);
-
-      // Invia email di benvenuto
-      try {
-        console.log('📮 Configurazione trasporto email...');
-        const transporter = nodemailer.createTransport({
-          host: process.env.SMTP_HOST,
-          port: Number(process.env.SMTP_PORT) || 587,
-          secure: false,
-          auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-          },
-        });
+      } else {
+        // SVILUPPO: Usa file JSON
+        console.log('📁 [DEV] Usando sistema file JSON per iscrizione:', email);
         
-        console.log('📧 Invio email di benvenuto a:', email);
-        const html = `
-          <div style="background: linear-gradient(135deg, #0f172a 0%, #2563eb 100%); padding: 0; min-height: 600px; font-family: Inter, Arial, sans-serif;">
-            <div style="max-width: 600px; margin: 0 auto; background: rgba(30,41,59,0.98); border-radius: 24px; box-shadow: 0 8px 32px rgba(37,99,235,0.15); padding: 40px; position: relative; top: 0;">
-              <div style="text-align:center; margin-bottom:32px;">
-                <img src='https://genai4business.com/logo.png' alt='GenAI4Business Logo' style='height:48px; margin-bottom:16px;' />
-                <h1 style="color: #2563eb; font-size: 32px; font-weight: 800; margin: 32px 0 16px;">Welcome to GenAI4Business!</h1>
-              </div>
-              <div style="color: #f1f5f9; font-size: 18px; line-height: 1.6; margin-bottom: 32px;">
-                <p>Hello and welcome! 🎉<br><br>
-                You've just joined a growing community of enthusiasts, professionals, and students passionate about Generative AI for business.<br><br>
-                <b>What's next?</b><br>
-                - Explore our latest articles, guides, and resources<br>
-                - Get inspired by real-world AI use cases for business<br>
-                - Access exclusive content and updates<br><br>
-                <a href="https://genai4business.com" style="display:inline-block; background:#2563eb; color:#fff; border-radius:8px; padding:14px 32px; font-weight:700; text-decoration:none; font-size:18px; margin-top:16px;">Visit GenAI4Business</a>
-                </p>
-              </div>
-              <div style="text-align: center; color: #94a3b8; font-size: 14px; margin-top: 48px;">
-                You received this email because you subscribed to <b>GenAI4Business</b> newsletter.<br />
-                <a href="mailto:info@genai4business.com?subject=Unsubscribe&body=Please remove ${email} from the newsletter" style="color: #60a5fa; text-decoration: underline;">Unsubscribe</a>
-              </div>
-            </div>
-          </div>
-        `;
+        const filePath = path.join('content', 'newsletter.json');
+        let emails: string[] = [];
         
-        await transporter.sendMail({
-          from: process.env.SMTP_FROM || 'GenAI4Business <no-reply@genai4business.com>',
-          to: email,
-          subject: 'Welcome to GenAI4Business! 🚀',
-          html,
-        });
-        console.log('✅ Email di benvenuto inviata con successo a:', email);
-      } catch (emailError) {
-        console.error('⚠️ Errore invio email (ma iscrizione salvata):', emailError);
-        // Non blocco la risposta - l'iscrizione è comunque avvenuta
-      }
+        // Assicurati che la directory content esista
+        const contentDir = path.join('content');
+        if (!fsSync.existsSync(contentDir)) {
+          fsSync.mkdirSync(contentDir, { recursive: true });
+          console.log('✅ [DEV] Directory content creata');
+        }
+        
+        // Leggi file esistente
+        try {
+          if (fsSync.existsSync(filePath)) {
+            const data = await fs.readFile(filePath, 'utf-8');
+            emails = JSON.parse(data);
+            console.log('📋 [DEV] Caricati', emails.length, 'iscritti esistenti');
+          }
+        } catch (e) {
+          console.log('⚠️ [DEV] File newsletter.json non trovato, creo nuovo');
+          emails = [];
+        }
+        
+        // Controlla duplicati
+        if (emails.includes(email)) {
+          console.log('⚠️ [DEV] Email già iscritta:', email);
+          return res.status(409).json({ error: 'Email già iscritta alla newsletter' });
+        }
+        
+        // Aggiungi nuova email
+        emails.push(email);
+        
+        // Salva nel file
+        await fs.writeFile(filePath, JSON.stringify(emails, null, 2));
+        console.log('✅ [DEV] Iscritto salvato in newsletter.json:', email);
 
-      res.status(200).json({ 
-        success: true, 
-        message: 'Iscrizione completata con successo!',
-        email: email
-      });
-      
+        // Invia email di benvenuto
+        await sendWelcomeEmail(email);
+
+        return res.status(200).json({ 
+          success: true, 
+          message: 'Iscrizione completata con successo!',
+          email: email
+        });
+      }
     } catch (error) {
       console.error('❌ Errore nell\'iscrizione:', error);
       res.status(500).json({ error: 'Errore durante l\'iscrizione' });
     }
   });
+
+  // Funzione helper per inviare email di benvenuto
+  async function sendWelcomeEmail(email: string) {
+    try {
+      console.log('📮 Configurazione trasporto email...');
+      const transporter = nodemailer.createTransporter({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT) || 587,
+        secure: false,
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+      
+      console.log('📧 Invio email di benvenuto a:', email);
+      const html = `
+        <div style="background: linear-gradient(135deg, #0f172a 0%, #2563eb 100%); padding: 0; min-height: 600px; font-family: Inter, Arial, sans-serif;">
+          <div style="max-width: 600px; margin: 0 auto; background: rgba(30,41,59,0.98); border-radius: 24px; box-shadow: 0 8px 32px rgba(37,99,235,0.15); padding: 40px; position: relative; top: 0;">
+            <div style="text-align:center; margin-bottom:32px;">
+              <img src='https://genai4business.com/logo.png' alt='GenAI4Business Logo' style='height:48px; margin-bottom:16px;' />
+              <h1 style="color: #2563eb; font-size: 32px; font-weight: 800; margin: 32px 0 16px;">Welcome to GenAI4Business!</h1>
+            </div>
+            <div style="color: #f1f5f9; font-size: 18px; line-height: 1.6; margin-bottom: 32px;">
+              <p>Hello and welcome! 🎉<br><br>
+              You've just joined a growing community of enthusiasts, professionals, and students passionate about Generative AI for business.<br><br>
+              <b>What's next?</b><br>
+              - Explore our latest articles, guides, and resources<br>
+              - Get inspired by real-world AI use cases for business<br>
+              - Access exclusive content and updates<br><br>
+              <a href="https://genai4business.com" style="display:inline-block; background:#2563eb; color:#fff; border-radius:8px; padding:14px 32px; font-weight:700; text-decoration:none; font-size:18px; margin-top:16px;">Visit GenAI4Business</a>
+              </p>
+            </div>
+            <div style="text-align: center; color: #94a3b8; font-size: 14px; margin-top: 48px;">
+              You received this email because you subscribed to <b>GenAI4Business</b> newsletter.<br />
+              <a href="mailto:info@genai4business.com?subject=Unsubscribe&body=Please remove ${email} from the newsletter" style="color: #60a5fa; text-decoration: underline;">Unsubscribe</a>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      await transporter.sendMail({
+        from: process.env.SMTP_FROM || 'GenAI4Business <no-reply@genai4business.com>',
+        to: email,
+        subject: 'Welcome to GenAI4Business! 🚀',
+        html,
+      });
+      console.log('✅ Email di benvenuto inviata con successo a:', email);
+    } catch (emailError) {
+      console.error('⚠️ Errore invio email (ma iscrizione salvata):', emailError);
+      // Non blocco la risposta - l'iscrizione è comunque avvenuta
+    }
+  }
   
   // Admin API routes for content management
   apiRouter.post("/admin/articles", authMiddleware, adminMiddleware, async (req: Request, res: Response) => {
@@ -719,18 +769,44 @@ ${content}`;
     res.status(201).json(newComment);
   });
 
-  // API per ottenere la lista degli iscritti alla newsletter
+  // API per ottenere la lista degli iscritti alla newsletter (pubblica)
   apiRouter.get('/newsletter-subscribers', async (req: Request, res: Response) => {
-    const filePath = path.join('content', 'newsletter.json');
-    let emails: string[] = [];
     try {
-      const data = await fs.readFile(filePath, 'utf-8');
-      emails = JSON.parse(data);
-    } catch (e) {
-      // Se il file non esiste, emails resta []
+      if (process.env.NODE_ENV === 'production') {
+        // PRODUZIONE: Usa database PostgreSQL
+        console.log('🗄️ [PROD] Caricando iscritti da database per API pubblica');
+        
+        try {
+          const dbSubscribers = await db.select().from(subscribers).orderBy(desc(subscribers.createdAt));
+          const emails = dbSubscribers.map(sub => sub.email);
+          console.log('✅ [PROD] Restituiti', emails.length, 'iscritti da database');
+          return res.json(emails);
+        } catch (dbError) {
+          console.error('❌ [PROD] Errore database API pubblica:', dbError);
+          return res.json([]); // Fallback: array vuoto
+        }
+      } else {
+        // SVILUPPO: Usa file JSON
+        console.log('📁 [DEV] Caricando iscritti da file per API pubblica');
+        
+        const filePath = path.join('content', 'newsletter.json');
+        let emails: string[] = [];
+        
+        try {
+          const data = await fs.readFile(filePath, 'utf-8');
+          emails = JSON.parse(data);
+          console.log('✅ [DEV] Restituiti', emails.length, 'iscritti da file');
+        } catch (e) {
+          console.log('⚠️ [DEV] File non trovato, ritorno array vuoto');
+          emails = [];
+        }
+        
+        return res.json(emails);
+      }
+    } catch (error) {
+      console.error('❌ Errore API pubblica newsletter-subscribers:', error);
+      res.json([]); // Sempre un array, mai errore 500 per API pubblica
     }
-    // Se in futuro vuoi aggiungere la data, qui puoi restituire un array di oggetti { email, date }
-    res.json(emails);
   });
 
   // Nuove API per la gestione della newsletter
@@ -740,29 +816,53 @@ ${content}`;
     try {
       console.log('📋 Richiesta lista iscritti newsletter');
       
-      // Sistema principale: file JSON
-      const filePath = path.join('content', 'newsletter.json');
-      let emails: string[] = [];
-      
-      try {
-        if (fsSync.existsSync(filePath)) {
-          const data = await fs.readFile(filePath, 'utf-8');
-          emails = JSON.parse(data);
-          console.log('✅ Caricati', emails.length, 'iscritti da newsletter.json');
+      if (process.env.NODE_ENV === 'production') {
+        // PRODUZIONE: Usa database PostgreSQL
+        console.log('🗄️ [PROD] Usando database PostgreSQL per iscritti');
+        
+        try {
+          const dbSubscribers = await db.select().from(subscribers).orderBy(desc(subscribers.createdAt));
+          console.log('✅ [PROD] Caricati', dbSubscribers.length, 'iscritti da database');
+          
+          // Converti al formato atteso dal frontend
+          const formattedSubscribers = dbSubscribers.map(sub => ({
+            id: sub.id,
+            email: sub.email,
+            createdAt: sub.createdAt.toISOString()
+          }));
+          
+          return res.json(formattedSubscribers);
+        } catch (dbError) {
+          console.error('❌ [PROD] Errore database:', dbError);
+          return res.status(500).json({ error: 'Errore nel caricamento iscritti dal database' });
         }
-      } catch (e) {
-        console.log('⚠️ Errore lettura newsletter.json:', e);
-        emails = [];
+      } else {
+        // SVILUPPO: Usa file JSON
+        console.log('📁 [DEV] Usando file JSON per iscritti');
+        
+        const filePath = path.join('content', 'newsletter.json');
+        let emails: string[] = [];
+        
+        try {
+          if (fsSync.existsSync(filePath)) {
+            const data = await fs.readFile(filePath, 'utf-8');
+            emails = JSON.parse(data);
+            console.log('✅ [DEV] Caricati', emails.length, 'iscritti da newsletter.json');
+          }
+        } catch (e) {
+          console.log('⚠️ [DEV] Errore lettura newsletter.json:', e);
+          emails = [];
+        }
+        
+        // Converti in formato richiesto dal componente
+        const subscribersData = emails.map((email, index) => ({
+          id: index + 1,
+          email: email,
+          createdAt: new Date().toISOString()
+        }));
+        
+        return res.json(subscribersData);
       }
-      
-      // Converti in formato richiesto dal componente
-      const subscribers = emails.map((email, index) => ({
-        id: index + 1,
-        email: email,
-        createdAt: new Date().toISOString() // Data fittizia per ora
-      }));
-      
-      res.json(subscribers);
     } catch (error) {
       console.error('Errore nel recupero degli iscritti:', error);
       res.status(500).json({ error: 'Errore nel recupero degli iscritti' });
@@ -777,33 +877,55 @@ ${content}`;
       
       console.log('🗑️ Richiesta cancellazione iscritto:', email);
       
-      // Sistema principale: file JSON
-      const filePath = path.join('content', 'newsletter.json');
-      let emails: string[] = [];
-      
-      try {
-        if (fsSync.existsSync(filePath)) {
-          const data = await fs.readFile(filePath, 'utf-8');
-          emails = JSON.parse(data);
+      if (process.env.NODE_ENV === 'production') {
+        // PRODUZIONE: Usa database PostgreSQL
+        console.log('🗄️ [PROD] Cancellando iscritto dal database PostgreSQL:', email);
+        
+        try {
+          const result = await db.delete(subscribers).where(eq(subscribers.email, email)).returning();
+          
+          if (result.length === 0) {
+            return res.status(404).json({ error: 'Iscritto non trovato' });
+          }
+          
+          console.log('✅ [PROD] Iscritto rimosso dal database:', email);
+          return res.json({ success: true });
+          
+        } catch (dbError) {
+          console.error('❌ [PROD] Errore database durante cancellazione:', dbError);
+          return res.status(500).json({ error: 'Errore nella cancellazione dal database' });
         }
-      } catch (e) {
-        console.log('⚠️ Errore lettura newsletter.json:', e);
-        return res.status(500).json({ error: 'Errore nella lettura del file iscritti' });
+      } else {
+        // SVILUPPO: Usa file JSON
+        console.log('📁 [DEV] Cancellando iscritto da file JSON:', email);
+        
+        const filePath = path.join('content', 'newsletter.json');
+        let emails: string[] = [];
+        
+        try {
+          if (fsSync.existsSync(filePath)) {
+            const data = await fs.readFile(filePath, 'utf-8');
+            emails = JSON.parse(data);
+          }
+        } catch (e) {
+          console.log('⚠️ [DEV] Errore lettura newsletter.json:', e);
+          return res.status(500).json({ error: 'Errore nella lettura del file iscritti' });
+        }
+        
+        // Rimuovi l'email
+        const originalLength = emails.length;
+        emails = emails.filter(e => e !== email);
+        
+        if (emails.length === originalLength) {
+          return res.status(404).json({ error: 'Iscritto non trovato' });
+        }
+        
+        // Salva il file aggiornato
+        await fs.writeFile(filePath, JSON.stringify(emails, null, 2));
+        console.log('✅ [DEV] Iscritto rimosso da newsletter.json:', email);
+        
+        return res.json({ success: true });
       }
-      
-      // Rimuovi l'email
-      const originalLength = emails.length;
-      emails = emails.filter(e => e !== email);
-      
-      if (emails.length === originalLength) {
-        return res.status(404).json({ error: 'Iscritto non trovato' });
-      }
-      
-      // Salva il file aggiornato
-      await fs.writeFile(filePath, JSON.stringify(emails, null, 2));
-      console.log('✅ Iscritto rimosso da newsletter.json:', email);
-      
-      res.json({ success: true });
     } catch (error) {
       console.error('Errore nella cancellazione dell\'iscritto:', error);
       res.status(500).json({ error: 'Errore nella cancellazione dell\'iscritto' });
@@ -1284,6 +1406,50 @@ ${content}`;
       res.json(debug);
     } catch (error: any) {
       res.status(500).json({ error: "Debug failed", message: error.message });
+    }
+  });
+
+  // Debug endpoint temporaneo per newsletter (RIMUOVI IN PRODUZIONE)
+  apiRouter.get('/debug/newsletter/subscribers', async (req: Request, res: Response) => {
+    try {
+      console.log('🔍 [DEBUG] Richiesta debug lista iscritti newsletter');
+      
+      // Sistema principale: file JSON
+      const filePath = path.join('content', 'newsletter.json');
+      let emails: string[] = [];
+      
+      try {
+        if (fsSync.existsSync(filePath)) {
+          const data = await fs.readFile(filePath, 'utf-8');
+          emails = JSON.parse(data);
+          console.log('✅ [DEBUG] Caricati', emails.length, 'iscritti da newsletter.json');
+          console.log('📋 [DEBUG] Lista completa:', emails);
+        } else {
+          console.log('❌ [DEBUG] File newsletter.json non trovato');
+        }
+      } catch (e) {
+        console.log('⚠️ [DEBUG] Errore lettura newsletter.json:', e);
+        emails = [];
+      }
+      
+      // Converti in formato richiesto dal componente
+      const subscribers = emails.map((email, index) => ({
+        id: index + 1,
+        email: email,
+        createdAt: new Date().toISOString()
+      }));
+      
+      res.json({
+        debug: true,
+        filePath: filePath,
+        fileExists: fsSync.existsSync(filePath),
+        totalEmails: emails.length,
+        rawEmails: emails,
+        formattedSubscribers: subscribers
+      });
+    } catch (error) {
+      console.error('❌ [DEBUG] Errore nel recupero degli iscritti:', error);
+      res.status(500).json({ error: 'Errore nel recupero degli iscritti', debug: true });
     }
   });
 
