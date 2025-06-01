@@ -29,10 +29,26 @@ function App() {
   // Initialize smooth scrolling with Lenis
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 0.8,
-      easing: (t: number) => 1 - Math.pow(1 - t, 3), // Cubic ease-out più fluido
-      wheelMultiplier: 1.2, // Miglior responsività della rotellina
-      normalizeWheel: true, // Normalizza le differenze tra browser
+      duration: 0.6, // Ancora più veloce
+      easing: (t: number) => t, // Linear per massima performance
+      wheelMultiplier: 2, // Più responsivo
+    });
+
+    let isScrolling = false;
+    let scrollTimeout: NodeJS.Timeout;
+
+    // Ottimizzazione per disabilitare animazioni durante scroll
+    lenis.on('scroll', () => {
+      if (!isScrolling) {
+        document.body.classList.add('scrolling');
+        isScrolling = true;
+      }
+      
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        document.body.classList.remove('scrolling');
+        isScrolling = false;
+      }, 150); // Riabilita animazioni dopo 150ms di inattività
     });
 
     function raf(time: number) {
@@ -40,7 +56,19 @@ function App() {
       requestAnimationFrame(raf);
     }
 
-    requestAnimationFrame(raf);
+    // Usa scheduler con priorità alta per scroll fluido
+    const startRAF = () => {
+      if ('scheduler' in window && 'postTask' in window.scheduler) {
+        // Usa scheduler API per priorità alta
+        window.scheduler.postTask(() => {
+          requestAnimationFrame(raf);
+        }, { priority: 'user-blocking' });
+      } else {
+        requestAnimationFrame(raf);
+      }
+    };
+
+    startRAF();
 
     // Recupera preferenza tema e applica classe
     fetch('/api/user/preferences')
@@ -56,6 +84,8 @@ function App() {
       });
 
     return () => {
+      clearTimeout(scrollTimeout);
+      document.body.classList.remove('scrolling');
       lenis.destroy();
     };
   }, []);
@@ -87,7 +117,7 @@ function App() {
       <EnhancedHeader />
       <Breadcrumb />
       <main className="flex-grow relative z-10">
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="sync" initial={false}>
           <Switch>
             <Route path="/" component={Home} />
             <Route path="/articles" component={Articles} />

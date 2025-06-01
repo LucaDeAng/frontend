@@ -349,11 +349,16 @@ body {
   backface-visibility: hidden;
   -webkit-perspective: 1000;
   perspective: 1000;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 /* Webkit scrollbars */
 ::-webkit-scrollbar {
   width: 8px;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 ::-webkit-scrollbar-track {
@@ -732,6 +737,64 @@ header, footer {
   backface-visibility: hidden;
   -webkit-perspective: 1000;
   perspective: 1000;
+  /* Ottimizzazioni GPU aggressive */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Ottimizzazioni per elementi che si muovono durante lo scroll */
+body, html {
+  /* Scroll hardware accelerated */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+  /* Elimina bounce e migliorare performance */
+  -webkit-transform: translate3d(0,0,0);
+  transform: translate3d(0,0,0);
+  /* Forza layer composition per GPU */
+  will-change: scroll-position;
+}
+
+/* Performance per elementi animati */
+.motion-reduce-false {
+  /* Forza GPU acceleration per tutti gli elementi in movimento */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  /* Riduce paint operations */
+  contain: layout style paint;
+}
+
+/* Ottimizzazioni per immagini e media */
+img, video, iframe {
+  /* GPU acceleration per media */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  /* Riduce reflow durante scroll */
+  will-change: transform;
+  /* Performance image rendering */
+  image-rendering: optimizeSpeed;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+/* Ottimizzazioni specifiche per scroll */
+::-webkit-scrollbar {
+  /* Hardware accelerated scrollbar */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* CSS Containment per performance */
+.scroll-container, main, section, article {
+  /* Limita paint e layout ai contenitori */
+  contain: layout style;
+}
+
+/* Riduce costly operations durante scroll */
+.expensive-operation {
+  /* Evita repaints during scroll */
+  will-change: auto;
+  contain: strict;
 }
 
 /* Ottimizzazione per dispositivi touch */
@@ -752,4 +815,52 @@ header, footer {
 [data-scroll-locked] {
   overflow: hidden !important;
   overscroll-behavior: none !important;
+}
+
+/* Performance ottimizzazioni per scroll real-time */
+.scrolling {
+  /* Disabilita transizioni durante scroll per performance */
+}
+
+.scrolling * {
+  animation-duration: 0.01ms !important;
+  animation-delay: 0.01ms !important;
+  transition-duration: 0.01ms !important;
+  transition-delay: 0.01ms !important;
+}
+
+/* Ottimizzazioni per scroll fluido real-time */
+body.scrolling {
+  /* Disabilita smooth scroll nativo durante Lenis scroll */
+  scroll-behavior: auto;
+}
+
+/* Contenimento per animazioni pesanti */
+.heavy-animation {
+  /* Contenimento per ridurre repaints */
+  contain: layout style paint size;
+  /* Layer isolation per GPU */
+  isolation: isolate;
+}
+
+/* Ottimizzazioni specifiche per componenti animati */
+.framer-motion {
+  /* Forza GPU acceleration per Framer Motion */
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+/* Riduci complessità durante scroll */
+@media (prefers-reduced-motion: no-preference) {
+  .scrolling .motion-safe\\:animate-pulse {
+    animation: none !important;
+  }
+  
+  .scrolling .motion-safe\\:animate-bounce {
+    animation: none !important;
+  }
+  
+  .scrolling .motion-safe\\:animate-spin {
+    animation: none !important;
+  }
 }
