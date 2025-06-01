@@ -26,19 +26,47 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
-// Configurazione multer per usare /tmp invece di public/uploads
+// Configurazione multer per usare /tmp in produzione e public/uploads in locale
 const uploadsDir = process.env.NODE_ENV === 'production' ? '/tmp/uploads' : path.join('public', 'uploads');
 
 // Assicuriamoci che la directory esista
 try {
   if (!fsSync.existsSync(uploadsDir)) {
     fsSync.mkdirSync(uploadsDir, { recursive: true });
+    console.log(`✅ Directory uploads creata: ${uploadsDir}`);
   }
 } catch (error) {
-  console.warn('Impossibile creare la directory uploads:', error);
+  console.warn('⚠️ Impossibile creare la directory uploads:', error);
 }
 
-const upload = multer({ dest: uploadsDir });
+// Configurazione multer con DiskStorage personalizzato per Render
+const multerStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    // Usa sempre la directory uploads configurata
+    cb(null, uploadsDir);
+  },
+  filename: function (req, file, cb) {
+    // Genera un nome univoco per il file
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname);
+    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+  }
+});
+
+const upload = multer({ 
+  storage: multerStorage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB max
+  },
+  fileFilter: function (req, file, cb) {
+    // Solo immagini
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Solo file immagine sono permessi!'));
+    }
+  }
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API routes
