@@ -31,7 +31,6 @@ function App() {
     const lenis = new Lenis({
       duration: 0.8,
       easing: (t: number) => 1 - Math.pow(1 - t, 3), // Cubic ease-out più fluido
-      gestureDirection: 'vertical',
       smooth: true,
       mouseMultiplier: 1.5, // Aumentato per scroll più responsivo
       smoothTouch: false,
