@@ -444,11 +444,13 @@ body {
   margin-top: -10px;
   -webkit-backdrop-filter: invert(1);
   backdrop-filter: invert(1);
-  transition: transform 0.2s ease-out;
+  transition: transform 0.1s ease-out;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .custom-cursor.active {
-  transform: scale(1.5);
+  transform: scale(1.5) translateZ(0);
 }
 
 /* Glitch Animation */

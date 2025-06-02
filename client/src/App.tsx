@@ -32,10 +32,18 @@ function App() {
       e.preventDefault();
       
       const delta = e.deltaY;
-      const scrollSpeed = 2; // Velocità scroll personalizzata
+      const scrollSpeed = 0.8; // Velocità ridotta per maggiore controllo
       
-      window.scrollBy({
-        top: delta * scrollSpeed,
+      // Calcola nuova posizione scroll
+      const currentScroll = window.pageYOffset;
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const newScroll = currentScroll + (delta * scrollSpeed);
+      
+      // Limiti per evitare scroll fuori pagina
+      const clampedScroll = Math.max(0, Math.min(maxScroll, newScroll));
+      
+      window.scrollTo({
+        top: clampedScroll,
         behavior: 'auto' // Scroll immediato senza smooth nativo
       });
     };
