@@ -1,8 +1,11 @@
 import { motion } from 'framer-motion';
 import Container from '@/components/layout/Container';
-import { Rocket, GitBranch, Users, Zap, Calendar, Target, CheckCircle2, Clock, AlertCircle, Brain, Heart } from 'lucide-react';
+import { Rocket, GitBranch, Users, Zap, Calendar, Target, CheckCircle2, Clock, AlertCircle, Brain, Heart, Bolt, Trophy, ArrowRight, Play } from 'lucide-react';
+import { Link } from 'wouter';
 
 export default function BuildInPublic() {
+  console.log('BuildInPublic: Componente caricato correttamente');
+  
   const updates = [
     {
       date: "May 2025",
@@ -104,6 +107,96 @@ export default function BuildInPublic() {
                 Welcome to the transparent side of my work. Here I post real-time updates, prototypes, and take-aways from building this AI Hub—so clients, peers, and curious onlookers can see exactly how strategy becomes shipped software (and sometimes learn from my mis-steps!).
               </p>
             </div>
+
+            {/* Bolt Hackathon Section */}
+            <motion.div
+              className="relative bg-gradient-to-br from-purple-900/20 to-blue-900/20 p-8 rounded-2xl border border-purple-500/30"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+            >
+              <div className="absolute top-4 right-4">
+                <div className="flex items-center gap-2 bg-purple-600/20 px-3 py-1 rounded-full border border-purple-400/30">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                  <span className="text-purple-300 text-sm font-medium">LIVE</span>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4 mb-6">
+                <motion.div 
+                  className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  <Bolt className="w-8 h-8 text-white" />
+                </motion.div>
+                <div>
+                  <h2 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
+                    Bolt Hackathon 2025
+                    <Trophy className="w-6 h-6 text-yellow-500" />
+                  </h2>
+                  <p className="text-purple-300">30 giorni di sviluppo in pubblico</p>
+                </div>
+              </div>
+
+              <p className="text-gray-300 mb-6 text-lg leading-relaxed">
+                Sto partecipando al <a href="https://hackathon.dev/" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 underline">Bolt Hackathon</a> con l'obiettivo di costruire e migliorare AI Hub in 30 giorni. 
+                Ogni giorno condivido progressi, sfide e apprendimenti in tempo reale.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="bg-black/20 p-4 rounded-lg border border-purple-500/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Calendar className="w-5 h-5 text-purple-400" />
+                    <span className="text-purple-300 font-semibold">Durata</span>
+                  </div>
+                  <p className="text-white">30 giorni consecutivi</p>
+                  <p className="text-gray-400 text-sm">Gennaio 2025</p>
+                </div>
+                
+                <div className="bg-black/20 p-4 rounded-lg border border-blue-500/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Target className="w-5 h-5 text-blue-400" />
+                    <span className="text-blue-300 font-semibold">Obiettivo</span>
+                  </div>
+                  <p className="text-white">AI Hub v2.0</p>
+                  <p className="text-gray-400 text-sm">Platform completa</p>
+                </div>
+                
+                <div className="bg-black/20 p-4 rounded-lg border border-green-500/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Users className="w-5 h-5 text-green-400" />
+                    <span className="text-green-300 font-semibold">Community</span>
+                  </div>
+                  <p className="text-white">Open Source</p>
+                  <p className="text-gray-400 text-sm">Tutto pubblico</p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-4">
+                <Link href="/bolt-hackathon">
+                  <motion.button
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Play className="w-4 h-4" />
+                    Segui il Journey
+                    <ArrowRight className="w-4 h-4" />
+                  </motion.button>
+                </Link>
+                
+                <a 
+                  href="https://hackathon.dev/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="bg-zinc-800 hover:bg-zinc-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200 border border-zinc-600"
+                >
+                  <Bolt className="w-4 h-4" />
+                  Bolt Official
+                </a>
+              </div>
+            </motion.div>
 
             {/* Development Timeline */}
             <div>

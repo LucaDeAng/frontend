@@ -6,6 +6,7 @@ import ArticleEditor from './pages/admin/ArticleEditor';
 import Newsletter from './pages/admin/Newsletter';
 import About from './pages/about';
 import BuildInPublic from './pages/build-in-public';
+import BoltHackathon from './pages/bolt-hackathon';
 import VotablePromptPage from './pages/playground';
 
 export default function Routes() {
@@ -18,6 +19,7 @@ export default function Routes() {
       <Route path="/admin/newsletter" component={Newsletter} />
       <Route path="/about" component={About} />
       <Route path="/build-in-public" component={BuildInPublic} />
+      <Route path="/bolt-hackathon" component={BoltHackathon} />
       <Route path="/prompts" component={VotablePromptPage} />
     </Switch>
   );

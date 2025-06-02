@@ -302,6 +302,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Non blocco la risposta - l'iscrizione è comunque avvenuta
     }
   }
+
+  // Funzione helper per inviare email di benvenuto hackathon
+  async function sendHackathonWelcomeEmail(email: string) {
+    try {
+      console.log('📮 Configurazione trasporto email per hackathon...');
+      const transporter = nodemailer.createTransporter({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT) || 587,
+        secure: false,
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+      
+      console.log('📧 Invio email di benvenuto hackathon a:', email);
+      const html = `
+        <div style="background: linear-gradient(135deg, #581c87 0%, #2563eb 100%); padding: 0; min-height: 600px; font-family: Inter, Arial, sans-serif;">
+          <div style="max-width: 600px; margin: 0 auto; background: rgba(30,41,59,0.98); border-radius: 24px; box-shadow: 0 8px 32px rgba(139,69,217,0.15); padding: 40px; position: relative; top: 0;">
+            <div style="text-align:center; margin-bottom:32px;">
+              <div style="width: 80px; height: 80px; margin: 0 auto 16px; background: linear-gradient(135deg, #8b5cf6, #3b82f6); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <span style="color: white; font-size: 32px;">⚡</span>
+              </div>
+              <h1 style="color: #8b5cf6; font-size: 32px; font-weight: 800; margin: 32px 0 16px;">Benvenuto al Bolt Hackathon! ⚡</h1>
+            </div>
+            <div style="color: #f1f5f9; font-size: 18px; line-height: 1.6; margin-bottom: 32px;">
+              <p>Ciao e benvenuto! 🎉<br><br>
+              Ti sei appena iscritto per seguire il mio journey di 30 giorni nel Bolt Hackathon! 🚀<br><br>
+              <b>Cosa riceverai:</b><br>
+              - Aggiornamenti quotidiani sui progressi<br>
+              - Insight su sfide e soluzioni<br>
+              - Code snippets e breakthrough<br>
+              - Dietro le quinte dello sviluppo<br><br>
+              <a href="https://genai4business.com/bolt-hackathon" style="display:inline-block; background: linear-gradient(135deg, #8b5cf6, #3b82f6); color:#fff; border-radius:8px; padding:14px 32px; font-weight:700; text-decoration:none; font-size:18px; margin-top:16px;">Segui il Journey 🏃‍♂️</a>
+              </p>
+            </div>
+            <div style="background: rgba(139,69,217,0.1); border: 1px solid rgba(139,69,217,0.3); border-radius: 12px; padding: 20px; margin: 24px 0;">
+              <h3 style="color: #8b5cf6; margin: 0 0 12px; font-size: 18px;">🎯 Obiettivo del Hackathon</h3>
+              <p style="color: #cbd5e1; margin: 0; font-size: 16px;">
+                Trasformare AI Hub in una piattaforma completa in 30 giorni, documentando ogni step del processo.
+              </p>
+            </div>
+            <div style="text-align: center; color: #94a3b8; font-size: 14px; margin-top: 48px;">
+              Hai ricevuto questa email perché ti sei iscritto agli aggiornamenti del <b>Bolt Hackathon</b>.<br />
+              <a href="mailto:info@genai4business.com?subject=Unsubscribe%20Hackathon&body=Please remove ${email} from the hackathon newsletter" style="color: #8b5cf6; text-decoration: underline;">Disiscrivi</a>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      await transporter.sendMail({
+        from: process.env.SMTP_FROM || 'GenAI4Business Hackathon <no-reply@genai4business.com>',
+        to: email,
+        subject: '⚡ Benvenuto al Bolt Hackathon Journey!',
+        html,
+      });
+      console.log('✅ Email di benvenuto hackathon inviata con successo a:', email);
+    } catch (emailError) {
+      console.error('⚠️ Errore invio email hackathon (ma iscrizione salvata):', emailError);
+      // Non blocco la risposta - l'iscrizione è comunque avvenuta
+    }
+  }
   
   // Admin API routes for content management
   apiRouter.post("/admin/articles", authMiddleware, adminMiddleware, async (req: Request, res: Response) => {
@@ -1461,6 +1523,166 @@ ${content}`;
     } catch (error) {
       console.error('❌ [DEBUG] Errore nel recupero degli iscritti:', error);
       res.status(500).json({ error: 'Errore nel recupero degli iscritti', debug: true });
+    }
+  });
+
+  // Hackathon APIs
+  
+  // Get all hackathon days
+  apiRouter.get("/hackathon/days", async (req: Request, res: Response) => {
+    try {
+      console.log("🔍 [HACKATHON] Richiesta giorni hackathon ricevuta");
+      
+      const hackathonFile = path.join('content', 'hackathon-days.json');
+      
+      try {
+        const data = await fs.readFile(hackathonFile, 'utf-8');
+        const days = JSON.parse(data);
+        console.log("✅ [HACKATHON] Giorni caricati dal file:", days?.length || 0);
+        res.json(days);
+      } catch (fileError) {
+        console.log("📁 [HACKATHON] File non trovato, inizializzo 30 giorni...");
+        
+        // Initialize 30 days of hackathon if file doesn't exist
+        const startDate = new Date('2025-01-01');
+        const hackathonDays = [];
+        
+        for (let i = 0; i < 30; i++) {
+          const currentDate = new Date(startDate);
+          currentDate.setDate(startDate.getDate() + i);
+          
+          hackathonDays.push({
+            day: i + 1,
+            date: currentDate.toLocaleDateString('it-IT'),
+            title: i === 0 ? 'Kickoff - Setup del progetto' : `Giorno ${i + 1}`,
+            description: i === 0 ? 'Configurazione ambiente, planning e obiettivi iniziali' : 'Da pianificare...',
+            achievements: i === 0 ? ['Setup repository', 'Configurazione CI/CD', 'Planning roadmap'] : [],
+            challenges: i === 0 ? ['Definire scope preciso', 'Bilanciare features vs tempo'] : [],
+            techStack: i === 0 ? ['React', 'TypeScript', 'Vite'] : [],
+            status: i === 0 ? 'completed' : 'planned',
+            timeSpent: i === 0 ? 8 : 0,
+            githubCommits: i === 0 ? 12 : 0
+          });
+        }
+        
+        // Save initialized data
+        try {
+          await fs.mkdir(path.dirname(hackathonFile), { recursive: true });
+          await fs.writeFile(hackathonFile, JSON.stringify(hackathonDays, null, 2));
+          console.log("✅ [HACKATHON] Giorni inizializzati e salvati");
+        } catch (saveError) {
+          console.warn("⚠️ [HACKATHON] Impossibile salvare il file iniziale:", saveError);
+        }
+        
+        res.json(hackathonDays);
+      }
+    } catch (error) {
+      console.error("❌ [HACKATHON] Errore nel recupero dei giorni:", error);
+      res.status(500).json({ error: "Errore interno del server" });
+    }
+  });
+
+  // Update a specific hackathon day
+  apiRouter.put("/hackathon/days/:dayNumber", authMiddleware, adminMiddleware, async (req: Request, res: Response) => {
+    try {
+      const { dayNumber } = req.params;
+      const updatedDay = req.body;
+      
+      console.log(`🔄 [HACKATHON] Aggiornamento giorno ${dayNumber}:`, updatedDay);
+      
+      const hackathonFile = path.join('content', 'hackathon-days.json');
+      
+      try {
+        const data = await fs.readFile(hackathonFile, 'utf-8');
+        const days = JSON.parse(data);
+        
+        const dayIndex = parseInt(dayNumber) - 1;
+        if (dayIndex < 0 || dayIndex >= days.length) {
+          return res.status(404).json({ error: "Giorno non trovato" });
+        }
+        
+        // Update the specific day
+        days[dayIndex] = { ...days[dayIndex], ...updatedDay, day: parseInt(dayNumber) };
+        
+        // Save updated data
+        await fs.writeFile(hackathonFile, JSON.stringify(days, null, 2));
+        
+        console.log(`✅ [HACKATHON] Giorno ${dayNumber} aggiornato con successo`);
+        res.json(days[dayIndex]);
+        
+      } catch (fileError) {
+        console.error(`❌ [HACKATHON] Errore nel file per il giorno ${dayNumber}:`, fileError);
+        res.status(404).json({ error: "File dei giorni hackathon non trovato" });
+      }
+    } catch (error) {
+      console.error(`❌ [HACKATHON] Errore nell'aggiornamento del giorno ${req.params.dayNumber}:`, error);
+      res.status(500).json({ error: "Errore interno del server" });
+    }
+  });
+
+  // Subscribe to hackathon newsletter
+  apiRouter.post("/hackathon/subscribe", async (req: Request, res: Response) => {
+    console.log('📧 Richiesta iscrizione newsletter hackathon ricevuta:', req.body);
+    
+    const { email } = req.body;
+    if (!email || !email.includes('@')) {
+      console.log('❌ Email non valida:', email);
+      return res.status(400).json({ error: 'Invalid email' });
+    }
+
+    try {
+      const subscriberFile = path.join('content', 'hackathon-subscribers.json');
+      
+      try {
+        const data = await fs.readFile(subscriberFile, 'utf-8');
+        const subscribers = JSON.parse(data);
+        
+        // Check if email already exists
+        if (subscribers.find((sub: any) => sub.email === email)) {
+          console.log('⚠️ Email già iscritta alla newsletter hackathon:', email);
+          return res.status(409).json({ error: 'Email già iscritta alla newsletter' });
+        }
+        
+        // Add new subscriber
+        subscribers.push({
+          email,
+          subscribedAt: new Date().toISOString(),
+          type: 'hackathon'
+        });
+        
+        await fs.writeFile(subscriberFile, JSON.stringify(subscribers, null, 2));
+        
+      } catch (fileError) {
+        // Create new file if doesn't exist
+        const newSubscribers = [{
+          email,
+          subscribedAt: new Date().toISOString(),
+          type: 'hackathon'
+        }];
+        
+        await fs.mkdir(path.dirname(subscriberFile), { recursive: true });
+        await fs.writeFile(subscriberFile, JSON.stringify(newSubscribers, null, 2));
+      }
+      
+      console.log('✅ Iscritto salvato nella newsletter hackathon:', email);
+      
+      // Send welcome email for hackathon
+      try {
+        await sendHackathonWelcomeEmail(email);
+      } catch (emailError) {
+        console.warn('⚠️ Impossibile inviare email di benvenuto hackathon:', emailError);
+        // Non blocchiamo la risposta se l'email fallisce
+      }
+      
+      res.status(200).json({ 
+        success: true, 
+        message: 'Iscrizione alla newsletter hackathon completata!',
+        email: email
+      });
+      
+    } catch (error) {
+      console.error('❌ Errore durante l\'iscrizione alla newsletter hackathon:', error);
+      res.status(500).json({ error: 'Errore durante l\'iscrizione' });
     }
   });
 

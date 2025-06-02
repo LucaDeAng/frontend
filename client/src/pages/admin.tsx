@@ -18,7 +18,10 @@ import {
   Lightbulb,
   Rocket,
   Bot,
-  Mail
+  Mail,
+  Bolt,
+  Calendar,
+  Clock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -58,7 +61,7 @@ const PROMPT_CATEGORIES = [
 
 export default function AdminDashboard() {
   const { toast } = useToast();
-  const [selectedTab, setSelectedTab] = useState<'articles' | 'create' | 'prompts' | 'newsletter'>('articles');
+  const [selectedTab, setSelectedTab] = useState<'articles' | 'create' | 'prompts' | 'newsletter' | 'hackathon'>('articles');
   const [editingArticle, setEditingArticle] = useState<ArticleMeta | null>(null);
   const [copiedPrompt, setCopiedPrompt] = useState(false);
   
@@ -98,6 +101,11 @@ export default function AdminDashboard() {
   // Query per gli iscritti newsletter
   const { data: newsletterEmails = [], refetch: refetchNewsletter } = useQuery<string[]>({
     queryKey: ['/api/newsletter-subscribers'],
+  });
+  
+  // Query per i giorni dell'hackathon
+  const { data: hackathonDays = [], refetch: refetchHackathon } = useQuery<any[]>({
+    queryKey: ['/api/hackathon/days'],
   });
   
   // Handle form input changes
@@ -395,6 +403,18 @@ export default function AdminDashboard() {
               <div className="flex items-center space-x-2">
                 <Mail className="w-4 h-4" />
                 <span>Newsletter</span>
+              </div>
+            </button>
+            
+            <button 
+              className={`py-3 px-5 font-medium ${
+                selectedTab === 'hackathon' ? 'text-primary border-b-2 border-primary' : 'text-gray-400 hover:text-white'
+              }`}
+              onClick={() => setSelectedTab('hackathon')}
+            >
+              <div className="flex items-center space-x-2">
+                <Calendar className="w-4 h-4" />
+                <span>Hackathon</span>
               </div>
             </button>
           </div>

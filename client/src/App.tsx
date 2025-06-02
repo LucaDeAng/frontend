@@ -16,7 +16,6 @@ import CustomCursor from "@/components/ui/cursor";
 import ScrollProgress from "@/components/ui/scroll-progress";
 import ReadingProgress from "@/components/ui/reading-progress";
 import ParticleBackground from "@/components/ui/particle-background";
-import FluidCursor from "@/components/ui/fluid-cursor";
 import AdminLogin from "@/pages/AdminLogin";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import TagPage from "@/pages/tag";
@@ -57,8 +56,18 @@ function App() {
 
     // Recupera preferenza tema e applica classe
     fetch('/api/user/preferences')
-      .then(res => res.json())
+      .then(res => {
+        console.log('🔍 Response status:', res.status);
+        console.log('🔍 Response headers:', res.headers);
+        console.log('🔍 Response ok:', res.ok);
+        
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
       .then(prefs => {
+        console.log('✅ Preferenze caricate:', prefs);
         if (prefs.theme === 'dark') {
           document.body.classList.add('dark');
           document.body.classList.remove('light');
@@ -66,6 +75,12 @@ function App() {
           document.body.classList.add('light');
           document.body.classList.remove('dark');
         }
+      })
+      .catch(error => {
+        console.warn('Impossibile caricare le preferenze utente, utilizzo tema di default:', error);
+        // Applica tema di default (light) quando la chiamata API fallisce
+        document.body.classList.add('light');
+        document.body.classList.remove('dark');
       });
 
     return () => {
@@ -77,20 +92,8 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-black text-white">
-      {/* Custom cursors */}
+      {/* Custom cursor */}
       <CustomCursor />
-      <FluidCursor 
-        SIM_RESOLUTION={128}
-        DYE_RESOLUTION={1024}
-        DENSITY_DISSIPATION={2.5}
-        VELOCITY_DISSIPATION={1.5}
-        PRESSURE={0.8}
-        CURL={2}
-        SPLAT_RADIUS={0.3}
-        SPLAT_FORCE={4000}
-        SHADING={true}
-        COLOR_UPDATE_SPEED={5}
-      />
       
       {/* Enhanced progress indicators */}
       <ScrollProgress />
