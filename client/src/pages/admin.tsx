@@ -58,6 +58,7 @@ const PROMPT_MODELS = [
 const PROMPT_CATEGORIES = [
   'Business', 'Creatività', 'Programmazione', 'Marketing', 'Ricerca', 'Educazione', 'Altro'
 ];
+const HACKATHON_STATUSES = ['completed', 'in-progress', 'planned'];
 
 export default function AdminDashboard() {
   const { toast } = useToast();
@@ -105,6 +106,15 @@ export default function AdminDashboard() {
   // Query per i giorni dell'hackathon
   const { data: hackathonDays = [], refetch: refetchHackathon } = useQuery<any[]>({
     queryKey: ['/api/hackathon/days'],
+  });
+
+  const [editingHackathonIndex, setEditingHackathonIndex] = useState<number | null>(null);
+  const [hackathonForm, setHackathonForm] = useState({
+    title: '',
+    description: '',
+    status: 'planned',
+    timeSpent: 0,
+    githubCommits: 0,
   });
   
   // Handle form input changes
@@ -343,6 +353,39 @@ export default function AdminDashboard() {
     } else {
       toast({ title: 'Error', description: 'Failed to delete prompt', variant: 'destructive' });
     }
+  };
+
+  // Hackathon handlers
+  const handleEditHackathonDay = (index: number) => {
+    const day = hackathonDays[index];
+    setEditingHackathonIndex(index);
+    setHackathonForm({
+      title: day.title,
+      description: day.description,
+      status: day.status,
+      timeSpent: day.timeSpent || 0,
+      githubCommits: day.githubCommits || 0,
+    });
+  };
+
+  const handleSaveHackathonDay = async (index: number) => {
+    const day = hackathonDays[index];
+    const token = localStorage.getItem('adminToken');
+    if (!token) return;
+    await fetch(`/api/hackathon/days/${day.day}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(hackathonForm),
+    });
+    await refetchHackathon();
+    setEditingHackathonIndex(null);
+  };
+
+  const handleCancelHackathonEdit = () => {
+    setEditingHackathonIndex(null);
   };
   
   return (
@@ -837,6 +880,46 @@ More content here...
                     Open Newsletter Management
                   </Button>
                 </div>
+              </div>
+            )}
+
+            {/* Hackathon Tab */}
+            {selectedTab === 'hackathon' && (
+              <div className="p-6 space-y-4">
+                {hackathonDays.map((day, index) => (
+                  <div key={day.day} className="border-b border-white/10 pb-4">
+                    {editingHackathonIndex === index ? (
+                      <div className="space-y-2">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-400 mb-1">Title</label>
+                          <Input value={hackathonForm.title} onChange={e => setHackathonForm(prev => ({...prev, title: e.target.value}))} className="bg-black/50 border-white/10" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-400 mb-1">Description</label>
+                          <Textarea value={hackathonForm.description} onChange={e => setHackathonForm(prev => ({...prev, description: e.target.value}))} className="bg-black/50 border-white/10" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-400 mb-1">Status</label>
+                          <select value={hackathonForm.status} onChange={e => setHackathonForm(prev => ({...prev, status: e.target.value}))} className="w-full bg-black/50 border border-white/10 rounded px-3 py-2 text-white">
+                            {HACKATHON_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                          </select>
+                        </div>
+                        <div className="flex justify-end gap-2">
+                          <Button variant="outline" className="border-destructive/30 text-destructive hover:bg-destructive/20" onClick={handleCancelHackathonEdit}>Cancel</Button>
+                          <Button className="bg-primary hover:bg-primary/90" onClick={() => handleSaveHackathonDay(index)}><Save className="w-4 h-4 mr-2" />Save</Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h3 className="text-white font-semibold">Day {day.day}: {day.title}</h3>
+                          <p className="text-sm text-gray-400">{day.date} • {day.status}</p>
+                        </div>
+                        <Button variant="outline" className="h-8 border-primary/30 text-primary hover:bg-primary/20" onClick={() => handleEditHackathonDay(index)}><Edit className="w-3.5 h-3.5" /></Button>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             )}
           </div>
