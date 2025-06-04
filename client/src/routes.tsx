@@ -20,7 +20,7 @@ export default function Routes() {
       <Route path="/about" component={About} />
       <Route path="/build-in-public" component={BuildInPublic} />
       <Route path="/bolt-hackathon" component={BoltHackathon} />
-      <Route path="/prompts" component={VotablePromptPage} />
+        <Route path="/playground" component={VotablePromptPage} />
     </Switch>
   );
 } 

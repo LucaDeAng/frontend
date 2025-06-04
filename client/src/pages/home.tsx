@@ -71,7 +71,7 @@ export default function Home() {
                     <span>Browse Articles</span>
                   </Button>
                 </Link>
-                <Link href="/prompts">
+                <Link href="/playground">
                   <Button className="px-6 py-6 border border-white/10 bg-black/40 text-white rounded-lg w-full sm:w-auto">
                     <Bot className="mr-2 h-5 w-5" />
                     <span>AI Prompts</span>
@@ -115,7 +115,7 @@ export default function Home() {
                   title: "AI Prompt Library",
                   description: "A professional collection of optimized prompts for various AI tasks. Ready to use with ChatGPT or other models.",
                   icon: <Brain className="h-16 w-16 text-cyan-400" />,
-                  link: "/prompts"
+                  link: "/playground"
                 },
                 {
                   title: "Build in Public",
