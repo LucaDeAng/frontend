@@ -6,6 +6,7 @@ import { markdownToHtml } from '@/lib/markdown';
 import Container from '@/components/layout/Container';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { LazyImage } from '@/components/ui/lazy-image';
 import { Link } from 'wouter';
 import { Edit } from 'lucide-react';
 
@@ -38,13 +39,11 @@ export default function ArticleContent({ article, isAdmin = false }: ArticleCont
           <header className="mb-10">
             {/* Cover image */}
             {meta.image && (
-              <div className="mb-6 rounded-xl overflow-hidden">
-                <img
+              <div className="mb-6 rounded-xl overflow-hidden" style={{ maxHeight: '320px' }}>
+                <LazyImage
                   src={meta.image}
                   alt={meta.title + ' - illustration'}
                   className="w-full h-64 object-cover rounded-xl border border-primary/20"
-                  loading="lazy"
-                  style={{ maxHeight: '320px' }}
                 />
               </div>
             )}
@@ -86,3 +85,4 @@ export default function ArticleContent({ article, isAdmin = false }: ArticleCont
     </div>
   );
 }
+

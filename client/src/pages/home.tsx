@@ -27,11 +27,13 @@ export default function Home() {
         {/* Hero section with video background */}
         <section className="relative py-8 md:py-12 overflow-hidden bg-black">
           <div className="absolute inset-0 z-0 overflow-hidden">
-            <video 
-              autoPlay 
-              loop 
+            <video
+              autoPlay
+              loop
               muted
               playsInline
+              preload="metadata"
+              poster="https://images.unsplash.com/photo-1498050108023-c5249f4df8bf?auto=format&fit=crop&w=1200&q=60"
               className="w-full h-full object-cover opacity-60"
             >
               <source src="https://player.vimeo.com/external/3163534.sd.mp4" type="video/mp4" />

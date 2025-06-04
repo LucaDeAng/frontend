@@ -6,6 +6,7 @@ import ArticleSearch from '@/components/articles/ArticleSearch';
 import { ArticleMeta } from '@shared/types';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function Articles() {
   const { data: articles, isLoading, error } = useQuery<ArticleMeta[]>({
@@ -52,7 +53,7 @@ export default function Articles() {
             {isLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div key={i} className="h-96 bg-black/30 border border-white/10 animate-pulse rounded-xl"></div>
+                  <Skeleton key={i} className="h-96 rounded-xl border border-white/10" />
                 ))}
               </div>
             ) : error ? (
