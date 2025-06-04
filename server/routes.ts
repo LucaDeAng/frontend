@@ -17,8 +17,12 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
-// Configurazione multer per usare /tmp in produzione e public/uploads in locale
-const uploadsDir = process.env.NODE_ENV === 'production' ? '/tmp/uploads' : path.join('public', 'uploads');
+// Configurazione della directory uploads.
+// Su Render il filesystem dell'app è in sola lettura, quindi usiamo sempre /tmp.
+// Rileviamo l'ambiente Render tramite la variabile d'ambiente RENDER.
+const uploadsDir = (process.env.NODE_ENV === 'production' || process.env.RENDER)
+  ? '/tmp/uploads'
+  : path.join('public', 'uploads');
 
 // Assicuriamoci che la directory esista (solo se siamo in grado di crearla)
 try {

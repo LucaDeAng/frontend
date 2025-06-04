@@ -152,8 +152,11 @@ app.use((req, res, next) => {
 function serveStaticFiles(app: express.Express) {
   const distPath = path.resolve(process.cwd(), "dist/public");
   
-  // Configurazione per servire i file uploads
-  const uploadsDir = process.env.NODE_ENV === 'production' ? '/tmp/uploads' : path.join(process.cwd(), 'public', 'uploads');
+  // Configurazione per servire i file uploads.
+  // Su Render il filesystem è in sola lettura, quindi serviamo i file da /tmp.
+  const uploadsDir = (process.env.NODE_ENV === 'production' || process.env.RENDER)
+    ? '/tmp/uploads'
+    : path.join(process.cwd(), 'public', 'uploads');
   
   // Middleware per servire file uploads
   app.use('/uploads', express.static(uploadsDir));
