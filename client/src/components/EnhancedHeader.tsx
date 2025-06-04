@@ -204,11 +204,12 @@ export default function EnhancedHeader() {
                   {searchOpen ? (
                     <motion.div
                       initial={{ width: 0, opacity: 0 }}
-                      animate={{ width: 360, opacity: 1 }}
+                      animate={{ width: "100%", opacity: 1 }}
                       exit={{ width: 0, opacity: 0 }}
-                      className="absolute right-0 z-50"
+                      className="absolute right-0 z-50 w-full"
+                      style={{ maxWidth: "22.5rem" }}
                     >
-                      <form onSubmit={handleSearch} className="flex items-center bg-zinc-900 border border-primary/30 rounded-lg px-3 py-2 shadow-lg w-80">
+                      <form onSubmit={handleSearch} className="flex items-center bg-zinc-900 border border-primary/30 rounded-lg px-3 py-2 shadow-lg w-full">
                         <Search className="h-4 w-4 text-primary mr-2" />
                         <input
                           ref={searchRef}
@@ -234,7 +235,7 @@ export default function EnhancedHeader() {
                         {/* <button ...>Prompt</button> <button ...>Risorse</button> */}
                       </div>
                       {/* Risultati live */}
-                      <div className="bg-zinc-900 border border-primary/20 rounded-lg mt-2 max-h-80 overflow-y-auto shadow-xl w-80">
+                        <div className="bg-zinc-900 border border-primary/20 rounded-lg mt-2 max-h-80 overflow-y-auto shadow-xl w-full">
                         {searchLoading && <div className="p-4 text-gray-400">Caricamento...</div>}
                         {!searchLoading && searchQuery && searchResults.length === 0 && (
                           <div className="p-4 text-gray-400">Nessun risultato</div>
