@@ -37,7 +37,7 @@ export default function Menu() {
       {/* Desktop menu */}
       <div className="hidden md:flex items-center space-x-1" role="navigation">
         {menuItems.map((item) => (
-          <Link href={item.path} key={item.name}>
+          <Link href={item.path} key={item.name} asChild>
             <a
               className={`relative px-4 py-2 rounded-lg ${
                 location === item.path
@@ -82,6 +82,7 @@ export default function Menu() {
                   href={item.path}
                   key={item.name}
                   onClick={() => setIsMenuOpen(false)}
+                  asChild
                 >
                   <a
                     className={`flex items-center space-x-3 px-2 py-2 rounded-lg ${
