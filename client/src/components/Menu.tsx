@@ -22,6 +22,9 @@ export default function Menu() {
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           className="text-white hover:text-primary-100 transition-colors"
+          aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={isMenuOpen}
+          aria-controls="mobile-navigation"
         >
           {isMenuOpen ? (
             <X className="h-6 w-6" />
@@ -32,14 +35,16 @@ export default function Menu() {
       </div>
 
       {/* Desktop menu */}
-      <div className="hidden md:flex items-center space-x-1">
+      <div className="hidden md:flex items-center space-x-1" role="navigation">
         {menuItems.map((item) => (
           <Link href={item.path} key={item.name}>
-            <a className={`relative px-4 py-2 rounded-lg ${
-              location === item.path 
-                ? 'text-primary' 
-                : 'text-white hover:text-primary/80'
+            <a
+              className={`relative px-4 py-2 rounded-lg ${
+                location === item.path
+                  ? 'text-primary'
+                  : 'text-white hover:text-primary/80'
               }`}
+              aria-current={location === item.path ? 'page' : undefined}
             >
               <div className="flex items-center space-x-2">
                 {item.icon}
@@ -61,7 +66,9 @@ export default function Menu() {
 
       {/* Mobile menu dropdown */}
       {isMenuOpen && (
-        <motion.div 
+        <motion.div
+          id="mobile-navigation"
+          role="menu"
           className="absolute top-16 left-0 right-0 bg-black/95 border-b border-white/10 md:hidden z-50"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -71,16 +78,19 @@ export default function Menu() {
           <div className="container mx-auto px-6 py-4">
             <div className="flex flex-col space-y-3">
               {menuItems.map((item) => (
-                <Link 
-                  href={item.path} 
+                <Link
+                  href={item.path}
                   key={item.name}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <a className={`flex items-center space-x-3 px-2 py-2 rounded-lg ${
-                    location === item.path 
-                      ? 'text-primary bg-primary/10' 
-                      : 'text-gray-300 hover:text-white hover:bg-white/5'
+                  <a
+                    className={`flex items-center space-x-3 px-2 py-2 rounded-lg ${
+                      location === item.path
+                        ? 'text-primary bg-primary/10'
+                        : 'text-gray-300 hover:text-white hover:bg-white/5'
                     }`}
+                    aria-current={location === item.path ? 'page' : undefined}
+                    role="menuitem"
                   >
                     {item.icon}
                     <span>{item.name}</span>

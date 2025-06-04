@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { ArticleMeta } from '@shared/types';
 import { ArrowRight, Calendar, Tag } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { LazyImage } from '@/components/ui/lazy-image';
 
 interface ArticleCardProps {
   article: ArticleMeta;
@@ -40,11 +41,10 @@ export default function ArticleCard({ article }: ArticleCardProps) {
   return (
     <article className="bg-black/30 border border-white/10 rounded-xl overflow-hidden hover:border-primary/30 transition-all duration-300 flex flex-col h-full group">
       <div className="relative overflow-hidden h-48">
-        <img 
-          src={imageUrl} 
-          alt={`${title} - illustration`} 
+        <LazyImage
+          src={imageUrl}
+          alt={`${title} - illustration`}
           className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-          loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-80"></div>
 

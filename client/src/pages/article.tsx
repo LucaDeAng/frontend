@@ -6,6 +6,7 @@ import { Helmet } from 'react-helmet';
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ShareIcon, BookmarkIcon, StarIcon } from '@heroicons/react/24/outline';
+import { Skeleton } from '@/components/ui/skeleton';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import { Link } from 'wouter';
 import Container from '@/components/layout/Container';
@@ -28,18 +29,18 @@ export default function ArticlePage() {
     return (
       <div className="py-20 bg-black">
         <div className="container mx-auto px-6 md:px-8">
-          <div className="max-w-4xl mx-auto">
-            <div className="h-8 bg-white/10 rounded-md w-1/3 mb-4 animate-pulse"></div>
-            <div className="h-16 bg-white/10 rounded-md w-2/3 mb-8 animate-pulse"></div>
-            <div className="space-y-4">
+          <div className="max-w-4xl mx-auto space-y-4">
+            <Skeleton className="h-8 w-1/3" />
+            <Skeleton className="h-16 w-2/3" />
+            <div className="space-y-2">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="h-4 bg-white/10 rounded-md animate-pulse"></div>
+                <Skeleton key={i} className="h-4" />
               ))}
             </div>
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   if (error || !article) {

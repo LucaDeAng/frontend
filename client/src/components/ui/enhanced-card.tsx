@@ -1,6 +1,7 @@
 import { motion, HTMLMotionProps } from 'framer-motion';
 import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
+import { baseCard } from './base-styles';
 
 interface EnhancedCardProps extends HTMLMotionProps<"div"> {
   variant?: 'default' | 'glass' | 'elevated' | 'interactive';
@@ -10,15 +11,15 @@ interface EnhancedCardProps extends HTMLMotionProps<"div"> {
 }
 
 const EnhancedCard = forwardRef<HTMLDivElement, EnhancedCardProps>(
-  ({ 
-    className, 
-    variant = 'default', 
-    depth = 'md', 
-    hover = true, 
-    children, 
-    ...props 
+  ({
+    className,
+    variant = 'default',
+    depth = 'md',
+    hover = true,
+    children,
+    ...props
   }, ref) => {
-    const baseClasses = "rounded-xl border transition-all duration-300";
+    const baseClasses = `${baseCard} duration-300`;
     
     const variants = {
       default: "bg-zinc-900/80 border-primary/20",
