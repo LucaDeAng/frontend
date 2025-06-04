@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRoute } from 'wouter';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, UseQueryOptions } from '@tanstack/react-query';
 import { Article } from '@shared/types';
 import Container from '@/components/layout/Container';
 import { Card, CardContent } from '@/components/ui/card';
@@ -40,7 +40,7 @@ export default function ArticleEditor() {
         });
       }
     }
-  });
+  } as UseQueryOptions<Article>);
 
   // Update article mutation
   const updateArticle = useMutation({
