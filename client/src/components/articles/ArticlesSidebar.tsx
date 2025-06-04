@@ -86,6 +86,8 @@ export default function ArticlesSidebar({ articles, onFilterChange, currentFilte
           <button
             onClick={() => toggleSection('categories')}
             className="flex items-center justify-between w-full text-left mb-3"
+            aria-expanded={expandedSection === 'categories'}
+            aria-controls="sidebar-categories"
           >
             <h4 className="font-semibold text-white">Categories</h4>
             <motion.div
@@ -97,8 +99,9 @@ export default function ArticlesSidebar({ articles, onFilterChange, currentFilte
           </button>
           
           <motion.div
+            id="sidebar-categories"
             initial={false}
-            animate={{ 
+            animate={{
               height: expandedSection === 'categories' ? 'auto' : 0,
               opacity: expandedSection === 'categories' ? 1 : 0
             }}
@@ -116,6 +119,7 @@ export default function ArticlesSidebar({ articles, onFilterChange, currentFilte
                   }`}
                   whileHover={{ x: 4 }}
                   whileTap={{ scale: 0.98 }}
+                  aria-pressed={currentFilters.category === category.id || (category.id === 'all' && !currentFilters.category)}
                 >
                   <div className="flex items-center space-x-3">
                     {category.icon}
@@ -145,6 +149,7 @@ export default function ArticlesSidebar({ articles, onFilterChange, currentFilte
                 }`}
                 whileHover={{ x: 4 }}
                 whileTap={{ scale: 0.98 }}
+                aria-pressed={currentFilters.sortBy === option.id}
               >
                 {option.icon}
                 <span className="font-mono text-sm">{option.name}</span>
@@ -168,6 +173,7 @@ export default function ArticlesSidebar({ articles, onFilterChange, currentFilte
                 }`}
                 whileHover={{ x: 4 }}
                 whileTap={{ scale: 0.98 }}
+                aria-pressed={currentFilters.dateRange === range.id || (range.id === 'all' && !currentFilters.dateRange)}
               >
                 <span className="font-mono text-sm">{range.name}</span>
               </motion.button>

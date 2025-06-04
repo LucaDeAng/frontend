@@ -92,6 +92,9 @@ export default function AdvancedSearch({ isOpen, onClose, onSearch }: AdvancedSe
       {isOpen && (
         <motion.div
           className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="advanced-search-title"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -108,9 +111,10 @@ export default function AdvancedSearch({ isOpen, onClose, onSearch }: AdvancedSe
               {/* Search Header */}
               <div className="glass-card mb-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-2xl font-bold text-white">Advanced Search</h2>
+                  <h2 id="advanced-search-title" className="text-2xl font-bold text-white">Advanced Search</h2>
                   <button
                     onClick={onClose}
+                    aria-label="Close search dialog"
                     className="p-2 hover:bg-white/10 rounded-lg transition-colors"
                   >
                     <X className="h-5 w-5 text-gray-400" />
@@ -125,6 +129,7 @@ export default function AdvancedSearch({ isOpen, onClose, onSearch }: AdvancedSe
                       ref={inputRef}
                       type="text"
                       value={query}
+                      aria-label="Search query"
                       onChange={(e) => {
                         setQuery(e.target.value);
                         setShowSuggestions(e.target.value.length > 0);
