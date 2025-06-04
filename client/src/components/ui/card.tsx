@@ -1,22 +1,28 @@
 import * as React from "react"
+import { motion } from "framer-motion"
 
 import { cn } from "@/lib/utils"
+import { baseCard } from "./base-styles"
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'accent' | 'highlight'
 }
 
 const variants = {
-  default: 'bg-[var(--color-surface)] border border-[var(--color-primary)] shadow-lg rounded-2xl p-6 text-[var(--color-text)]',
-  accent: 'bg-[var(--color-accent)]/10 border border-[var(--color-accent)] shadow-lg rounded-2xl p-6 text-[var(--color-text)]',
-  highlight: 'bg-[var(--color-highlight)]/10 border border-[var(--color-highlight)] shadow-lg rounded-2xl p-6 text-[var(--color-text)]',
+  default: `${baseCard} bg-[var(--color-surface)] border-[var(--color-primary)] shadow-lg rounded-2xl p-6 text-[var(--color-text)]`,
+  accent: `${baseCard} bg-[var(--color-accent)]/10 border-[var(--color-accent)] shadow-lg rounded-2xl p-6 text-[var(--color-text)]`,
+  highlight: `${baseCard} bg-[var(--color-highlight)]/10 border-[var(--color-highlight)] shadow-lg rounded-2xl p-6 text-[var(--color-text)]`,
 }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = 'default', ...props }, ref) => (
-    <div
+    <motion.div
       ref={ref}
       className={cn(variants[variant], className)}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ scale: 1.02 }}
+      transition={{ duration: 0.2 }}
       {...props}
     />
   )

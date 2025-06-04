@@ -1,15 +1,16 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { baseBadge } from "./base-styles"
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: 'primary' | 'accent' | 'highlight' | 'outline';
 }
 
 const variants = {
-  primary: 'bg-[var(--color-primary)] text-white px-3 py-1 rounded-full text-xs font-semibold',
-  accent: 'bg-[var(--color-accent)] text-white px-3 py-1 rounded-full text-xs font-semibold',
-  highlight: 'bg-[var(--color-highlight)] text-black px-3 py-1 rounded-full text-xs font-semibold',
-  outline: 'border border-[var(--color-primary)] text-[var(--color-primary)] px-3 py-1 rounded-full text-xs font-semibold bg-transparent',
+  primary: `${baseBadge} bg-[var(--color-primary)] text-white`,
+  accent: `${baseBadge} bg-[var(--color-accent)] text-white`,
+  highlight: `${baseBadge} bg-[var(--color-highlight)] text-black`,
+  outline: `${baseBadge} border border-[var(--color-primary)] text-[var(--color-primary)] bg-transparent`,
 };
 
 export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
