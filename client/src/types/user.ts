@@ -1,5 +1,5 @@
 export interface UserPreferences {
-  theme: 'light' | 'dark';
+  theme: 'light' | 'dark' | 'neon';
   language: string;
   notifications: boolean;
 }
