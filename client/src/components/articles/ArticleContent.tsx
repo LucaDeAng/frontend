@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'wouter';
 import { Edit } from 'lucide-react';
+import Typography from '@/components/ui/Typography';
 
 interface ArticleContentProps {
   article: Article;
@@ -78,9 +79,9 @@ export default function ArticleContent({ article, isAdmin = false }: ArticleCont
             </h1>
           </header>
         
-          <div className="prose prose-invert max-w-none prose-lg">
+          <Typography>
             <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
-          </div>
+          </Typography>
         </article>
       </Container>
     </div>

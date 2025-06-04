@@ -445,7 +445,7 @@ body {
   }
 
   p {
-    @apply text-base font-mono leading-relaxed text-neutral-400;
+    @apply text-base font-mono leading-relaxed text-neutral-400 mb-4 md:mb-6;
   }
   
   ::selection {
