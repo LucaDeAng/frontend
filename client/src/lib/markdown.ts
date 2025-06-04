@@ -33,8 +33,9 @@ export function extractFrontmatter(markdown: string, slug: string): Article {
     author: data.author || 'AI Hub Team',
     category: data.category || 'Uncategorized',
     slug,
+    tags: data.tags || [],
     ...data
   };
-  
-  return { meta, content };
+
+  return { slug, meta, content };
 }

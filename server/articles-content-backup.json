@@ -1,5 +1,6 @@
 {
   "benvenuto": {
+    "slug": "benvenuto",
     "meta": {
       "slug": "benvenuto",
       "title": "Benvenuto in AI Hub - Il Tuo Portale per l'Intelligenza Artificiale",
@@ -13,6 +14,7 @@
     "content": "# Benvenuto in AI Hub\n\nCiao e benvenuto su **AI Hub**, il tuo portale di riferimento per tutto ciò che riguarda l'intelligenza artificiale! 🚀\n\n## Cosa Troverai Qui\n\nSu AI Hub potrai esplorare:\n\n- **Guide Pratiche**: Tutorial step-by-step per implementare soluzioni AI\n- **Articoli di Approfondimento**: Analisi dettagliate delle ultime tendenze\n- **Case Studies**: Esempi reali di successo nell'implementazione dell'AI\n- **News & Updates**: Le ultime novità dal mondo dell'intelligenza artificiale\n\n## La Nostra Missione\n\nVogliamo rendere l'intelligenza artificiale accessibile a tutti, dai principianti agli esperti, fornendo contenuti di qualità che ti aiutino a:\n\n1. **Comprendere** le tecnologie AI più innovative\n2. **Applicare** l'AI nei tuoi progetti e nella tua azienda\n3. **Restare Aggiornato** sulle ultime tendenze del settore\n\nInizia la tua esplorazione e scopri come l'AI può trasformare il tuo futuro! 🎯"
   },
   "ai-transformation-2025": {
+    "slug": "ai-transformation-2025",
     "meta": {
       "slug": "ai-transformation-2025",
       "title": "The AI Transformation of 2025: From Research Labs to Real-World Impact",
