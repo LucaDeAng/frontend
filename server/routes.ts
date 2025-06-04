@@ -307,7 +307,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   async function sendHackathonWelcomeEmail(email: string) {
     try {
       console.log('📮 Configurazione trasporto email per hackathon...');
-      const transporter = nodemailer.createTransporter({
+      const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: Number(process.env.SMTP_PORT) || 587,
         secure: false,
