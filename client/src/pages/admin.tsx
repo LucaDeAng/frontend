@@ -63,7 +63,6 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const [selectedTab, setSelectedTab] = useState<'articles' | 'create' | 'prompts' | 'newsletter' | 'hackathon'>('articles');
   const [editingArticle, setEditingArticle] = useState<ArticleMeta | null>(null);
-  const [copiedPrompt, setCopiedPrompt] = useState(false);
   
   // Form state for creating/editing articles
   const [formData, setFormData] = useState({
@@ -111,11 +110,22 @@ export default function AdminDashboard() {
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+
+    if (name === 'slug') {
+      const slug = value
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/\s+/g, '-');
+      setFormData(prev => ({ ...prev, slug }));
+      return;
+    }
+
     setFormData(prev => ({ ...prev, [name]: value }));
-    
+
     // Auto-generate slug from title if slug field is empty
     if (name === 'title' && !formData.slug) {
-      const slug = value.toLowerCase()
+      const slug = value
+        .toLowerCase()
         .replace(/[^\w\s-]/g, '')
         .replace(/\s+/g, '-');
       setFormData(prev => ({ ...prev, slug }));
