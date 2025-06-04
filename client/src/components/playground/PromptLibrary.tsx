@@ -403,12 +403,17 @@ export default function PromptLibrary() {
           filteredPrompts.map((prompt, index) => (
             <PromptCard
               key={prompt.id}
+              id={prompt.id}
               title={prompt.title}
               description={prompt.description}
               promptText={prompt.promptText}
               category={prompt.category}
               model={prompt.model}
+              votes={0}
+              comments={[]}
               index={index}
+              onVote={() => {}}
+              onComment={() => {}}
             />
           ))
         ) : (

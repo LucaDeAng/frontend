@@ -107,7 +107,7 @@ app.use((req, res, next) => {
   const server = await registerRoutes(app);
 
   // Setup DRASTICAMENTE SEMPLIFICATO - NO VITE MAI
-  console.log("🚀 Avvio server in modalità simplificata...");
+  console.log("🚀 Avvio server in modalità **semplificata**...");
   console.log(`📍 NODE_ENV: ${process.env.NODE_ENV}`);
   
   // Sempre e solo file statici

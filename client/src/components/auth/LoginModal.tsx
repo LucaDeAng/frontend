@@ -25,7 +25,7 @@ export default function LoginModal({ isOpen, onClose, initialMode = 'login' }: L
 
   const loginMutation = useMutation({
     mutationFn: (data: { email: string; password: string }) =>
-      apiRequest('/api/auth/login', { method: 'POST', body: data }),
+      apiRequest('POST', '/api/auth/login', data),
     onSuccess: (user) => {
       queryClient.setQueryData(['/api/auth/user'], user);
       onClose();
@@ -38,7 +38,7 @@ export default function LoginModal({ isOpen, onClose, initialMode = 'login' }: L
 
   const registerMutation = useMutation({
     mutationFn: (data: { email: string; username: string; password: string; displayName: string }) =>
-      apiRequest('/api/auth/register', { method: 'POST', body: data }),
+      apiRequest('POST', '/api/auth/register', data),
     onSuccess: (user) => {
       queryClient.setQueryData(['/api/auth/user'], user);
       onClose();

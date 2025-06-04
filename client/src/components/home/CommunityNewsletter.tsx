@@ -34,8 +34,8 @@ export default function CommunityNewsletter() {
       
       if (res.status === 409) {
         // Email già iscritta - Analytics event
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'newsletter_duplicate_attempt', {
+        if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+          window.gtag('event', 'newsletter_duplicate_attempt', {
             event_category: 'engagement',
             event_label: 'Newsletter subscription',
             value: 1
@@ -57,8 +57,8 @@ export default function CommunityNewsletter() {
       }
       
       // Success - Analytics event
-      if (typeof gtag !== 'undefined') {
-        gtag('event', 'newsletter_signup_success', {
+      if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+        window.gtag('event', 'newsletter_signup_success', {
           event_category: 'conversion',
           event_label: 'Newsletter subscription',
           value: 1
@@ -79,8 +79,8 @@ export default function CommunityNewsletter() {
       console.error('Newsletter subscription error:', error);
       
       // Error - Analytics event
-      if (typeof gtag !== 'undefined') {
-        gtag('event', 'newsletter_signup_error', {
+      if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+        window.gtag('event', 'newsletter_signup_error', {
           event_category: 'error',
           event_label: 'Newsletter subscription',
           value: 1
