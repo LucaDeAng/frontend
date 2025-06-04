@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Theme } from '@/hooks/use-theme';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Container from '@/components/layout/Container';
 import { Helmet } from 'react-helmet';
@@ -46,7 +47,7 @@ export default function PreferencesPage() {
     },
   });
 
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState<Theme>('light');
   const [emailNotifications, setEmailNotifications] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
   const [success, setSuccess] = useState('');
@@ -106,6 +107,10 @@ export default function PreferencesPage() {
               <label className="flex items-center gap-2">
                 <input type="radio" name="theme" value="dark" checked={theme === 'dark'} onChange={() => setTheme('dark')} />
                 <span>Scuro</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input type="radio" name="theme" value="neon" checked={theme === 'neon'} onChange={() => setTheme('neon')} />
+                <span>Neon</span>
               </label>
             </div>
           </div>
