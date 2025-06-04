@@ -18,6 +18,7 @@ import ReadingProgress from "@/components/ui/reading-progress";
 import ParticleBackground from "@/components/ui/particle-background";
 import AdminLogin from "@/pages/AdminLogin";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import ArticleEditor from "@/pages/admin/ArticleEditor";
 import TagPage from "@/pages/tag";
 import CategoryPage from "@/pages/category";
 import PreferencesPage from '@/pages/preferences';
@@ -126,6 +127,11 @@ function App() {
             <Route path="/admin/newsletter">
               <ProtectedRoute>
                 <Newsletter />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/admin/articles/:slug">
+              <ProtectedRoute>
+                <ArticleEditor />
               </ProtectedRoute>
             </Route>
             <Route path="/tag/:tag" component={TagPage} />
