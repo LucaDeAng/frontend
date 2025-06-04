@@ -24,6 +24,24 @@ const uploadsDir = (process.env.NODE_ENV === 'production' || process.env.RENDER)
   ? '/tmp/uploads'
   : path.join('public', 'uploads');
 
+// Utilità per file newsletter e campagne quando il DB non è configurato
+const isProd = process.env.NODE_ENV === 'production';
+const hasDb = !!process.env.DATABASE_URL;
+const newsletterFilePath = (isProd && !hasDb)
+  ? path.join('/tmp', 'newsletter.json')
+  : path.join('content', 'newsletter.json');
+const newsletterCampaignsPath = (isProd && !hasDb)
+  ? path.join('/tmp', 'newsletter-campaigns.json')
+  : path.join('content', 'newsletter-campaigns.json');
+
+// Percorsi per file Hackathon quando non c'è un database configurato
+const hackathonDaysPath = (isProd && !hasDb)
+  ? path.join('/tmp', 'hackathon-days.json')
+  : path.join('content', 'hackathon-days.json');
+const hackathonSubscribersPath = (isProd && !hasDb)
+  ? path.join('/tmp', 'hackathon-subscribers.json')
+  : path.join('content', 'hackathon-subscribers.json');
+
 // Assicuriamoci che la directory esista (solo se siamo in grado di crearla)
 try {
   if (!fsSync.existsSync(uploadsDir)) {
@@ -204,14 +222,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // SVILUPPO: Usa file JSON
         console.log('📁 [DEV] Usando sistema file JSON per iscrizione:', email);
         
-        const filePath = path.join('content', 'newsletter.json');
+        const filePath = newsletterFilePath;
         let emails: string[] = [];
-        
-        // Assicurati che la directory content esista
-        const contentDir = path.join('content');
-        if (!fsSync.existsSync(contentDir)) {
-          fsSync.mkdirSync(contentDir, { recursive: true });
-          console.log('✅ [DEV] Directory content creata');
+
+        // Assicurati che la directory esista solo se usiamo path locali
+        const dir = path.dirname(filePath);
+        if (!fsSync.existsSync(dir)) {
+          fsSync.mkdirSync(dir, { recursive: true });
+          console.log(`✅ [DEV] Directory creata: ${dir}`);
         }
         
         // Leggi file esistente
@@ -856,7 +874,7 @@ ${content}`;
         // SVILUPPO: Usa file JSON
         console.log('📁 [DEV] Caricando iscritti da file per API pubblica');
         
-        const filePath = path.join('content', 'newsletter.json');
+        const filePath = newsletterFilePath;
         let emails: string[] = [];
         
         try {
@@ -912,7 +930,7 @@ ${content}`;
         // SVILUPPO: Usa file JSON
         console.log('📁 [DEV] Usando file JSON per iscritti');
         
-        const filePath = path.join('content', 'newsletter.json');
+        const filePath = newsletterFilePath;
         let emails: string[] = [];
         
         try {
@@ -976,7 +994,7 @@ ${content}`;
         // SVILUPPO: Usa file JSON
         console.log('📁 [DEV] Cancellando iscritto da file JSON:', email);
         
-        const filePath = path.join('content', 'newsletter.json');
+        const filePath = newsletterFilePath;
         let emails: string[] = [];
         
         try {
@@ -1013,7 +1031,7 @@ ${content}`;
   apiRouter.get('/admin/newsletter/campaigns', authMiddleware, adminMiddleware, async (req: Request, res: Response) => {
     try {
       // Per ora usiamo un file JSON semplice per le campagne
-      const campaignsPath = path.join('content', 'newsletter-campaigns.json');
+      const campaignsPath = newsletterCampaignsPath;
       let campaigns = [];
       
       try {
@@ -1042,7 +1060,7 @@ ${content}`;
         return res.status(400).json({ error: 'Subject e content sono obbligatori' });
       }
 
-      const campaignsPath = path.join('content', 'newsletter-campaigns.json');
+      const campaignsPath = newsletterCampaignsPath;
       let campaigns = [];
       
       try {
@@ -1084,7 +1102,7 @@ ${content}`;
       console.log('🚀 [CAMPAIGN] Avvio invio campagna:', campaignId);
 
       // Carica campagne
-      const campaignsPath = path.join('content', 'newsletter-campaigns.json');
+      const campaignsPath = newsletterCampaignsPath;
       let campaigns = [];
       
       try {
@@ -1108,7 +1126,7 @@ ${content}`;
       console.log('📧 [CAMPAIGN] Campagna trovata:', campaign.subject);
       
       // Carica subscribers
-      const subscribersPath = path.join('content', 'newsletter.json');
+      const subscribersPath = newsletterFilePath;
       let emails: string[] = [];
       
       try {
@@ -1278,7 +1296,7 @@ ${content}`;
       console.log('🔄 [CAMPAIGN] Reset campagna:', campaignId);
 
       // Carica campagne
-      const campaignsPath = path.join('content', 'newsletter-campaigns.json');
+      const campaignsPath = newsletterCampaignsPath;
       let campaigns = [];
       
       try {
@@ -1333,7 +1351,7 @@ ${content}`;
   apiRouter.get('/admin/newsletter/stats', authMiddleware, adminMiddleware, async (req: Request, res: Response) => {
     try {
       // Conta iscritti
-      const subscribersPath = path.join('content', 'newsletter.json');
+      const subscribersPath = newsletterFilePath;
       let emails: string[] = [];
       
       try {
@@ -1346,7 +1364,7 @@ ${content}`;
       }
 
       // Conta campagne
-      const campaignsPath = path.join('content', 'newsletter-campaigns.json');
+      const campaignsPath = newsletterCampaignsPath;
       let campaigns = [];
       
       try {
@@ -1492,7 +1510,7 @@ ${content}`;
       console.log('🔍 [DEBUG] Richiesta debug lista iscritti newsletter');
       
       // Sistema principale: file JSON
-      const filePath = path.join('content', 'newsletter.json');
+      const filePath = newsletterFilePath;
       let emails: string[] = [];
       
       try {
@@ -1537,7 +1555,7 @@ ${content}`;
     try {
       console.log("🔍 [HACKATHON] Richiesta giorni hackathon ricevuta");
       
-      const hackathonFile = path.join('content', 'hackathon-days.json');
+      const hackathonFile = hackathonDaysPath;
       
       try {
         const data = await fs.readFile(hackathonFile, 'utf-8');
@@ -1594,7 +1612,7 @@ ${content}`;
       
       console.log(`🔄 [HACKATHON] Aggiornamento giorno ${dayNumber}:`, updatedDay);
       
-      const hackathonFile = path.join('content', 'hackathon-days.json');
+      const hackathonFile = hackathonDaysPath;
       
       try {
         const data = await fs.readFile(hackathonFile, 'utf-8');
@@ -1635,7 +1653,7 @@ ${content}`;
     }
 
     try {
-      const subscriberFile = path.join('content', 'hackathon-subscribers.json');
+      const subscriberFile = hackathonSubscribersPath;
       
       try {
         const data = await fs.readFile(subscriberFile, 'utf-8');
