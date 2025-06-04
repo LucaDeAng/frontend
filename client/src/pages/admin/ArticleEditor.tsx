@@ -50,10 +50,12 @@ export default function ArticleEditor() {
   // Update article mutation
   const updateArticle = useMutation({
     mutationFn: async (data: typeof formData) => {
+      const token = localStorage.getItem('adminToken');
       const response = await fetch(`/api/admin/articles/${slug}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
         body: JSON.stringify({
           ...data,
