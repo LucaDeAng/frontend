@@ -3,6 +3,7 @@ import Container from "@/components/layout/Container";
 import { motion } from "framer-motion";
 import { Mail, Github, Linkedin, Twitter, FileText, Briefcase, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Typography from "@/components/ui/Typography";
 
 export default function About() {
   const containerVariants = {
@@ -31,7 +32,7 @@ export default function About() {
       </Helmet>
       
       <section className="py-24">
-        <Container className="px-6 md:px-12">
+        <Container>
           <div className="max-w-4xl mx-auto">
             <motion.div
               variants={containerVariants}
@@ -92,18 +93,18 @@ export default function About() {
               
               <motion.div variants={itemVariants} className="mb-16">
                 <h2 className="text-2xl font-semibold mb-6">La mia missione</h2>
-                <div className="prose dark:prose-invert max-w-none">
+                <Typography>
                   <p className="text-lg">
-                    Aiuto aziende e professionisti ad integrare soluzioni di intelligenza artificiale generativa nei loro processi, 
-                    consentendo loro di aumentare produttività, creatività e valore. Il mio approccio combina competenze tecniche 
+                    Aiuto aziende e professionisti ad integrare soluzioni di intelligenza artificiale generativa nei loro processi,
+                    consentendo loro di aumentare produttività, creatività e valore. Il mio approccio combina competenze tecniche
                     all'avanguardia con una profonda comprensione delle esigenze di business.
                   </p>
                   <p>
-                    Credo fermamente che l'AI generativa rappresenti un punto di svolta per ogni tipo di organizzazione, 
-                    ma solo se implementata con una chiara strategia e con attenzione agli aspetti etici e di governance. 
+                    Credo fermamente che l'AI generativa rappresenti un punto di svolta per ogni tipo di organizzazione,
+                    ma solo se implementata con una chiara strategia e con attenzione agli aspetti etici e di governance.
                     Il mio obiettivo è rendere questa tecnologia accessibile, comprensibile e applicabile in contesti reali.
                   </p>
-                </div>
+                </Typography>
               </motion.div>
               
               <motion.div variants={itemVariants} className="mb-16">

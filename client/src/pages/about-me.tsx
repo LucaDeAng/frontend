@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import Container from '@/components/layout/Container';
 import { Mail, Code, Brain, Lightbulb } from 'lucide-react';
+import Typography from '@/components/ui/Typography';
 
 export default function AboutMe() {
   return (
@@ -39,7 +40,7 @@ export default function AboutMe() {
               <p className="text-primary font-mono">Business & Digital Consultant</p>
             </div>
 
-            <div className="prose prose-invert max-w-none">
+            <Typography>
               <p className="text-gray-300 leading-relaxed text-lg">
                 Welcome to my Digital Strategy Hub! I'm Luca De Angelis, a business and digital consultant who partners with organisations to turn emerging technology—especially artificial intelligence—into measurable growth. Drawing on years of experience at the intersection of strategy, operations, and tech innovation, I translate complex concepts into actionable roadmaps that executives and teams can rally behind.
               </p>
@@ -91,7 +92,7 @@ export default function AboutMe() {
                   lucadeang@hotmail.it
                 </a>
               </div>
-            </div>
+            </Typography>
           </motion.div>
         </motion.article>
       </Container>

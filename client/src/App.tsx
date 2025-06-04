@@ -22,6 +22,8 @@ import TagPage from "@/pages/tag";
 import CategoryPage from "@/pages/category";
 import PreferencesPage from '@/pages/preferences';
 import Newsletter from '@/pages/admin/Newsletter';
+import NavigationSidebar from "@/components/NavigationSidebar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
 function App() {
   // Native smooth scroll with custom optimizations
@@ -91,7 +93,9 @@ function App() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-black text-white">
+    <SidebarProvider>
+      <NavigationSidebar />
+      <SidebarInset className="min-h-screen flex flex-col bg-black text-white">
       {/* Custom cursor */}
       <CustomCursor />
       
@@ -132,7 +136,8 @@ function App() {
         </AnimatePresence>
       </main>
       <EnhancedFooter />
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
 
