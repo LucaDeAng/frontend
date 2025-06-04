@@ -144,9 +144,9 @@ export default function PreferencesPage() {
           <button
             type="submit"
             className="bg-primary text-white px-6 py-2 rounded font-semibold hover:bg-primary-dark"
-            disabled={mutation.isLoading}
+            disabled={mutation.isPending}
           >
-            {mutation.isLoading ? 'Salvataggio...' : 'Salva preferenze'}
+            {mutation.isPending ? 'Salvataggio...' : 'Salva preferenze'}
           </button>
         </form>
       </Container>

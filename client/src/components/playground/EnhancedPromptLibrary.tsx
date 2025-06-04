@@ -452,7 +452,6 @@ export default function EnhancedPromptLibrary() {
   const { isAuthenticated, user } = useAuth();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
-  const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedModel, setSelectedModel] = useState<string>('');

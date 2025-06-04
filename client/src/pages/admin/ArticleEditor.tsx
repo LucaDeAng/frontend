@@ -28,7 +28,12 @@ export default function ArticleEditor() {
   const { data: article, isLoading } = useQuery<Article>({
     queryKey: [`/api/articles/${slug}`],
     enabled: !!slug,
-    onSettled: (data: Article) => {
+    queryFn: async () => {
+      const res = await fetch(`/api/articles/${slug}`);
+      if (!res.ok) throw new Error('Failed to fetch article');
+      return res.json();
+    },
+    onSuccess: (data: Article) => {
       if (data) {
         setFormData({
           title: data.meta.title,
