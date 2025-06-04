@@ -19,3 +19,14 @@ AI Hub è il punto di riferimento italiano per l'intelligenza artificiale. La pi
 ```bash
 git clone <url-repository>
 cd ai-hub
+```
+
+2. Installa le dipendenze
+```bash
+npm install
+```
+
+3. Avvia l'ambiente di sviluppo
+```bash
+npm run dev
+```
