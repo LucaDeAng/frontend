@@ -276,7 +276,9 @@ export default function AdminDashboard() {
     });
     setEditingPrompt(null);
   };
-  const handlePromptInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handlePromptInput = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setPromptForm(prev => ({ ...prev, [name]: value }));
   };
