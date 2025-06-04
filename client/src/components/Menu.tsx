@@ -37,29 +37,29 @@ export default function Menu() {
       {/* Desktop menu */}
       <div className="hidden md:flex items-center space-x-1" role="navigation">
         {menuItems.map((item) => (
-          <Link href={item.path} key={item.name} asChild>
-            <a
-              className={`relative px-4 py-2 rounded-lg ${
-                location === item.path
-                  ? 'text-primary'
-                  : 'text-white hover:text-primary/80'
-              }`}
-              aria-current={location === item.path ? 'page' : undefined}
-            >
-              <div className="flex items-center space-x-2">
-                {item.icon}
-                <span>{item.name}</span>
-              </div>
-              {location === item.path && (
-                <motion.div
-                  layoutId="menu-underline"
-                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.2 }}
-                />
-              )}
-            </a>
+          <Link
+            href={item.path}
+            key={item.name}
+            className={`relative px-4 py-2 rounded-lg ${
+              location === item.path
+                ? 'text-primary'
+                : 'text-white hover:text-primary/80'
+            }`}
+            aria-current={location === item.path ? 'page' : undefined}
+          >
+            <div className="flex items-center space-x-2">
+              {item.icon}
+              <span>{item.name}</span>
+            </div>
+            {location === item.path && (
+              <motion.div
+                layoutId="menu-underline"
+                className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
+              />
+            )}
           </Link>
         ))}
       </div>
@@ -82,20 +82,16 @@ export default function Menu() {
                   href={item.path}
                   key={item.name}
                   onClick={() => setIsMenuOpen(false)}
-                  asChild
+                  className={`flex items-center space-x-3 px-2 py-2 rounded-lg ${
+                    location === item.path
+                      ? 'text-primary bg-primary/10'
+                      : 'text-gray-300 hover:text-white hover:bg-white/5'
+                  }`}
+                  aria-current={location === item.path ? 'page' : undefined}
+                  role="menuitem"
                 >
-                  <a
-                    className={`flex items-center space-x-3 px-2 py-2 rounded-lg ${
-                      location === item.path
-                        ? 'text-primary bg-primary/10'
-                        : 'text-gray-300 hover:text-white hover:bg-white/5'
-                    }`}
-                    aria-current={location === item.path ? 'page' : undefined}
-                    role="menuitem"
-                  >
-                    {item.icon}
-                    <span>{item.name}</span>
-                  </a>
+                  {item.icon}
+                  <span>{item.name}</span>
                 </Link>
               ))}
             </div>
