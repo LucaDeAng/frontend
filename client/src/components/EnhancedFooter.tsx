@@ -79,7 +79,7 @@ export default function EnhancedFooter() {
   return (
     <footer className="bg-black border-t border-primary/20">
       {/* Main Footer Content */}
-      <div className="container mx-auto px-6 md:px-12 py-16">
+      <div className="container mx-auto max-w-screen-xl px-4 sm:px-6 md:px-12 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand Section */}
           <div className="lg:col-span-1">
@@ -228,7 +228,7 @@ export default function EnhancedFooter() {
 
       {/* Bottom Footer */}
       <div className="border-t border-primary/20 bg-black/50">
-        <div className="container mx-auto px-6 md:px-12 py-6">
+        <div className="container mx-auto max-w-screen-xl px-4 sm:px-6 md:px-12 py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between">
             <motion.p 
               className="text-gray-400 text-sm font-mono"
