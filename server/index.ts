@@ -177,18 +177,48 @@ function serveStaticFiles(app: express.Express) {
         let html = await fs.promises.readFile(indexPath, 'utf-8');
         if (article) {
           const articleUrl = `https://genai4business.com/article/${article.slug}`;
-          const imageUrl = article.meta.image || 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=630&q=80';
+          const imageUrl = article.meta.image ||
+            'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=630&q=80';
+
           html = html
             .replace(/<title>.*?<\/title>/, `<title>${article.meta.title} | AI Hub<\/title>`)
-            .replace(/<meta name="description" content=".*?" \/>/, `<meta name="description" content="${article.meta.summary}" />`)
-            .replace(/<meta property="og:title" content=".*?" \/>/, `<meta property="og:title" content="${article.meta.title} | AI Hub" />`)
-            .replace(/<meta property="og:description" content=".*?" \/>/, `<meta property="og:description" content="${article.meta.summary}" />`)
-            .replace(/<meta property="og:image" content=".*?" \/>/, `<meta property="og:image" content="${imageUrl}" />`)
-            .replace(/<meta property="og:url" content=".*?" \/>/, `<meta property="og:url" content="${articleUrl}" />`)
-            .replace(/<meta name="twitter:title" content=".*?" \/>/, `<meta name="twitter:title" content="${article.meta.title} | AI Hub" />`)
-            .replace(/<meta name="twitter:description" content=".*?" \/>/, `<meta name="twitter:description" content="${article.meta.summary}" />`)
-            .replace(/<meta name="twitter:image" content=".*?" \/>/, `<meta name="twitter:image" content="${imageUrl}" />`)
-            .replace(/<link rel="canonical" href=".*?" \/>/, `<link rel="canonical" href="${articleUrl}" />`);
+            .replace(/<meta name="description" content=".*?" \/>/,
+              `<meta name="description" content="${article.meta.summary}" />`)
+            .replace(/<meta property="og:title" content=".*?" \/>/,
+              `<meta property="og:title" content="${article.meta.title} | AI Hub" />`)
+            .replace(/<meta property="og:description" content=".*?" \/>/,
+              `<meta property="og:description" content="${article.meta.summary}" />`)
+            .replace(/<meta property="og:image" content=".*?" \/>/,
+              `<meta property="og:image" content="${imageUrl}" />`)
+            .replace(/<meta property="og:image:width" content=".*?" \/>/,
+              `<meta property="og:image:width" content="1200" />`)
+            .replace(/<meta property="og:image:height" content=".*?" \/>/,
+              `<meta property="og:image:height" content="630" />`)
+            .replace(/<meta property="og:image:alt" content=".*?" \/>/,
+              `<meta property="og:image:alt" content="${article.meta.title} - AI Hub" />`)
+            .replace(/<meta property="og:url" content=".*?" \/>/,
+              `<meta property="og:url" content="${articleUrl}" />`)
+            .replace(/<meta property="og:type" content=".*?" \/>/,
+              `<meta property="og:type" content="article" />`)
+            .replace(/<meta name="twitter:title" content=".*?" \/>/,
+              `<meta name="twitter:title" content="${article.meta.title} | AI Hub" />`)
+            .replace(/<meta name="twitter:description" content=".*?" \/>/,
+              `<meta name="twitter:description" content="${article.meta.summary}" />`)
+            .replace(/<meta name="twitter:image" content=".*?" \/>/,
+              `<meta name="twitter:image" content="${imageUrl}" />`)
+            .replace(/<meta name="twitter:image:alt" content=".*?" \/>/,
+              `<meta name="twitter:image:alt" content="${article.meta.title} - AI Hub" />`)
+            .replace(/<link rel="canonical" href=".*?" \/>/,
+              `<link rel="canonical" href="${articleUrl}" />`);
+
+          const articleMeta = [
+            `<meta property="article:published_time" content="${new Date(article.meta.date).toISOString()}" />`,
+            `<meta property="article:author" content="${article.meta.author}" />`,
+            `<meta property="article:section" content="${article.meta.category}" />`,
+            ...(article.meta.tags || []).map(tag => `<meta property="article:tag" content="${tag}" />`)
+          ].join('\n');
+
+          html = html.replace('</head>', `${articleMeta}\n</head>`);
         }
         res.set('Content-Type', 'text/html');
         res.send(html);
