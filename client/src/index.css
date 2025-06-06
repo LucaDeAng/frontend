@@ -947,7 +947,13 @@ body {
   box-shadow: inset 0 0 5px rgba(59, 130, 246, 0.2);
 }
 
-/* --- CURSORE DI DEFAULT OVUNQUE - REGOLA FINALE --- */
-body, html, *, *::before, *::after {
-  cursor: auto !important;
+/* --- CURSORE DI DEFAULT OVUNQUE --- */
+body,
+html {
+  cursor: auto;
+}
+
+/* Mostra il cursore a forma di mano sui link */
+a {
+  cursor: pointer;
 }
