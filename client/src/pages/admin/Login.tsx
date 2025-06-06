@@ -35,7 +35,8 @@ export default function Login() {
     },
     onSuccess: () => {
       toast.success('Login effettuato con successo');
-      setLocation('/articles');
+      // Redirect to the admin dashboard after a successful login
+      setLocation('/admin');
     },
     onError: () => {
       toast.error('Credenziali non valide');
