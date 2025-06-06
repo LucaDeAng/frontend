@@ -1,4 +1,6 @@
 import { useState } from 'react';
+
+declare const gtag: (...args: any[]) => void;
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';

@@ -38,7 +38,7 @@ const CATEGORIES = Object.keys(CATEGORY_INFO);
 
 export default function PreferencesPage() {
   const queryClient = useQueryClient();
-  const { data: prefs, isLoading } = useQuery({
+  const { data: prefs } = useQuery({
     queryKey: ['user-preferences'],
     queryFn: async () => {
       const res = await fetch('/api/user/preferences');
@@ -144,9 +144,9 @@ export default function PreferencesPage() {
           <button
             type="submit"
             className="bg-primary text-white px-6 py-2 rounded font-semibold hover:bg-primary-dark"
-            disabled={mutation.isLoading}
+            disabled={mutation.isPending}
           >
-            {mutation.isLoading ? 'Salvataggio...' : 'Salva preferenze'}
+            {mutation.isPending ? 'Salvataggio...' : 'Salva preferenze'}
           </button>
         </form>
       </Container>

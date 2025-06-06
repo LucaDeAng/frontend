@@ -35,8 +35,8 @@ interface PromptCardProps {
   promptText: string;
   category: string;
   model: string;
-  votes: number;
-  comments: Comment[];
+  votes?: number;
+  comments?: Comment[];
   index: number;
   onVote: (id: number, increment: boolean) => void;
   onComment: (id: number, comment: string) => void;
@@ -48,12 +48,12 @@ const PromptCard = ({
   description, 
   promptText, 
   category, 
-  model, 
-  votes, 
-  comments,
+  model,
+  votes = 0,
+  comments = [],
   index,
   onVote,
-  onComment 
+  onComment
 }: PromptCardProps) => {
   const [copied, setCopied] = useState(false);
   const [showComments, setShowComments] = useState(false);
@@ -287,8 +287,8 @@ export default function PromptLibrary() {
   ]);
   
   // Extract unique categories and models
-  const uniqueCategories = [...new Set(prompts.map(prompt => prompt.category))];
-  const uniqueModels = [...new Set(prompts.map(prompt => prompt.model))];
+  const uniqueCategories = Array.from(new Set(prompts.map(p => p.category)));
+  const uniqueModels = Array.from(new Set(prompts.map(p => p.model)));
   const categories = ['all', ...uniqueCategories];
   const models = ['all', ...uniqueModels];
   
@@ -403,12 +403,17 @@ export default function PromptLibrary() {
           filteredPrompts.map((prompt, index) => (
             <PromptCard
               key={prompt.id}
+              id={prompt.id}
               title={prompt.title}
               description={prompt.description}
               promptText={prompt.promptText}
               category={prompt.category}
               model={prompt.model}
+              votes={(prompt as any).votes ?? 0}
+              comments={(prompt as any).comments ?? []}
               index={index}
+              onVote={() => {}}
+              onComment={() => {}}
             />
           ))
         ) : (

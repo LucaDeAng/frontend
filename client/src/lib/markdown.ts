@@ -32,9 +32,10 @@ export function extractFrontmatter(markdown: string, slug: string): Article {
     summary: data.summary || '',
     author: data.author || 'AI Hub Team',
     category: data.category || 'Uncategorized',
+    image: data.image,
+    tags: Array.isArray(data.tags) ? data.tags : [],
     slug,
-    ...data
   };
-  
-  return { meta, content };
+
+  return { slug, meta, content };
 }

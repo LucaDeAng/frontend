@@ -137,10 +137,10 @@ export class MemStorage implements IStorage {
       }
 
       // Fallback al backup locale
-      const backup = articlesContentBackup as Record<string, Article>;
+      const backup = articlesContentBackup as Record<string, { meta: ArticleMeta; content: string }>;
       if (backup[slug]) {
         console.log(`📁 [STORAGE] Articolo '${slug}' caricato da backup locale`);
-        return backup[slug];
+        return { slug, ...backup[slug] } as Article;
       }
 
       console.error(`❌ [STORAGE] Articolo '${slug}' non trovato neanche nel backup`);

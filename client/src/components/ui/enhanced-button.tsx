@@ -54,7 +54,7 @@ const EnhancedButton = forwardRef<HTMLButtonElement, EnhancedButtonProps>(
     disabled,
     ...props 
   }, ref) => {
-    const Comp = asChild ? Slot : motion.button;
+    const Comp: any = asChild ? Slot : motion.button;
 
     const buttonContent = (
       <>
