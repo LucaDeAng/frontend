@@ -11,6 +11,7 @@ console.log('🔧 [DEBUG] SMTP_PASS:', process.env.SMTP_PASS ? '✅ Configurato'
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { storage } from "./storage";
+import { ensureUploadsDir, getUploadsDir } from './uploads';
 import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
@@ -154,8 +155,9 @@ function serveStaticFiles(app: express.Express) {
   const distPath = path.resolve(process.cwd(), "dist/public");
   
   // Configurazione per servire i file uploads
-  const uploadsDir = process.env.NODE_ENV === 'production' ? '/tmp/uploads' : path.join(process.cwd(), 'public', 'uploads');
-  
+  ensureUploadsDir();
+  const uploadsDir = getUploadsDir();
+
   // Middleware per servire file uploads
   app.use('/uploads', express.static(uploadsDir));
   console.log(`📁 Servendo file uploads da: ${uploadsDir}`);

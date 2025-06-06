@@ -12,34 +12,15 @@ import multer from 'multer';
 import Fuse from 'fuse.js';
 import fsSync from 'fs';
 import nodemailer from 'nodemailer';
+import { ensureUploadsDir, getUploadsDir } from './uploads';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
-// Configurazione multer per usare /tmp in produzione e public/uploads in locale
-const uploadsDir = process.env.NODE_ENV === 'production' ? '/tmp/uploads' : path.join('public', 'uploads');
-
-// Assicuriamoci che la directory esista (solo se siamo in grado di crearla)
-try {
-  if (!fsSync.existsSync(uploadsDir)) {
-    // In produzione, /tmp/uploads dovrebbe essere sempre creabile
-    // In sviluppo, creiamo public/uploads se possibile
-    fsSync.mkdirSync(uploadsDir, { recursive: true });
-    console.log(`✅ Directory uploads creata: ${uploadsDir}`);
-  } else {
-    console.log(`📁 Directory uploads già esistente: ${uploadsDir}`);
-  }
-} catch (error) {
-  console.warn('⚠️ Impossibile creare la directory uploads:', error);
-  
-  // Se in produzione e /tmp/uploads non è creabile, questo è un problema serio
-  if (process.env.NODE_ENV === 'production') {
-    console.error('❌ CRITICO: Impossibile creare directory uploads in produzione');
-  } else {
-    console.warn('⚠️ In sviluppo: uploads potrebbero non funzionare senza la directory');
-  }
-}
+// Configurazione directory uploads con fallback automatico
+ensureUploadsDir();
+const uploadsDir = getUploadsDir();
 
 // Configurazione multer con DiskStorage personalizzato per Render
 const multerStorage = multer.diskStorage({
