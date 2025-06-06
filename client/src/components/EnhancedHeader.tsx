@@ -132,7 +132,7 @@ export default function EnhancedHeader() {
           : 'py-4 bg-black/90 backdrop-blur-md'
       }`}
     >
-      <div className="container mx-auto px-6 md:px-12">
+      <div className="container mx-auto max-w-screen-xl px-4 sm:px-6 md:px-12">
         <div className="flex items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/">
@@ -306,7 +306,7 @@ export default function EnhancedHeader() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="flex flex-col h-full pt-20 px-6">
+            <div className="flex flex-col h-full pt-20 px-6 overflow-y-auto">
               {/* Mobile Search */}
               <form onSubmit={handleSearch} className="mb-8">
                 <div className="relative">
