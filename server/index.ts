@@ -10,6 +10,7 @@ console.log('🔧 [DEBUG] SMTP_PASS:', process.env.SMTP_PASS ? '✅ Configurato'
 
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
+import { storage } from "./storage";
 import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
@@ -162,6 +163,38 @@ function serveStaticFiles(app: express.Express) {
   console.log(`📁 Tentativo di servire file statici da: ${distPath}`);
   
   if (fs.existsSync(distPath)) {
+    // Route dinamica per le pagine articolo con meta tag OG specifici
+    app.get('/article/:slug', async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const { slug } = req.params;
+        const article = await storage.getArticleBySlug(slug);
+        const indexPath = path.resolve(distPath, 'index.html');
+        if (!fs.existsSync(indexPath)) {
+          return res.status(404).send("Applicazione non trovata. Eseguire 'npm run build' per buildare l'applicazione.");
+        }
+        let html = await fs.promises.readFile(indexPath, 'utf-8');
+        if (article) {
+          const articleUrl = `https://genai4business.com/article/${article.slug}`;
+          const imageUrl = article.meta.image || 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=630&q=80';
+          html = html
+            .replace(/<title>.*?<\/title>/, `<title>${article.meta.title} | AI Hub<\/title>`)
+            .replace(/<meta name="description" content=".*?" \/>/, `<meta name="description" content="${article.meta.summary}" />`)
+            .replace(/<meta property="og:title" content=".*?" \/>/, `<meta property="og:title" content="${article.meta.title} | AI Hub" />`)
+            .replace(/<meta property="og:description" content=".*?" \/>/, `<meta property="og:description" content="${article.meta.summary}" />`)
+            .replace(/<meta property="og:image" content=".*?" \/>/, `<meta property="og:image" content="${imageUrl}" />`)
+            .replace(/<meta property="og:url" content=".*?" \/>/, `<meta property="og:url" content="${articleUrl}" />`)
+            .replace(/<meta name="twitter:title" content=".*?" \/>/, `<meta name="twitter:title" content="${article.meta.title} | AI Hub" />`)
+            .replace(/<meta name="twitter:description" content=".*?" \/>/, `<meta name="twitter:description" content="${article.meta.summary}" />`)
+            .replace(/<meta name="twitter:image" content=".*?" \/>/, `<meta name="twitter:image" content="${imageUrl}" />`)
+            .replace(/<link rel="canonical" href=".*?" \/>/, `<link rel="canonical" href="${articleUrl}" />`);
+        }
+        res.set('Content-Type', 'text/html');
+        res.send(html);
+      } catch (e) {
+        next(e);
+      }
+    });
+
     app.use(express.static(distPath));
     console.log("✅ File statici configurati correttamente");
     
