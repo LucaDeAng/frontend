@@ -42,13 +42,13 @@ export default function AdvancedSearch({ isOpen, onClose, onSearch }: AdvancedSe
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Fetch search suggestions
-  const { data: suggestions = [] } = useQuery({
+  const { data: suggestions = [] } = useQuery<SearchSuggestion[]>({
     queryKey: ['/api/search/suggestions'],
     enabled: showSuggestions && query.length > 1,
   });
 
   // Fetch search results
-  const { data: results = [], isLoading } = useQuery({
+  const { data: results = [], isLoading } = useQuery<SearchResult[]>({
     queryKey: ['/api/search', query, filters],
     enabled: query.length > 2,
   });
