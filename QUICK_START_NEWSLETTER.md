@@ -22,6 +22,7 @@ SMTP_PORT=587
 SMTP_USER=lucadng@gmail.com
 SMTP_PASS=vzchspctcknlhtmy
 SMTP_FROM="AI Hub <no-reply@aihub.dev>"
+NEWSLETTER_SIGNUP_URL=https://genai4business.com/#newsletter
 
 # Environment
 NODE_ENV=development

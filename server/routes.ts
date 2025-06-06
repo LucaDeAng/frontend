@@ -13,6 +13,9 @@ import Fuse from 'fuse.js';
 import fsSync from 'fs';
 import nodemailer from 'nodemailer';
 
+const isProduction = process.env.NODE_ENV === 'production' || !!process.env.DATABASE_URL;
+const NEWSLETTER_SIGNUP_URL = process.env.NEWSLETTER_SIGNUP_URL || 'https://genai4business.com/#newsletter';
+
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
@@ -158,7 +161,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      if (process.env.NODE_ENV === 'production') {
+      if (isProduction) {
         // PRODUZIONE: Usa database PostgreSQL
         console.log('🗄️ [PROD] Salvando iscrizione nel database PostgreSQL:', email);
         
@@ -279,7 +282,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               - Explore our latest articles, guides, and resources<br>
               - Get inspired by real-world AI use cases for business<br>
               - Access exclusive content and updates<br><br>
-              <a href="https://genai4business.com" style="display:inline-block; background:#2563eb; color:#fff; border-radius:8px; padding:14px 32px; font-weight:700; text-decoration:none; font-size:18px; margin-top:16px;">Visit GenAI4Business</a>
+              <a href="${NEWSLETTER_SIGNUP_URL}" style="display:inline-block; background:#2563eb; color:#fff; border-radius:8px; padding:14px 32px; font-weight:700; text-decoration:none; font-size:18px; margin-top:16px;">Confirm your subscription</a>
               </p>
             </div>
             <div style="text-align: center; color: #94a3b8; font-size: 14px; margin-top: 48px;">
@@ -293,7 +296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await transporter.sendMail({
         from: process.env.SMTP_FROM || 'GenAI4Business <no-reply@genai4business.com>',
         to: email,
-        subject: 'Welcome to GenAI4Business! 🚀',
+        subject: 'Confirm your subscription to GenAI4Business 🚀',
         html,
       });
       console.log('✅ Email di benvenuto inviata con successo a:', email);
@@ -858,7 +861,7 @@ ${content}`;
   // API per ottenere la lista degli iscritti alla newsletter (pubblica)
   apiRouter.get('/newsletter-subscribers', async (req: Request, res: Response) => {
     try {
-      if (process.env.NODE_ENV === 'production') {
+      if (isProduction) {
         // PRODUZIONE: Usa database PostgreSQL
         console.log('🗄️ [PROD] Caricando iscritti da database per API pubblica');
         
@@ -907,7 +910,7 @@ ${content}`;
     try {
       console.log('📋 Richiesta lista iscritti newsletter');
       
-      if (process.env.NODE_ENV === 'production') {
+      if (isProduction) {
         // PRODUZIONE: Usa database PostgreSQL
         console.log('🗄️ [PROD] Usando database PostgreSQL per iscritti');
         
@@ -973,7 +976,7 @@ ${content}`;
       
       console.log('🗑️ Richiesta cancellazione iscritto:', email);
       
-      if (process.env.NODE_ENV === 'production') {
+      if (isProduction) {
         // PRODUZIONE: Usa database PostgreSQL
         console.log('🗄️ [PROD] Cancellando iscritto dal database PostgreSQL:', email);
         
@@ -1417,7 +1420,7 @@ ${content}`;
   apiRouter.get("/debug/articles-log", async (req: Request, res: Response) => {
     try {
       // Usa /tmp invece di /app per evitare problemi di permessi su Render
-      const debugFile = process.env.NODE_ENV === 'production' 
+      const debugFile = isProduction
         ? path.join("/tmp", "debug-articles.log")
         : path.join(process.cwd(), "debug-articles.log");
       const content = await fs.readFile(debugFile, "utf-8");
