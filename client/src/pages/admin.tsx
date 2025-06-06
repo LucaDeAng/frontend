@@ -2,18 +2,18 @@ import { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { 
-  Layout, 
-  FileText, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Save, 
-  X, 
-  Eye, 
-  Copy, 
-  CheckCheck, 
-  BrainCircuit, 
+import {
+  Layout,
+  FileText,
+  Plus,
+  Edit,
+  Trash2,
+  Save,
+  X,
+  Eye,
+  Copy,
+  CheckCheck,
+  BrainCircuit,
   Sparkles,
   Lightbulb,
   Rocket,
@@ -21,7 +21,8 @@ import {
   Mail,
   Bolt,
   Calendar,
-  Clock
+  Clock,
+  Bug
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -61,7 +62,7 @@ const PROMPT_CATEGORIES = [
 
 export default function AdminDashboard() {
   const { toast } = useToast();
-  const [selectedTab, setSelectedTab] = useState<'articles' | 'create' | 'prompts' | 'newsletter' | 'hackathon'>('articles');
+  const [selectedTab, setSelectedTab] = useState<'articles' | 'create' | 'prompts' | 'newsletter' | 'hackathon' | 'debug'>('articles');
   const [editingArticle, setEditingArticle] = useState<ArticleMeta | null>(null);
   
   // Form state for creating/editing articles
@@ -105,6 +106,16 @@ export default function AdminDashboard() {
   // Query per i giorni dell'hackathon
   const { data: hackathonDays = [], refetch: refetchHackathon } = useQuery<any[]>({
     queryKey: ['/api/hackathon/days'],
+  });
+
+  // Debug info, loaded only when the tab is active
+  const { data: debugArticles, refetch: refetchDebugArticles } = useQuery<any>({
+    queryKey: ['/api/debug/articles-info'],
+    enabled: selectedTab === 'debug',
+  });
+  const { data: debugNewsletter, refetch: refetchDebugNewsletter } = useQuery<any>({
+    queryKey: ['/api/debug/newsletter/subscribers'],
+    enabled: selectedTab === 'debug',
   });
   
   // Handle form input changes
@@ -418,7 +429,7 @@ export default function AdminDashboard() {
               </div>
             </button>
             
-            <button 
+            <button
               className={`py-3 px-5 font-medium ${
                 selectedTab === 'hackathon' ? 'text-primary border-b-2 border-primary' : 'text-gray-400 hover:text-white'
               }`}
@@ -427,6 +438,17 @@ export default function AdminDashboard() {
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4" />
                 <span>Hackathon</span>
+              </div>
+            </button>
+            <button
+              className={`py-3 px-5 font-medium ${
+                selectedTab === 'debug' ? 'text-primary border-b-2 border-primary' : 'text-gray-400 hover:text-white'
+              }`}
+              onClick={() => setSelectedTab('debug')}
+            >
+              <div className="flex items-center space-x-2">
+                <Bug className="w-4 h-4" />
+                <span>Debug</span>
               </div>
             </button>
           </div>
@@ -837,6 +859,21 @@ More content here...
                     Open Newsletter Management
                   </Button>
                 </div>
+              </div>
+            )}
+
+            {/* Debug Tab */}
+            {selectedTab === 'debug' && (
+              <div className="p-6 space-y-4">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-bold text-white">Debug Info</h2>
+                  <Button className="bg-primary hover:bg-primary/90 text-black" onClick={() => { refetchDebugArticles(); refetchDebugNewsletter(); }}>
+                    Refresh
+                  </Button>
+                </div>
+                <pre className="bg-black/20 border border-white/10 rounded p-4 text-xs overflow-auto">
+{`Articles: ${JSON.stringify(debugArticles, null, 2)}\nNewsletter: ${JSON.stringify(debugNewsletter, null, 2)}`}
+                </pre>
               </div>
             )}
           </div>
