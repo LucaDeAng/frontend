@@ -4,6 +4,8 @@ import path from "path";
 import { Article, ArticleMeta } from "@shared/types";
 import { extractFrontmatter } from "../client/src/lib/markdown";
 import fsSync from 'fs';
+// Import dinamico del database solo se disponibile
+
 
 // Import del backup locale degli articoli
 import articlesBackup from './articles-backup.json';
@@ -19,6 +21,9 @@ export interface IStorage {
   getArticles(): Promise<ArticleMeta[]>;
   getArticleBySlug(slug: string): Promise<Article | undefined>;
   saveEmail(email: string): Promise<void>;
+  saveArticleToDb(data: { slug: string; title: string; summary: string; content: string; author: string; category: string; image?: string; tags?: string[]; date?: string; }): Promise<void>;
+  updateArticleInDb(slug: string, data: { title: string; summary: string; content: string; author: string; category: string; image?: string; tags?: string[]; date?: string; }): Promise<void>;
+  deleteArticleFromDb(slug: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -70,6 +75,31 @@ export class MemStorage implements IStorage {
 
   async getArticles(): Promise<ArticleMeta[]> {
     try {
+      if (process.env.DATABASE_URL) {
+        try {
+          const { db } = await import("./db");
+          const { articles } = await import("@shared/schema");
+          const { desc } = await import("drizzle-orm");
+
+          const rows = await db.select().from(articles).orderBy(desc(articles.date));
+          if (rows.length > 0) {
+            console.log(`✅ [STORAGE] Articoli caricati da database: ${rows.length}`);
+            return rows.map(row => ({
+              slug: row.slug,
+              title: row.title,
+              date: (row.date instanceof Date ? row.date.toISOString() : row.date) as string,
+              summary: row.summary,
+              author: row.author,
+              category: row.category,
+              image: row.featuredImage ?? undefined,
+              tags: row.tags || []
+            }));
+          }
+        } catch (dbErr) {
+          console.warn("⚠️ [STORAGE] Errore DB articoli, fallback a filesystem", dbErr);
+        }
+      }
+
       const contentDir = path.join("content", "articles");
       
       // Prova prima a leggere dalla directory
@@ -123,6 +153,36 @@ export class MemStorage implements IStorage {
 
   async getArticleBySlug(slug: string): Promise<Article | undefined> {
     try {
+      if (process.env.DATABASE_URL) {
+        try {
+          const { db } = await import("./db");
+          const { articles } = await import("@shared/schema");
+          const { eq } = await import("drizzle-orm");
+
+          const rows = await db.select().from(articles).where(eq(articles.slug, slug)).limit(1);
+          if (rows.length > 0) {
+            const row = rows[0];
+            console.log(`✅ [STORAGE] Articolo '${slug}' caricato da database`);
+            return {
+              slug: row.slug,
+              meta: {
+                slug: row.slug,
+                title: row.title,
+                summary: row.summary,
+                author: row.author,
+                category: row.category,
+                date: (row.date instanceof Date ? row.date.toISOString() : row.date) as string,
+                image: row.featuredImage ?? undefined,
+                tags: row.tags || []
+              },
+              content: row.content
+            };
+          }
+        } catch (dbErr) {
+          console.warn(`⚠️ [STORAGE] Errore DB per l'articolo '${slug}', fallback`, dbErr);
+        }
+      }
+
       // Prova prima a leggere dal filesystem
       const filePath = path.join("content", "articles", `${slug}.md`);
       
@@ -163,6 +223,65 @@ export class MemStorage implements IStorage {
     if (!emails.includes(email)) {
       emails.push(email);
       await fs.writeFile(filePath, JSON.stringify(emails, null, 2), "utf-8");
+    }
+  }
+
+  // Metodi per la persistenza degli articoli nel database
+  async saveArticleToDb(data: { slug: string; title: string; summary: string; content: string; author: string; category: string; image?: string; tags?: string[]; date?: string; }) {
+    if (!process.env.DATABASE_URL) return;
+    try {
+      const { db } = await import("./db");
+      const { articles } = await import("@shared/schema");
+      await db.insert(articles).values({
+        slug: data.slug,
+        title: data.title,
+        summary: data.summary,
+        content: data.content,
+        author: data.author,
+        category: data.category,
+        featuredImage: data.image,
+        tags: data.tags ?? [],
+        date: data.date ? new Date(data.date) : new Date(),
+      }).onConflictDoNothing();
+      console.log(`🗄️ [STORAGE] Articolo '${data.slug}' salvato nel database`);
+    } catch (err) {
+      console.error(`⚠️ [STORAGE] Errore salvataggio articolo '${data.slug}' nel database`, err);
+    }
+  }
+
+  async updateArticleInDb(slug: string, data: { title: string; summary: string; content: string; author: string; category: string; image?: string; tags?: string[]; date?: string; }) {
+    if (!process.env.DATABASE_URL) return;
+    try {
+      const { db } = await import("./db");
+      const { articles } = await import("@shared/schema");
+      const { eq } = await import("drizzle-orm");
+      await db.update(articles).set({
+        title: data.title,
+        summary: data.summary,
+        content: data.content,
+        author: data.author,
+        category: data.category,
+        featuredImage: data.image,
+        tags: data.tags ?? [],
+        date: data.date ? new Date(data.date) : new Date(),
+        updatedAt: new Date(),
+      }).where(eq(articles.slug, slug));
+      console.log(`🗄️ [STORAGE] Articolo '${slug}' aggiornato nel database`);
+    } catch (err) {
+      console.error(`⚠️ [STORAGE] Errore aggiornamento articolo '${slug}' nel database`, err);
+    }
+  }
+
+  async deleteArticleFromDb(slug: string) {
+    if (!process.env.DATABASE_URL) return;
+    try {
+      const { db } = await import("./db");
+      const { articles } = await import("@shared/schema");
+      const { eq } = await import("drizzle-orm");
+      await db.delete(articles).where(eq(articles.slug, slug));
+      console.log(`🗄️ [STORAGE] Articolo '${slug}' eliminato dal database`);
+    } catch (err) {
+      console.error(`⚠️ [STORAGE] Errore eliminazione articolo '${slug}' dal database`, err);
     }
   }
 }

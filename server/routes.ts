@@ -397,6 +397,19 @@ ${content}`;
       // Create new article file
       const articlesDir = path.join("content", "articles");
       await fs.writeFile(path.join(articlesDir, `${slug}.md`), articleContent);
+
+      // Salva anche nel database se configurato
+      await storage.saveArticleToDb({
+        slug,
+        title,
+        summary,
+        content,
+        author,
+        category,
+        image,
+        tags,
+        date
+      });
       
       res.status(201).json({ 
         success: true, 
@@ -441,6 +454,18 @@ ${content}`;
       // Update article file
       const articlesDir = path.join("content", "articles");
       await fs.writeFile(path.join(articlesDir, `${slug}.md`), articleContent);
+
+      // Aggiorna anche il database se presente
+      await storage.updateArticleInDb(slug, {
+        title,
+        summary,
+        content,
+        author,
+        category,
+        image,
+        tags,
+        date
+      });
       
       res.json({ 
         success: true, 
@@ -466,6 +491,9 @@ ${content}`;
       // Elimina il file dell'articolo
       const articlesDir = path.join("content", "articles");
       await fs.unlink(path.join(articlesDir, `${slug}.md`));
+
+      // Rimuovi anche dal database se configurato
+      await storage.deleteArticleFromDb(slug);
       
       res.status(200).json({ 
         success: true, 
